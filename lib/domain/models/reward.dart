@@ -1,3 +1,5 @@
+/// Reward domain model.
+/// Represents rewards given for completing topics or quizzes (badges, points, items).
 class Reward {
   final String id;
   final String name;

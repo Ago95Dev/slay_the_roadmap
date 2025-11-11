@@ -1,5 +1,7 @@
 import '../models/roadmap_models.dart';
 
+/// Roadmap service.
+/// Business logic for roadmap operations: loading, updating progress and computing unlocks.
 class RoadmapService {
   Future<List<Topic>> getDartRoadmap() async {
     // Simuliamo un delay di rete

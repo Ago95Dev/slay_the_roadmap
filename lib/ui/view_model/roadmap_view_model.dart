@@ -1,3 +1,6 @@
+/// Roadmap view model.
+/// Provides roadmap data and actions to the UI, exposes state and notifies listeners.
+
 import 'package:flutter/material.dart';
 import '../../domain/models/topic.dart';
 import '../../data/repositories/roadmap_repository.dart';

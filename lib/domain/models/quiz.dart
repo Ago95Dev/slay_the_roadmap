@@ -1,3 +1,5 @@
+/// Quiz domain model.
+/// Models quiz structure: questions, choices, correct answers and metadata.
 class Quiz {
   final String id;
   final String topicId;
@@ -12,6 +14,8 @@ class Quiz {
   });
 }
 
+/// Question domain model.
+/// Models a single question with text, options, correct answer index and selected answer.
 class Question {
   final String text;
   final List<String> options;

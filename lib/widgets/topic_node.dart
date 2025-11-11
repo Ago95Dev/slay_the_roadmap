@@ -1,3 +1,6 @@
+/// Topic node widget.
+/// Visual representation of a single node in the roadmap tree (positioning, connectors).
+
 import 'package:flutter/material.dart';
 import '../models/roadmap_models.dart';
 
