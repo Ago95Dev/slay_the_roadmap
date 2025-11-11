@@ -3,3 +3,4 @@ export 'quiz.dart';
 export 'reward.dart';
 export 'boss_fight.dart';
 export 'player_progress.dart';
+export 'topic_detail.dart';

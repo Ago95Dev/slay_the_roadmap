@@ -1,7 +1,6 @@
 name: slay_the_roadmap
-description: "A gamified learning app for Dart and Flutter roadmap"
+description: "A gamified learning app for roadmap.sh Dart roadmap"
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
@@ -10,17 +9,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
   provider: ^6.1.1
-  shared_preferences: ^2.2.2
-  get_it: ^7.6.4
+  equatable: ^2.0.5
+  url_launcher: ^6.1.11
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/images/
+

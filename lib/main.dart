@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart';
+import 'package:provider/provider.dart';
+import 'ui/screens/roadmap_screen.dart';
+import 'ui/view_models/roadmap_view_model.dart';
+import 'data/repositories/roadmap_repository.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,14 +13,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Slay the Roadmap',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => RoadmapViewModel(LocalRoadmapRepository()),
+        ),
+      ],
+      child: MaterialApp(
+        title: 'Slay the Roadmap',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.blue,
+            brightness: Brightness.light,
+          ),
+          useMaterial3: true,
+        ),
+        home: const RoadmapScreen(),
+        debugShowCheckedModeBanner: false,
       ),
-      home: HomeScreen(),
-      debugShowCheckedModeBanner: false,
     );
   }
 }

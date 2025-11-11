@@ -1,160 +1,135 @@
 import 'package:flutter/material.dart';
 import '../../../domain/models/topic.dart';
+import 'roadmap_tree.dart'; // Import per RoadmapTree
 
 class TopicTile extends StatelessWidget {
   final Topic topic;
-  final int depth;
+  final int level;
   final Function(String) onTap;
   final Function(String) onExpand;
 
   const TopicTile({
     super.key,
     required this.topic,
-    required this.depth,
+    required this.level,
     required this.onTap,
     required this.onExpand,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasSubtopics = topic.subtopics.isNotEmpty;
-    final indent = depth * 20.0;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: EdgeInsets.only(left: indent),
-          child: Card(
-            color: _getCardColor(topic.status),
-            elevation: 2,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-              leading: _buildStatusIcon(topic.status),
-              title: Row(
-                children: [
-                  _buildTypeIndicator(topic.type),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      topic.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: _getTitleColor(topic.status),
-                        fontSize: 16,
-                      ),
+          margin: EdgeInsets.only(left: level * 20.0),
+          child: ListTile(
+            leading: _buildStatusIcon(),
+            title: Row(
+              children: [
+                if (topic.subtopics.isNotEmpty)
+                  IconButton(
+                    icon: Icon(
+                      topic.isExpanded 
+                          ? Icons.expand_less 
+                          : Icons.expand_more,
+                      color: Colors.blue,
+                    ),
+                    onPressed: () => onExpand(topic.id),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                Expanded(
+                  child: Text(
+                    topic.title,
+                    style: TextStyle(
+                      fontWeight: topic.isOptional 
+                          ? FontWeight.normal 
+                          : FontWeight.w600,
+                      color: _getTitleColor(),
+                      fontSize: 16,
                     ),
                   ),
-                ],
-              ),
-              subtitle: topic.description.isNotEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(
-                        topic.description,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          color: _getSubtitleColor(topic.status),
-                          fontSize: 12,
-                        ),
-                      ),
-                    )
-                  : null,
-              trailing: hasSubtopics
-                  ? IconButton(
-                      icon: Icon(
-                        topic.isExpanded ? Icons.expand_less : Icons.expand_more,
-                        color: _getIconColor(topic.status),
-                      ),
-                      onPressed: () => onExpand(topic.id),
-                    )
-                  : null,
-              onTap: () => onTap(topic.id),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
+                ),
+              ],
             ),
+            subtitle: topic.description.isNotEmpty 
+                ? Text(
+                    topic.description,
+                    style: const TextStyle(fontSize: 12),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  )
+                : null,
+            trailing: _buildTrailing(),
+            onTap: () => onTap(topic.id),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
           ),
         ),
-        if (hasSubtopics && topic.isExpanded)
-          Column(
-            children: topic.subtopics.map((subtopic) {
-              return TopicTile(
-                topic: subtopic,
-                depth: depth + 1,
-                onTap: onTap,
-                onExpand: onExpand,
-              );
-            }).toList(),
+        if (topic.isExpanded && topic.subtopics.isNotEmpty)
+          Padding(
+            padding: EdgeInsets.only(left: (level + 1) * 20.0),
+            child: RoadmapTree(
+              topics: topic.subtopics,
+              onTopicTap: onTap,
+              onTopicExpand: onExpand,
+              level: level + 1,
+            ),
           ),
       ],
     );
   }
 
-  Widget _buildStatusIcon(TopicStatus status) {
-    switch (status) {
+  Color _getTitleColor() {
+    switch (topic.status) {
       case TopicStatus.completed:
-        return const Icon(Icons.check_circle, color: Colors.green);
+        return Colors.green;
       case TopicStatus.inProgress:
-        return const Icon(Icons.play_circle_fill, color: Colors.orange);
+        return Colors.orange;
       case TopicStatus.locked:
-        return const Icon(Icons.lock, color: Colors.grey);
+        return Colors.grey;
     }
   }
 
-  Widget _buildTypeIndicator(TopicType type) {
-    return Container(
-      width: 12,
-      height: 12,
-      decoration: BoxDecoration(
-        color: type == TopicType.core ? Colors.blue : Colors.purple,
-        shape: BoxShape.circle,
-      ),
+  Widget _buildStatusIcon() {
+    switch (topic.status) {
+      case TopicStatus.completed:
+        return const Icon(Icons.check_circle, color: Colors.green, size: 24);
+      case TopicStatus.inProgress:
+        return const Icon(Icons.play_circle_fill, color: Colors.orange, size: 24);
+      case TopicStatus.locked:
+        return const Icon(Icons.lock, color: Colors.grey, size: 24);
+    }
+  }
+
+  Widget _buildTrailing() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (topic.isOptional)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.blue[50],
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              'OPZIONALE',
+              style: TextStyle(
+                color: Colors.blue[700],
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        const SizedBox(width: 8),
+        if (topic.quizId != null)
+          Icon(
+            Icons.quiz,
+            color: Colors.purple[300],
+            size: 20,
+          ),
+      ],
     );
-  }
-
-  Color _getTitleColor(TopicStatus status) {
-    switch (status) {
-      case TopicStatus.completed:
-        return Colors.green[800]!;
-      case TopicStatus.inProgress:
-        return Colors.orange[800]!;
-      case TopicStatus.locked:
-        return Colors.grey[600]!;
-    }
-  }
-
-  Color _getSubtitleColor(TopicStatus status) {
-    switch (status) {
-      case TopicStatus.completed:
-        return Colors.green[600]!;
-      case TopicStatus.inProgress:
-        return Colors.orange[600]!;
-      case TopicStatus.locked:
-        return Colors.grey[500]!;
-    }
-  }
-
-  Color _getIconColor(TopicStatus status) {
-    switch (status) {
-      case TopicStatus.completed:
-        return Colors.green[800]!;
-      case TopicStatus.inProgress:
-        return Colors.orange[800]!;
-      case TopicStatus.locked:
-        return Colors.grey[600]!;
-    }
-  }
-
-  Color _getCardColor(TopicStatus status) {
-    switch (status) {
-      case TopicStatus.completed:
-        return Colors.green[50]!;
-      case TopicStatus.inProgress:
-        return Colors.orange[50]!;
-      case TopicStatus.locked:
-        return Colors.grey[100]!;
-    }
   }
 }
