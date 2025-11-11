@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/roadmap_models.dart';
 import 'topic_node.dart';
 
+/// Roadmap tree helper widget.
+/// Alternative or shared roadmap tree widget used outside the UI/widgets folder.
 class RoadmapTree extends StatelessWidget {
   final List<Topic> topics;
   final Function(String) onTopicTap;

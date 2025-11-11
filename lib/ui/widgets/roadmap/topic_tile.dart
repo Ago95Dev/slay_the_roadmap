@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../domain/models/topic.dart';
 
+/// Topic tile widget.
+/// Small UI component representing a single topic node (title, icon, progress).
 class TopicTile extends StatelessWidget {
   final Topic topic;
   final int depth;

@@ -1,3 +1,6 @@
+/// Shared preferences service.
+/// Wrapper over SharedPreferences for simple key/value storage used in the app.
+
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../domain/models/player_progress.dart';

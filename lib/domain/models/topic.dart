@@ -1,3 +1,5 @@
+/// Topic domain model.
+/// Represents a learning topic or node in the roadmap with metadata and relationships.
 class Topic {
   final String id;
   final String title;

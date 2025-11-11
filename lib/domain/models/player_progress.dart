@@ -1,3 +1,5 @@
+/// PlayerProgress domain model.
+/// Tracks player's progress, completed topics, scores and unlocks.
 import 'topic.dart';
 import 'reward.dart';
 

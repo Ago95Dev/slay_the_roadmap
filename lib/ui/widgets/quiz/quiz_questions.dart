@@ -1,3 +1,6 @@
+/// Quiz questions widget.
+/// UI widget that renders quiz questions and choice controls used in the quiz screen.
+
 import 'package:flutter/material.dart';
 import '../../../domain/models/quiz.dart';
 import '../../../data/repositories/quiz_repository.dart';

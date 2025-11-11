@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../domain/models/topic.dart';
 import 'topic_tile.dart';
 
+/// Roadmap tree widget.
+/// Renders a tree view of the roadmap topics for UI consumption.
 class RoadmapTree extends StatelessWidget {
   final List<Topic> topics;
   final Function(String) onTopicTap;

@@ -1,3 +1,6 @@
+/// UI wrapper for Quiz screen.
+/// Connects quiz view model to the quiz UI widgets and handles user interactions.
+
 import 'package:flutter/material.dart';
 import '../../domain/models/quiz.dart';
 import '../../data/repositories/quiz_repository.dart';

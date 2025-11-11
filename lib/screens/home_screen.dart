@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'roadmap_selection_screen.dart';
 import 'boss_fight_screen.dart';
 
+/// Home screen.
+/// Main landing screen that links to roadmap, quizzes, and player overview.
 class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

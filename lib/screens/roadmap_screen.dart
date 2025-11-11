@@ -1,3 +1,5 @@
+/// Roadmap selection screen.
+/// Lets the user choose or switch between different roadmaps or starting points.
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/roadmap_models.dart';

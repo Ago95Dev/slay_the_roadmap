@@ -1,3 +1,5 @@
+/// BossFight domain model.
+/// Represents a boss fight: enemies, conditions, rewards and related logic.
 class BossFight {
   final String id;
   final String chapterId;

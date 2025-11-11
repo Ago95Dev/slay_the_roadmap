@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+/// BossFight screen.
+/// UI screen that displays and manages a boss fight encounter for the player.
 class BossFightScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

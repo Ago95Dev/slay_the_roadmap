@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/roadmap_models.dart';
 import '../services/roadmap_service.dart';
 
+/// Quiz screen.
+/// UI for taking quizzes: shows questions, accepts answers and displays results.
 class QuizScreen extends StatefulWidget {
   final String topicId;
 
