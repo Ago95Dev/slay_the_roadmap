@@ -3,30 +3,42 @@ import 'roadmap_selection_screen.dart';
 import 'boss_fight_screen.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = screenWidth > 600 ? 400.0 : screenWidth * 0.85;
 
     return Scaffold(
-      backgroundColor: Colors.grey[900],
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      appBar: AppBar(
+        title: const Text(
+          '🎮 Slay the Roadmap',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 0,
+        centerTitle: true,
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Title Section
-                _buildTitleSection(),
-                SizedBox(height: 40),
+                // Subtitle Section
+                _buildSubtitleSection(context),
+                const SizedBox(height: 32),
 
                 // Menu Cards Column
                 _buildMenuColumn(context, cardWidth),
                 
                 // Footer
-                SizedBox(height: 30),
-                _buildFooter(),
+                const SizedBox(height: 30),
+                _buildFooter(context),
               ],
             ),
           ),
@@ -35,44 +47,29 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTitleSection() {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue, Colors.purple],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              Text(
-                '🎮 SLAY THE ROADMAP',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.2,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 8),
-              Text(
-                'Learn Programming through Adventure',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white70,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+  Widget _buildSubtitleSection(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.secondary,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-      ],
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Text(
+        'Learn Programming through Adventure',
+        style: TextStyle(
+          fontSize: 16,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
+        ),
+        textAlign: TextAlign.center,
+      ),
     );
   }
 
@@ -88,12 +85,14 @@ class HomeScreen extends StatelessWidget {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => RoadmapSelectionScreen()),
+              MaterialPageRoute(
+                builder: (context) => const RoadmapSelectionScreen(),
+              ),
             );
           },
           cardWidth,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildMenuCard(
           context,
           '⚔️ BOSS FIGHT',
@@ -103,12 +102,14 @@ class HomeScreen extends StatelessWidget {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => BossFightScreen()),
+              MaterialPageRoute(
+                builder: (context) => const BossFightScreen(),
+              ),
             );
           },
           cardWidth,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildMenuCard(
           context,
           '📊 PROFILE & STATS',
@@ -120,7 +121,7 @@ class HomeScreen extends StatelessWidget {
           },
           cardWidth,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildMenuCard(
           context,
           '🏆 ACHIEVEMENTS',
@@ -132,7 +133,7 @@ class HomeScreen extends StatelessWidget {
           },
           cardWidth,
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildMenuCard(
           context,
           '⚙️ SETTINGS',
@@ -157,7 +158,7 @@ class HomeScreen extends StatelessWidget {
     VoidCallback onTap,
     double width,
   ) {
-    return Container(
+    return SizedBox(
       width: width,
       child: Card(
         elevation: 6,
@@ -177,31 +178,31 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(15),
             ),
             child: Padding(
-              padding: EdgeInsets.all(16),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Container(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(icon, color: Colors.white, size: 22),
                   ),
-                  SizedBox(width: 16),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 4),
+                        const SizedBox(height: 4),
                         Text(
                           subtitle,
                           style: TextStyle(
@@ -214,8 +215,8 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(width: 8),
-                  Icon(
+                  const SizedBox(width: 8),
+                  const Icon(
                     Icons.arrow_forward_ios,
                     color: Colors.white,
                     size: 16,
@@ -229,29 +230,29 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(BuildContext context) {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.05),
+            color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Text(
             '🎯 Complete topics • Earn rewards • Defeat bosses',
             style: TextStyle(
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
               fontSize: 12,
             ),
             textAlign: TextAlign.center,
           ),
         ),
-        SizedBox(height: 12),
+        const SizedBox(height: 12),
         Text(
           'Slay the Roadmap v1.0.0',
           style: TextStyle(
-            color: Colors.white60,
+            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
             fontSize: 11,
           ),
         ),
@@ -263,24 +264,22 @@ class HomeScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey[800],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        title: Text(
+        title: const Text(
           '🚧 Coming Soon!',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        content: Text(
+        content: const Text(
           'This awesome feature is currently in development and will be available in the next update!',
-          style: TextStyle(color: Colors.white70),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text(
+            child: const Text(
               'EXPLORE MORE',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),
         ],

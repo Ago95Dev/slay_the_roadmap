@@ -2,16 +2,22 @@ import 'package:flutter/material.dart';
 import 'roadmap_screen.dart';
 
 class RoadmapSelectionScreen extends StatelessWidget {
+  const RoadmapSelectionScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Choose Your Roadmap'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text(
+          'Choose Your Roadmap',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        elevation: 0,
       ),
       body: ListView(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         children: [
           _buildRoadmapCard(
             context,
@@ -22,11 +28,13 @@ class RoadmapSelectionScreen extends StatelessWidget {
             () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => RoadmapScreen()),
+                MaterialPageRoute(
+                  builder: (context) => const RoadmapScreen(),
+                ),
               );
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildRoadmapCard(
             context,
             'Flutter Roadmap',
@@ -37,7 +45,7 @@ class RoadmapSelectionScreen extends StatelessWidget {
               _showComingSoon(context);
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildRoadmapCard(
             context,
             'Web Development',
@@ -48,7 +56,7 @@ class RoadmapSelectionScreen extends StatelessWidget {
               _showComingSoon(context);
             },
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildRoadmapCard(
             context,
             'Data Structures',
@@ -64,7 +72,14 @@ class RoadmapSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRoadmapCard(BuildContext context, String title, String description, Color color, IconData icon, VoidCallback onTap) {
+  Widget _buildRoadmapCard(
+    BuildContext context,
+    String title,
+    String description,
+    Color color,
+    IconData icon,
+    VoidCallback onTap,
+  ) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -74,40 +89,43 @@ class RoadmapSelectionScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               Container(
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: color, size: 30),
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       title,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       description,
                       style: TextStyle(
-                        color: Colors.grey[600],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                       ),
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, color: Colors.grey),
+              Icon(
+                Icons.arrow_forward_ios,
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+              ),
             ],
           ),
         ),
@@ -119,12 +137,23 @@ class RoadmapSelectionScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Coming Soon!'),
-        content: Text('This roadmap will be available in the next update.'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        title: const Text(
+          '🚧 Coming Soon!',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: const Text(
+          'This roadmap will be available in the next update.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
+            child: const Text(
+              'OK',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
