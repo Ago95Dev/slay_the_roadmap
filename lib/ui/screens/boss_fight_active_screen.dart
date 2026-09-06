@@ -213,15 +213,16 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
           ),
         ),
 
-        // Combat log 
+        // Combat log (dark-fantasy: fondo scuro + testo chiaro,
+        // contrasto AA in entrambi i temi light/dark)
         Expanded(
           child: Container(
             margin: const EdgeInsets.all(16),
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Colors.grey[100],
+              color: const Color(0xFF1E1B2E),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[300]!),
+              border: Border.all(color: const Color(0xFF7E57C2)),
             ),
             child: SingleChildScrollView(
               reverse: true,
@@ -230,6 +231,8 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                 style: const TextStyle(
                   fontFamily: 'monospace',
                   fontSize: 13,
+                  color: Color(0xFFEDE7F6),
+                  height: 1.45,
                 ),
               ),
             ),
