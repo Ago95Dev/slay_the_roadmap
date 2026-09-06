@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../animations/dungeon_motion.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 
@@ -49,7 +50,7 @@ class SettingsScreen extends StatelessWidget {
   }
 
   Future<void> _confirmReset(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showPopDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Reset progressi?'),

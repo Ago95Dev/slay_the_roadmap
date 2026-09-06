@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-class PlayerHealthBar extends StatelessWidget {
+/// HP bar del giocatore con danno/cura animati: il riempimento passa dal
+/// vecchio al nuovo valore con Tween (300ms, one-shot). Rispetta
+/// `MediaQuery.disableAnimations`.
+class PlayerHealthBar extends StatefulWidget {
   final int currentHp;
   final int maxHp;
 
@@ -11,8 +14,32 @@ class PlayerHealthBar extends StatelessWidget {
   });
 
   @override
+  State<PlayerHealthBar> createState() => _PlayerHealthBarState();
+}
+
+class _PlayerHealthBarState extends State<PlayerHealthBar> {
+  late double _fromFraction;
+
+  double _fractionOf(int current, int max) {
+    if (max <= 0) return 0;
+    return (current / max).clamp(0.0, 1.0);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fromFraction = _fractionOf(widget.currentHp, widget.maxHp);
+  }
+
+  @override
+  void didUpdateWidget(PlayerHealthBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _fromFraction = _fractionOf(oldWidget.currentHp, oldWidget.maxHp);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final percentage = currentHp / maxHp;
+    final percentage = _fractionOf(widget.currentHp, widget.maxHp);
     final Color barColor = _getHealthColor(percentage);
 
     return Column(
@@ -36,7 +63,7 @@ class PlayerHealthBar extends StatelessWidget {
               ],
             ),
             Text(
-              '$currentHp / $maxHp',
+              '${widget.currentHp} / ${widget.maxHp}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -46,7 +73,7 @@ class PlayerHealthBar extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 8),
-        
+
         // HP bar
         Container(
           height: 24,
@@ -69,26 +96,31 @@ class PlayerHealthBar extends StatelessWidget {
                 Container(
                   color: Colors.grey[300],
                 ),
-                
-                // HP fill
-                FractionallySizedBox(
-                  widthFactor: percentage,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          barColor,
-                          barColor.withValues(alpha: 0.8),
-                        ],
-                      ),
+
+                // HP fill with animation
+                if (MediaQuery.disableAnimationsOf(context))
+                  FractionallySizedBox(
+                    widthFactor: percentage,
+                    child: _fill(barColor),
+                  )
+                else
+                  TweenAnimationBuilder<double>(
+                    tween: Tween<double>(
+                      begin: _fromFraction,
+                      end: percentage,
+                    ),
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeOutCubic,
+                    builder: (context, value, _) => FractionallySizedBox(
+                      widthFactor: value.clamp(0.0, 1.0),
+                      child: _fill(barColor),
                     ),
                   ),
-                ),
-                
+
                 // HP text overlay
                 Center(
                   child: Text(
-                    '$currentHp HP',
+                    '${widget.currentHp} HP',
                     style: TextStyle(
                       color: percentage > 0.3 ? Colors.white : barColor,
                       fontWeight: FontWeight.bold,
@@ -109,6 +141,19 @@ class PlayerHealthBar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _fill(Color barColor) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            barColor,
+            barColor.withValues(alpha: 0.8),
+          ],
+        ),
+      ),
     );
   }
 

@@ -8,6 +8,7 @@ import '../../domain/models/topic.dart';
 import '../../domain/models/topic_detail.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import 'quiz_screen.dart';
 import 'reward_choice_screen.dart';
@@ -32,7 +33,7 @@ class TopicDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final detail = topicDetail;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(topic.title),
@@ -47,7 +48,7 @@ class TopicDetailScreen extends StatelessWidget {
                 final vm = context.read<RoadmapViewModel>();
                 final result = await Navigator.push<QuizResult>(
                   context,
-                  MaterialPageRoute(
+                  DungeonPageRoute(
                     builder: (context) => QuizScreen(
                       topicId: topic.id,
                       topicTitle: topic.title,
@@ -66,8 +67,7 @@ class TopicDetailScreen extends StatelessWidget {
                     listen: false,
                   );
                   if (playerVm != null) {
-                    final leveledUp =
-                        playerVm.addCompletedTopic(topic.id);
+                    final leveledUp = playerVm.addCompletedTopic(topic.id);
                     if (leveledUp) {
                       if (!context.mounted) return;
                       // F6: level-up mostrato una sola volta (al crossing).
@@ -104,7 +104,7 @@ class TopicDetailScreen extends StatelessWidget {
                       } else {
                         await Navigator.push<Reward>(
                           context,
-                          MaterialPageRoute(
+                          DungeonPageRoute(
                             builder: (_) => RewardChoiceScreen(
                               topicId: topic.id,
                             ),
@@ -127,7 +127,9 @@ class TopicDetailScreen extends StatelessWidget {
             ),
         ],
       ),
-      body: detail != null ? _buildDetailContent(detail) : _buildPlaceholderContent(),
+      body: detail != null
+          ? _buildDetailContent(detail)
+          : _buildPlaceholderContent(),
     );
   }
 

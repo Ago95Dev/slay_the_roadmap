@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
 import 'boss_fight_screen.dart';
@@ -105,7 +106,7 @@ class HomeScreen extends StatelessWidget {
             () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
+                DungeonPageRoute(
                   builder: (context) => const RoadmapScreen(),
                 ),
               );
@@ -135,7 +136,7 @@ class HomeScreen extends StatelessWidget {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(
+              DungeonPageRoute(
                 builder: (context) => const BossFightScreen(),
               ),
             );
@@ -152,7 +153,7 @@ class HomeScreen extends StatelessWidget {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(
+              DungeonPageRoute(
                 builder: (context) => const SettingsScreen(),
               ),
             );
@@ -167,7 +168,7 @@ class HomeScreen extends StatelessWidget {
   /// roadmap a iniziale e naviga alla roadmap.
   Future<void> _startNewRun(BuildContext context, bool hasProgress) async {
     if (hasProgress) {
-      final confirmed = await showDialog<bool>(
+      final confirmed = await showPopDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           shape: RoundedRectangleBorder(
@@ -201,7 +202,7 @@ class HomeScreen extends StatelessWidget {
     }
     Navigator.push(
       context,
-      MaterialPageRoute(
+      DungeonPageRoute(
         builder: (context) => const RoadmapScreen(),
       ),
     );
@@ -218,68 +219,70 @@ class HomeScreen extends StatelessWidget {
   ) {
     return SizedBox(
       width: width,
-      child: Card(
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(15),
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: gradientColors,
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+      child: PressableScale(
+        child: Card(
+          elevation: 6,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(15),
+            onTap: onTap,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(15),
               ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      shape: BoxShape.circle,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, color: Colors.white, size: 22),
                     ),
-                    child: Icon(icon, color: Colors.white, size: 22),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          title,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitle,
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.9),
-                            fontSize: 12,
+                          const SizedBox(height: 4),
+                          Text(
+                            subtitle,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 12,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  const Icon(
-                    Icons.arrow_forward_ios,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    const Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.white,
+                      size: 16,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -294,7 +297,8 @@ class HomeScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
+            color:
+                Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Text(

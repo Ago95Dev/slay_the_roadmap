@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../domain/models/topic.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import '../widgets/roadmap/roadmap_tree.dart';
 import 'topic_detail_screen.dart';
@@ -26,7 +27,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   void _onTopicTap(String topicId) async {
     final viewModel = context.read<RoadmapViewModel>();
     final topic = _findTopic(viewModel.topics, topicId);
-    
+
     if (topic == null) return;
 
     // Gate F1 (US-01): i topic locked non sono navigabili.
@@ -55,7 +56,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   void _showTopicDetail(Topic topic) {
     Navigator.push(
       context,
-      MaterialPageRoute(
+      DungeonPageRoute(
         builder: (context) => TopicDetailScreen(
           topic: topic,
           topicDetail: topic.detail,
@@ -85,7 +86,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   void _showInventory(BuildContext context) {
     final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
     final rewards = playerVm?.inventory.rewards ?? [];
-    showDialog(
+    showPopDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Inventario'),
@@ -216,19 +217,24 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                   ],
                 ),
               ),
-              
-              // Roadmap tree
+
+              // Roadmap tree: scrollabile (a 800x600 l'albero intero non
+              // ci sta); HUD e stats restano fisse sopra.
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
                     await viewModel.loadRoadmap();
                   },
-                  child: RoadmapTree(
-                    topics: viewModel.topics,
-                    onTopicTap: _onTopicTap,
-                    onTopicExpand: (topicId) {
-                      viewModel.toggleTopicExpansion(topicId);
-                    },
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: RoadmapTree(
+                      topics: viewModel.topics,
+                      onTopicTap: _onTopicTap,
+                      onTopicExpand: (topicId) {
+                        viewModel.toggleTopicExpansion(topicId);
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -245,8 +251,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     return Builder(
       builder: (context) {
         try {
-          final progress =
-              Provider.of<PlayerViewModel>(context).progress;
+          final progress = Provider.of<PlayerViewModel>(context).progress;
           return PlayerHud(progress: progress);
         } catch (_) {
           return const SizedBox.shrink();

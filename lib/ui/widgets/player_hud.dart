@@ -1,22 +1,46 @@
 import 'package:flutter/material.dart';
 
+import '../animations/dungeon_motion.dart';
 import '../../domain/models/player_progress.dart';
 
 /// HUD globale del giocatore (F6): XP bar + "Livello N" + XP mancanti
 /// al prossimo livello. Unica fonte: [PlayerProgress] (stesse soglie
 /// dell'Hub futuro: L1 0 / L2 100 / L3 500).
-class PlayerHud extends StatelessWidget {
+///
+/// La barra XP si muove con Tween tra un valore e l'altro (300ms,
+/// one-shot); rispetta `MediaQuery.disableAnimations`.
+class PlayerHud extends StatefulWidget {
   final PlayerProgress progress;
 
   const PlayerHud({super.key, required this.progress});
 
   @override
+  State<PlayerHud> createState() => _PlayerHudState();
+}
+
+class _PlayerHudState extends State<PlayerHud> {
+  late double _fromProgress;
+
+  @override
+  void initState() {
+    super.initState();
+    _fromProgress = widget.progress.xpProgress;
+  }
+
+  @override
+  void didUpdateWidget(PlayerHud oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _fromProgress = oldWidget.progress.xpProgress;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final xp = progress.experience;
-    final level = progress.level;
-    final next = progress.xpForNextLevel;
-    final missing = progress.xpToNextLevel;
-    final streak = progress.streak;
+    final xp = widget.progress.experience;
+    final level = widget.progress.level;
+    final next = widget.progress.xpForNextLevel;
+    final missing = widget.progress.xpToNextLevel;
+    final streak = widget.progress.streak;
+    final target = widget.progress.xpProgress;
 
     return Container(
       key: const Key('player_hud'),
@@ -57,12 +81,25 @@ class PlayerHud extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 6),
-          LinearProgressIndicator(
-            key: const Key('player_hud_bar'),
-            value: progress.xpProgress,
-            minHeight: 8,
-            borderRadius: BorderRadius.circular(4),
-          ),
+          if (MediaQuery.disableAnimationsOf(context))
+            LinearProgressIndicator(
+              key: const Key('player_hud_bar'),
+              value: target,
+              minHeight: 8,
+              borderRadius: BorderRadius.circular(4),
+            )
+          else
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: _fromProgress, end: target),
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              builder: (context, value, _) => LinearProgressIndicator(
+                key: const Key('player_hud_bar'),
+                value: value.clamp(0.0, 1.0),
+                minHeight: 8,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
         ],
       ),
     );
@@ -71,9 +108,9 @@ class PlayerHud extends StatelessWidget {
 
 /// Dialog celebrativo "Livello N raggiunto!" (F6): il chiamante lo mostra
 /// una sola volta confrontando il level prima/dopo la mutazione XP
-/// (quiz passato / prima vittoria boss).
+/// (quiz passato / prima vittoria boss). Entrata scale + fade (250ms).
 Future<void> showLevelUpDialog(BuildContext context, int newLevel) {
-  return showDialog<void>(
+  return showPopDialog<void>(
     context: context,
     builder: (ctx) => AlertDialog(
       key: const Key('level_up_dialog'),

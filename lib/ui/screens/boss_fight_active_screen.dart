@@ -5,6 +5,7 @@ import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
 import '../view_models/player_view_model.dart';
+import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import 'reward_choice_screen.dart';
 import '../widgets/boss/boss_health_bar.dart';
@@ -73,6 +74,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
       }
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -199,8 +201,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               onPressed: () {
                 bool canEnter = true;
                 try {
-                  canEnter =
-                      context.read<PlayerViewModel>().canEnterBoss;
+                  canEnter = context.read<PlayerViewModel>().canEnterBoss;
                 } catch (_) {
                   canEnter = true;
                 }
@@ -286,18 +287,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: const Color(0xFF7E57C2)),
             ),
-            child: SingleChildScrollView(
-              reverse: true,
-              child: Text(
-                viewModel.combatLog,
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 13,
-                  color: Color(0xFFEDE7F6),
-                  height: 1.45,
-                ),
-              ),
-            ),
+            child: CombatLogView(log: viewModel.combatLog),
           ),
         ),
 
@@ -407,7 +397,8 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
   ) {
     final quiz = viewModel.currentQuiz!;
     final currentQuestion = quiz.questions[viewModel.currentQuestionIndex];
-    final isLastQuestion = viewModel.currentQuestionIndex == quiz.questions.length - 1;
+    final isLastQuestion =
+        viewModel.currentQuestionIndex == quiz.questions.length - 1;
 
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -452,7 +443,8 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               itemCount: currentQuestion.options.length,
               itemBuilder: (context, index) {
                 final isSelected =
-                    viewModel.selectedAnswers[viewModel.currentQuestionIndex] == index;
+                    viewModel.selectedAnswers[viewModel.currentQuestionIndex] ==
+                        index;
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   color: isSelected ? Colors.purple[50] : null,
@@ -460,7 +452,8 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                     title: Text(currentQuestion.options[index]),
                     leading: Radio<int>(
                       value: index,
-                      groupValue: viewModel.selectedAnswers[viewModel.currentQuestionIndex],
+                      groupValue: viewModel
+                          .selectedAnswers[viewModel.currentQuestionIndex],
                       onChanged: (value) {
                         viewModel.selectQuizAnswer(value!);
                       },
@@ -485,7 +478,9 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                   child: const Text('Back'),
                 ),
                 ElevatedButton(
-                  onPressed: viewModel.selectedAnswers[viewModel.currentQuestionIndex] != null
+                  onPressed: viewModel.selectedAnswers[
+                              viewModel.currentQuestionIndex] !=
+                          null
                       ? () {
                           if (isLastQuestion) {
                             viewModel.submitQuiz();
@@ -519,10 +514,13 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.celebration,
-              size: 100,
-              color: Colors.green,
+            // Celebrazione sobria: un solo PopIn scale + fade (250ms).
+            const PopIn(
+              child: Icon(
+                Icons.celebration,
+                size: 100,
+                color: Colors.green,
+              ),
             ),
             const SizedBox(height: 24),
             const Text(
@@ -600,7 +598,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
   ) async {
     final reward = await Navigator.push<Reward>(
       context,
-      MaterialPageRoute(
+      DungeonPageRoute(
         builder: (context) => RewardChoiceScreen(
           topicId: boss.id,
           rewardsOverride: boss.availableRewards,
@@ -630,9 +628,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     } catch (_) {
       levelAfter = null;
     }
-    if (levelBefore != null &&
-        levelAfter != null &&
-        levelAfter > levelBefore) {
+    if (levelBefore != null && levelAfter != null && levelAfter > levelBefore) {
       await showLevelUpDialog(context, levelAfter);
       if (!context.mounted) return;
     }
@@ -653,10 +649,12 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
-              Icons.sentiment_dissatisfied,
-              size: 100,
-              color: Colors.orange,
+            const PopIn(
+              child: Icon(
+                Icons.sentiment_dissatisfied,
+                size: 100,
+                color: Colors.orange,
+              ),
             ),
             const SizedBox(height: 24),
             const Text(
@@ -683,8 +681,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                   onPressed: () {
                     bool canEnter = true;
                     try {
-                      canEnter =
-                          context.read<PlayerViewModel>().canEnterBoss;
+                      canEnter = context.read<PlayerViewModel>().canEnterBoss;
                     } catch (_) {
                       canEnter = true;
                     }
@@ -729,7 +726,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     BossFight boss,
   ) {
     final bool outOfEnergy = boss.currentEnergy <= 0;
-    showDialog(
+    showPopDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Use a Card (1⚡ — hai ${boss.currentEnergy}⚡)'),

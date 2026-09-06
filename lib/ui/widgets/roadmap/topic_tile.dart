@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../domain/models/topic.dart';
+import '../../animations/dungeon_motion.dart';
 import 'roadmap_tree.dart'; // Import per RoadmapTree
 
 class TopicTile extends StatelessWidget {
@@ -19,63 +20,75 @@ class TopicTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          margin: EdgeInsets.only(left: level * 20.0),
-          child: ListTile(
-            leading: _buildStatusIcon(),
-            title: Row(
-              children: [
-                if (topic.subtopics.isNotEmpty)
-                  IconButton(
-                    icon: Icon(
-                      topic.isExpanded 
-                          ? Icons.expand_less 
-                          : Icons.expand_more,
-                      color: Colors.blue,
+        PressableScale(
+          child: Container(
+            margin: EdgeInsets.only(left: level * 20.0),
+            child: ListTile(
+              leading: _buildStatusIcon(),
+              title: Row(
+                children: [
+                  if (topic.subtopics.isNotEmpty)
+                    IconButton(
+                      icon: Icon(
+                        topic.isExpanded
+                            ? Icons.expand_less
+                            : Icons.expand_more,
+                        color: Colors.blue,
+                      ),
+                      onPressed: () => onExpand(topic.id),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
                     ),
-                    onPressed: () => onExpand(topic.id),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                Expanded(
-                  child: Text(
-                    topic.title,
-                    style: TextStyle(
-                      fontWeight: topic.isOptional 
-                          ? FontWeight.normal 
-                          : FontWeight.w600,
-                      color: _getTitleColor(),
-                      fontSize: 16,
+                  Expanded(
+                    child: Text(
+                      topic.title,
+                      style: TextStyle(
+                        fontWeight: topic.isOptional
+                            ? FontWeight.normal
+                            : FontWeight.w600,
+                        color: _getTitleColor(),
+                        fontSize: 16,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
+              subtitle: topic.description.isNotEmpty
+                  ? Text(
+                      topic.description,
+                      style: const TextStyle(fontSize: 12),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : null,
+              trailing: _buildTrailing(),
+              onTap: () => onTap(topic.id),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
             ),
-            subtitle: topic.description.isNotEmpty 
-                ? Text(
-                    topic.description,
-                    style: const TextStyle(fontSize: 12),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  )
-                : null,
-            trailing: _buildTrailing(),
-            onTap: () => onTap(topic.id),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
           ),
         ),
-        if (topic.isExpanded && topic.subtopics.isNotEmpty)
-          Padding(
-            padding: EdgeInsets.only(left: (level + 1) * 20.0),
-            child: RoadmapTree(
-              topics: topic.subtopics,
-              onTopicTap: onTap,
-              onTopicExpand: onExpand,
-              level: level + 1,
-            ),
+        // Espansione/collasso con altezza animata (200ms, niente salti).
+        ClipRect(
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            alignment: Alignment.topCenter,
+            child: topic.isExpanded && topic.subtopics.isNotEmpty
+                ? Padding(
+                    padding: EdgeInsets.only(left: (level + 1) * 20.0),
+                    child: RoadmapTree(
+                      topics: topic.subtopics,
+                      onTopicTap: onTap,
+                      onTopicExpand: onExpand,
+                      level: level + 1,
+                    ),
+                  )
+                : const SizedBox(width: double.infinity),
           ),
+        ),
       ],
     );
   }
@@ -96,7 +109,8 @@ class TopicTile extends StatelessWidget {
       case TopicStatus.completed:
         return const Icon(Icons.check_circle, color: Colors.green, size: 24);
       case TopicStatus.inProgress:
-        return const Icon(Icons.play_circle_fill, color: Colors.orange, size: 24);
+        return const Icon(Icons.play_circle_fill,
+            color: Colors.orange, size: 24);
       case TopicStatus.locked:
         return const Icon(Icons.lock, color: Colors.grey, size: 24);
     }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../animations/dungeon_motion.dart';
 import '../view_models/quiz_view_model.dart';
 import '../../data/repositories/quiz_repository.dart';
 
@@ -106,8 +107,8 @@ class _QuizScreenState extends State<QuizScreen> {
           Text(
             'Domanda ${viewModel.currentQuestionIndex + 1} di ${quiz.questions.length}',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 20),
 
@@ -120,8 +121,8 @@ class _QuizScreenState extends State<QuizScreen> {
               child: Text(
                 currentQuestion.text,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontSize: 18,
-                ),
+                      fontSize: 18,
+                    ),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -132,7 +133,9 @@ class _QuizScreenState extends State<QuizScreen> {
             child: ListView.builder(
               itemCount: currentQuestion.options.length,
               itemBuilder: (context, index) {
-                final isSelected = viewModel.selectedAnswers[viewModel.currentQuestionIndex] == index;
+                final isSelected =
+                    viewModel.selectedAnswers[viewModel.currentQuestionIndex] ==
+                        index;
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 4),
                   color: isSelected ? Colors.purple[50] : null,
@@ -140,7 +143,8 @@ class _QuizScreenState extends State<QuizScreen> {
                     title: Text(currentQuestion.options[index]),
                     leading: Radio<int>(
                       value: index,
-                      groupValue: viewModel.selectedAnswers[viewModel.currentQuestionIndex],
+                      groupValue: viewModel
+                          .selectedAnswers[viewModel.currentQuestionIndex],
                       onChanged: (value) {
                         viewModel.selectAnswer(value!);
                       },
@@ -154,31 +158,33 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           ),
 
-          // Hint dopo 2 errori sulla stessa domanda
+          // Hint dopo 2 errori sulla stessa domanda (comparsa animata).
           if (viewModel.shouldShowHintForCurrent)
-            Container(
-              key: const Key('quiz_hint'),
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.amber[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.amber),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Icon(Icons.lightbulb_outline,
-                      color: Colors.amber, size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      viewModel.currentHint ?? 'Rileggi il topic e riprova.',
-                      style: Theme.of(context).textTheme.bodyMedium,
+            PopIn(
+              child: Container(
+                key: const Key('quiz_hint'),
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.amber[50],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.amber),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.lightbulb_outline,
+                        color: Colors.amber, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        viewModel.currentHint ?? 'Rileggi il topic e riprova.',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
@@ -189,13 +195,15 @@ class _QuizScreenState extends State<QuizScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 ElevatedButton(
-                  onPressed: viewModel.currentQuestionIndex > 0 
-                      ? viewModel.previousQuestion 
+                  onPressed: viewModel.currentQuestionIndex > 0
+                      ? viewModel.previousQuestion
                       : null,
                   child: const Text('Indietro'),
                 ),
                 ElevatedButton(
-                  onPressed: viewModel.selectedAnswers[viewModel.currentQuestionIndex] != null
+                  onPressed: viewModel.selectedAnswers[
+                              viewModel.currentQuestionIndex] !=
+                          null
                       ? () {
                           if (viewModel.isLastQuestion) {
                             viewModel.submitQuiz();
@@ -208,7 +216,8 @@ class _QuizScreenState extends State<QuizScreen> {
                     backgroundColor: Colors.purple,
                     foregroundColor: Colors.white,
                   ),
-                  child: Text(viewModel.isLastQuestion ? 'Concludi Quiz' : 'Avanti'),
+                  child: Text(
+                      viewModel.isLastQuestion ? 'Concludi Quiz' : 'Avanti'),
                 ),
               ],
             ),
@@ -227,18 +236,20 @@ class _QuizScreenState extends State<QuizScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            passed ? Icons.celebration : Icons.sentiment_dissatisfied,
-            size: 80,
-            color: passed ? Colors.green : Colors.orange,
+          PopIn(
+            child: Icon(
+              passed ? Icons.celebration : Icons.sentiment_dissatisfied,
+              size: 80,
+              color: passed ? Colors.green : Colors.orange,
+            ),
           ),
           const SizedBox(height: 24),
           Text(
             passed ? 'Quiz Superato! 🎉' : 'Quiz Non Superato',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              color: passed ? Colors.green : Colors.orange,
-              fontWeight: FontWeight.bold,
-            ),
+                  color: passed ? Colors.green : Colors.orange,
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: 16),
           Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/reward_repository.dart';
 import '../../domain/models/reward.dart';
+import '../animations/dungeon_motion.dart';
 import '../view_models/player_view_model.dart';
 
 /// Scelta di 1 ricompensa su 3 dopo un quiz passato (F3, US-03).
@@ -61,7 +62,13 @@ class RewardChoiceScreen extends StatelessWidget {
             itemCount: rewards.length,
             itemBuilder: (context, index) {
               final reward = rewards[index];
-              return _buildRewardCard(context, reward);
+              // Entrata in sequenza (60ms l'una, max 180ms) + feedback tap.
+              return PopIn(
+                delayMs: (index * 60).clamp(0, 180),
+                child: PressableScale(
+                  child: _buildRewardCard(context, reward),
+                ),
+              );
             },
           );
         },
@@ -107,8 +114,7 @@ class RewardChoiceScreen extends StatelessWidget {
           ],
         ),
         onTap: () {
-          final playerVm =
-              Provider.of<PlayerViewModel>(context, listen: false);
+          final playerVm = Provider.of<PlayerViewModel>(context, listen: false);
           final ok = playerVm.claimReward(topicId, reward);
           if (!ok && context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
