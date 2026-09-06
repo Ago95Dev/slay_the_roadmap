@@ -89,8 +89,13 @@ void main() {
 
   group('TopicDetailScreen quiz entry (AppBar)', () {
     testWidgets('icona quiz presente e naviga a QuizScreen', (tester) async {
+      // Il detail ora legge RoadmapViewModel per gestire il QuizResult:
+      // va fornito anche in questo harness (in app è globale da main.dart).
       await tester.pumpWidget(
-        const MaterialApp(home: TopicDetailScreen(topic: _openTopic)),
+        ChangeNotifierProvider(
+          create: (_) => RoadmapViewModel(_FakeRoadmapRepository([_openTopic])),
+          child: const MaterialApp(home: TopicDetailScreen(topic: _openTopic)),
+        ),
       );
       await tester.pumpAndSettle();
 

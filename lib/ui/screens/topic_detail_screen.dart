@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../domain/models/quiz.dart';
 import '../../domain/models/topic.dart';
 import '../../domain/models/topic_detail.dart';
+import '../view_models/roadmap_view_model.dart';
 import 'quiz_screen.dart';
 
 class TopicDetailScreen extends StatelessWidget {
@@ -35,8 +38,9 @@ class TopicDetailScreen extends StatelessWidget {
           if (topic.quizId != null && !topic.isCompleted)
             IconButton(
               icon: const Icon(Icons.quiz),
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                final vm = context.read<RoadmapViewModel>();
+                final result = await Navigator.push<QuizResult>(
                   context,
                   MaterialPageRoute(
                     builder: (context) => QuizScreen(
@@ -45,6 +49,10 @@ class TopicDetailScreen extends StatelessWidget {
                     ),
                   ),
                 );
+                if (result?.passed == true) {
+                  vm.updateTopicStatus(topic.id, TopicStatus.completed);
+                  if (context.mounted) Navigator.pop(context);
+                }
               },
               tooltip: 'Avvia Quiz',
             ),
