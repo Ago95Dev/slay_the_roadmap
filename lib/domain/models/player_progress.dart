@@ -178,6 +178,8 @@ class PlayerProgress extends Equatable {
     'state': boss.state.index,
     'currentTurn': boss.currentTurn,
     'lastAction': boss.lastAction,
+    'maxEnergy': boss.maxEnergy,
+    'currentEnergy': boss.currentEnergy,
   };
 
   static BossFight _bossFightFromJson(Map<String, dynamic> json) => BossFight(
@@ -194,6 +196,8 @@ class PlayerProgress extends Equatable {
     adaptiveQuizzes: [], // Simplified for now
     currentTurn: json['currentTurn'],
     lastAction: json['lastAction'],
+    maxEnergy: (json['maxEnergy'] as num?)?.toInt() ?? 3,
+    currentEnergy: (json['currentEnergy'] as num?)?.toInt() ?? 3,
   );
 
   @override

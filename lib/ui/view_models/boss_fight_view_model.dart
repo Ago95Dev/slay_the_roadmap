@@ -7,7 +7,8 @@ import 'dart:math';
 
 class BossFightViewModel extends ChangeNotifier {
   final BossRepository _repository;
-  
+  final Duration bossTurnDelay;
+
   BossFight? _currentBoss;
   bool _isLoading = false;
   String? _error;
@@ -15,8 +16,10 @@ class BossFightViewModel extends ChangeNotifier {
   int _currentQuestionIndex = 0;
   List<int?> _selectedAnswers = [];
   String _combatLog = '';
+  List<Reward> _initialDeck = const [];
 
-  BossFightViewModel(this._repository);
+  BossFightViewModel(this._repository,
+      {this.bossTurnDelay = const Duration(milliseconds: 1500)});
 
   // Getters
   BossFight? get currentBoss => _currentBoss;
@@ -29,6 +32,10 @@ class BossFightViewModel extends ChangeNotifier {
   
   bool get isQuizActive => _currentQuiz != null;
   bool get canAttack => _currentBoss?.state == BossFightState.playerTurn && !isQuizActive;
+  bool get canUseCard =>
+      canAttack &&
+      (_currentBoss?.currentEnergy ?? 0) > 0 &&
+      (_currentBoss?.playerDeck.isNotEmpty ?? false);
   bool get isBossDefeated => _currentBoss?.isBossDefeated ?? false;
   bool get isPlayerDefeated => _currentBoss?.isPlayerDefeated ?? false;
   bool get isBattleOver => isBossDefeated || isPlayerDefeated;
@@ -54,27 +61,65 @@ class BossFightViewModel extends ChangeNotifier {
     }
   }
 
-  // Start the battle
-  void startBattle() {
+  // Start the battle. Il deck è popolato dall'inventario del giocatore
+  // (solo attack/defense, copie single-use per il fight).
+  void startBattle({List<Reward> inventory = const []}) {
     if (_currentBoss == null) return;
-    
+
+    final deck = inventory
+        .where((r) =>
+            r.type == RewardType.attack || r.type == RewardType.defense)
+        .map((r) => r.copyWith(isSelected: false))
+        .toList();
+    _initialDeck = List.unmodifiable(deck);
+
     _currentBoss = _currentBoss!.copyWith(
       state: BossFightState.playerTurn,
       currentTurn: 1,
+      playerDeck: List.of(deck),
+      maxEnergy: _currentBoss!.maxEnergy,
+      currentEnergy: _currentBoss!.maxEnergy,
     );
     _addToCombatLog('⚔️ Your turn! Choose your action.');
     notifyListeners();
   }
 
-  // Player chooses to use a card from their deck
+  // Player chooses to use a card from their deck (costo: 1 energia,
+  // single-use per fight). Si possono giocare più carte per turno finché
+  // c'è energia; a energia 0 le carte sono bloccate. Il turno finisce con
+  // il quiz ("quiz di fine turno", sempre disponibile) o con la vittoria.
   void useCard(Reward card) {
     if (_currentBoss == null || !canAttack) return;
+    if (_currentBoss!.currentEnergy <= 0) {
+      _addToCombatLog('⚡ Not enough energy to use ${card.name}! Answer the quiz to end your turn.');
+      notifyListeners();
+      return;
+    }
+    if (!_currentBoss!.playerDeck.any((c) => c.id == card.id)) return;
+
+    final newEnergy = _currentBoss!.currentEnergy - 1;
+    final newDeck =
+        _currentBoss!.playerDeck.where((c) => c.id != card.id).toList();
+    _currentBoss = _currentBoss!.copyWith(
+      currentEnergy: newEnergy,
+      playerDeck: newDeck,
+    );
 
     int damage = _calculateCardDamage(card);
     _dealDamageToBoss(damage);
-    _addToCombatLog('💥 You used ${card.name}! Dealt $damage damage.');
-    
-    _endPlayerTurn();
+
+    // Lethal card -> vittoria immediata
+    if (_currentBoss!.isBossDefeated) {
+      _currentBoss = _currentBoss!.copyWith(state: BossFightState.victory);
+      _addToCombatLog(
+          '💥 You used ${card.name}! Dealt $damage damage. 🎉 Victory! You defeated ${_currentBoss!.name}!');
+      notifyListeners();
+      return;
+    }
+
+    _addToCombatLog(
+        '💥 You used ${card.name}! Dealt $damage damage. (⚡$newEnergy/${_currentBoss!.maxEnergy} — play another card or answer the quiz)');
+    notifyListeners();
   }
 
   // Player chooses to answer quiz questions for attack
@@ -147,7 +192,7 @@ class BossFightViewModel extends ChangeNotifier {
     );
     notifyListeners();
 
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(bossTurnDelay, () {
       _executeBossTurn();
     });
   }
@@ -171,12 +216,13 @@ class BossFightViewModel extends ChangeNotifier {
       return;
     }
 
-    // Back to player turn
+    // Back to player turn, energia ripristinata
     _currentBoss = _currentBoss!.copyWith(
       state: BossFightState.playerTurn,
       currentTurn: _currentBoss!.currentTurn + 1,
+      currentEnergy: _currentBoss!.maxEnergy,
     );
-    _addToCombatLog('⚔️ Your turn again!');
+    _addToCombatLog('⚔️ Your turn again! (⚡${_currentBoss!.maxEnergy}/${_currentBoss!.maxEnergy})');
     notifyListeners();
   }
 
@@ -250,13 +296,15 @@ class BossFightViewModel extends ChangeNotifier {
 
   void retryBattle() {
     if (_currentBoss == null) return;
-    
-    // Reset battle state
+
+    // Reset battle state: full HP + energia, deck ripristinato
     _currentBoss = _currentBoss!.copyWith(
       currentHp: _currentBoss!.maxHp,
       currentPlayerHp: _currentBoss!.maxPlayerHp,
       state: BossFightState.notStarted,
       currentTurn: 0,
+      currentEnergy: _currentBoss!.maxEnergy,
+      playerDeck: List.of(_initialDeck),
     );
     _combatLog = '';
     _currentQuiz = null;

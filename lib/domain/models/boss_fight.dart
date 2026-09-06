@@ -19,6 +19,8 @@ class BossFight extends Equatable {
   final List<Quiz> adaptiveQuizzes;
   final int currentTurn;
   final String lastAction;
+  final int maxEnergy;
+  final int currentEnergy;
 
   const BossFight({
     required this.id,
@@ -34,6 +36,8 @@ class BossFight extends Equatable {
     this.adaptiveQuizzes = const [],
     this.currentTurn = 0,
     this.lastAction = '',
+    this.maxEnergy = 3,
+    this.currentEnergy = 3,
   });
 
   double get bossHpPercentage => currentHp / maxHp;
@@ -41,6 +45,13 @@ class BossFight extends Equatable {
 
   bool get isBossDefeated => currentHp <= 0;
   bool get isPlayerDefeated => currentPlayerHp <= 0;
+
+  /// Una carta costa 1 energia; a 0 le carte sono bloccate (il quiz resta
+  /// sempre disponibile).
+  bool get canUseCard =>
+      state == BossFightState.playerTurn &&
+      currentEnergy > 0 &&
+      playerDeck.isNotEmpty;
 
   List<BossActionType> get availableBossActions {
     if (bossHpPercentage <= 0.25) {
@@ -60,6 +71,8 @@ class BossFight extends Equatable {
     List<Reward>? playerDeck,
     int? currentTurn,
     String? lastAction,
+    int? maxEnergy,
+    int? currentEnergy,
   }) {
     return BossFight(
       id: id,
@@ -75,6 +88,8 @@ class BossFight extends Equatable {
       adaptiveQuizzes: adaptiveQuizzes,
       currentTurn: currentTurn ?? this.currentTurn,
       lastAction: lastAction ?? this.lastAction,
+      maxEnergy: maxEnergy ?? this.maxEnergy,
+      currentEnergy: currentEnergy ?? this.currentEnergy,
     );
   }
 
@@ -93,6 +108,8 @@ class BossFight extends Equatable {
     adaptiveQuizzes,
     currentTurn,
     lastAction,
+    maxEnergy,
+    currentEnergy,
   ];
 }
 

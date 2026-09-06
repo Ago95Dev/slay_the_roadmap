@@ -16,10 +16,17 @@ class RewardChoiceScreen extends StatelessWidget {
   final String topicId;
   final RewardRepository? repository;
 
+  /// Se fornito (F4 boss fight: `availableRewards` del boss), mostra
+  /// direttamente queste reward invece di interrogare il repository.
+  /// Il claim resta su `claimReward(topicId, reward)`: per i boss
+  /// passare `topicId = bossId`.
+  final List<Reward>? rewardsOverride;
+
   const RewardChoiceScreen({
     super.key,
     required this.topicId,
     this.repository,
+    this.rewardsOverride,
   });
 
   @override
@@ -33,7 +40,9 @@ class RewardChoiceScreen extends StatelessWidget {
         automaticallyImplyLeading: false,
       ),
       body: FutureBuilder<List<Reward>>(
-        future: repo.getRewardsForTopic(topicId),
+        future: rewardsOverride != null
+            ? Future.value(rewardsOverride)
+            : repo.getRewardsForTopic(topicId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());

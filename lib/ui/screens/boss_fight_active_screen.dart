@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/boss_fight.dart';
+import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
+import '../view_models/player_view_model.dart';
+import 'reward_choice_screen.dart';
 import '../widgets/boss/boss_health_bar.dart';
 import '../widgets/boss/player_health_bar.dart';
 import '../widgets/boss/action_card.dart';
@@ -9,9 +12,14 @@ import '../widgets/boss/action_card.dart';
 class BossFightActiveScreen extends StatefulWidget {
   final String bossId;
 
+  /// True se tutti i topic del capitolo sono completed: mostra
+  /// "Capitolo completato" nella schermata di vittoria.
+  final bool chapterCompleted;
+
   const BossFightActiveScreen({
     super.key,
     required this.bossId,
+    this.chapterCompleted = false,
   });
 
   @override
@@ -19,6 +27,15 @@ class BossFightActiveScreen extends StatefulWidget {
 }
 
 class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
+  bool _rewardClaimed = false;
+
+  List<Reward> _inventoryRewards(BuildContext context) {
+    try {
+      return context.read<PlayerViewModel>().inventory.rewards;
+    } catch (_) {
+      return const [];
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -68,7 +85,12 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
             );
           }
 
-          final boss = viewModel.currentBoss!;
+          final boss = viewModel.currentBoss;
+          if (boss == null) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
 
           // Show battle start screen
           if (boss.state == BossFightState.notStarted) {
@@ -135,7 +157,9 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () => viewModel.startBattle(),
+              onPressed: () => viewModel.startBattle(
+                inventory: _inventoryRewards(context),
+              ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
@@ -164,6 +188,10 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     BossFight boss,
   ) {
     final bool isPlayerTurn = boss.state == BossFightState.playerTurn;
+    // Il quiz di fine turno è sempre disponibile (anche a energia 0 o
+    // deck vuoto); solo le carte richiedono 1 energia.
+    final bool cardsBlocked =
+        !isPlayerTurn || boss.currentEnergy <= 0 || boss.playerDeck.isEmpty;
 
     return Column(
       children: [
@@ -217,7 +245,33 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                 currentHp: boss.currentPlayerHp,
                 maxHp: boss.maxPlayerHp,
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.bolt, size: 18, color: Colors.amber),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Energia: ${boss.currentEnergy}/${boss.maxEnergy}',
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  if (boss.currentEnergy <= 0)
+                    const Padding(
+                      padding: EdgeInsets.only(left: 8),
+                      child: Text(
+                        '(carte bloccate: rispondi al quiz)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12),
 
               // Action buttons
               if (isPlayerTurn) ...[
@@ -238,19 +292,25 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton.icon(
-                        onPressed: boss.playerDeck.isNotEmpty
-                            ? () => _showDeckDialog(context, viewModel, boss)
-                            : null,
+                        onPressed: cardsBlocked
+                            ? null
+                            : () => _showDeckDialog(context, viewModel, boss),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.orange,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         icon: const Icon(Icons.style),
-                        label: const Text('Use Card'),
+                        label: Text(
+                            'Use Card (1⚡)${boss.playerDeck.isEmpty ? ' — vuoto' : ''}'),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Il quiz chiude il turno e fa attaccare il boss.',
+                  style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
                 ),
               ] else ...[
                 const Row(
@@ -413,32 +473,85 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               style: const TextStyle(fontSize: 20),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: Show reward selection screen
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 48,
-                  vertical: 16,
-                ),
-              ),
-              child: const Text(
-                'CLAIM REWARDS',
+            if (widget.chapterCompleted) ...[
+              const SizedBox(height: 12),
+              const Text(
+                'Capitolo completato',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Colors.deepPurple,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+            const SizedBox(height: 32),
+            if (_rewardClaimed) ...[
+              const Text(
+                'Premio ottenuto! (+100 XP alla prima vittoria)',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('GO BACK'),
+              ),
+            ] else ...[
+              ElevatedButton(
+                onPressed: () => _claimVictoryReward(context, viewModel, boss),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 48,
+                    vertical: 16,
+                  ),
+                ),
+                child: const Text(
+                  'CLAIM REWARDS',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
-            ),
+            ],
           ],
         ),
       ),
     );
+  }
+
+  /// Vittoria: riusa RewardChoiceScreen con le availableRewards del boss.
+  /// Il tap su una carta chiama claimReward(bossId) dentro la schermata;
+  /// al ritorno si registra la vittoria (+100 XP solo la prima volta).
+  /// Sconfitta: nessuna reward/XP (solo retry con retryBattle).
+  Future<void> _claimVictoryReward(
+    BuildContext context,
+    BossFightViewModel viewModel,
+    BossFight boss,
+  ) async {
+    final reward = await Navigator.push<Reward>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RewardChoiceScreen(
+          topicId: boss.id,
+          rewardsOverride: boss.availableRewards,
+        ),
+      ),
+    );
+    if (!context.mounted || reward == null) return;
+    try {
+      context.read<PlayerViewModel>().recordBossVictory(
+            viewModel.currentBoss ?? boss,
+          );
+    } catch (_) {
+      // Senza PlayerViewModel (es. test): nessun XP, ma la vittoria resta.
+    }
+    setState(() {
+      _rewardClaimed = true;
+    });
   }
 
   Widget _buildDefeatScreen(
@@ -502,26 +615,35 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     BossFightViewModel viewModel,
     BossFight boss,
   ) {
+    final bool outOfEnergy = boss.currentEnergy <= 0;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Use a Card'),
+        title: Text('Use a Card (1⚡ — hai ${boss.currentEnergy}⚡)'),
         content: SizedBox(
           width: double.maxFinite,
           height: 300,
-          child: ListView.builder(
-            itemCount: boss.playerDeck.length,
-            itemBuilder: (context, index) {
-              final card = boss.playerDeck[index];
-              return ActionCard(
-                reward: card,
-                onTap: () {
-                  Navigator.pop(context);
-                  viewModel.useCard(card);
-                },
-              );
-            },
-          ),
+          child: boss.playerDeck.isEmpty
+              ? const Center(
+                  child: Text(
+                    'Deck vuoto: rispondi al quiz per attaccare.',
+                    textAlign: TextAlign.center,
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: boss.playerDeck.length,
+                  itemBuilder: (context, index) {
+                    final card = boss.playerDeck[index];
+                    return ActionCard(
+                      reward: card,
+                      isEnabled: !outOfEnergy,
+                      onTap: () {
+                        Navigator.pop(context);
+                        viewModel.useCard(card);
+                      },
+                    );
+                  },
+                ),
         ),
         actions: [
           TextButton(

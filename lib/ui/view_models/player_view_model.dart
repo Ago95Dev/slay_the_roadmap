@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../domain/models/boss_fight.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
 
@@ -43,5 +44,24 @@ class PlayerViewModel with ChangeNotifier {
   void addCompletedTopic(String topicId) {
     _progress = _progress.addCompletedTopic(topicId);
     notifyListeners();
+  }
+
+  bool isBossDefeated(String bossId) =>
+      _progress.bossFights.containsKey(bossId);
+
+  /// Registra la vittoria contro [boss].
+  /// Ritorna true solo alla prima vittoria (unica a dare +100 XP);
+  /// le vittorie successive aggiornano il fight ma senza XP.
+  /// Non assegna reward: il claim passa da [claimReward] via
+  /// RewardChoiceScreen (topicId = bossId).
+  bool recordBossVictory(BossFight boss) {
+    final isFirst = !isBossDefeated(boss.id);
+    final victorious = boss.copyWith(state: BossFightState.victory);
+    _progress = _progress.copyWith(
+      bossFights: {..._progress.bossFights, boss.id: victorious},
+      experience: isFirst ? _progress.experience + 100 : _progress.experience,
+    );
+    notifyListeners();
+    return isFirst;
   }
 }
