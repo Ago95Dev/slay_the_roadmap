@@ -17,7 +17,8 @@ Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignme
 - [ ] F6 HUD + livelli
 - [x] F7 Hub minimo (`6ece7d0` console: action/xp/level/badge/3 rule verificate E2E)
 - [x] F7-app EngineClient offline-first (`dart-define`, Fake fallback)
-- [ ] F8 docs esame
+- [ ] Fase 1B A-E (gap Octalysis/Toda) ← PROSSIMO
+- [ ] F8 docs esame (GamiDOC aggiornato ALLA FINE con tutto)
 
 ## §0 — Convenzione commit (obbligatoria a fine fase/sottofase)
 
@@ -55,6 +56,20 @@ Leaderboard/social/share/deck-code, shop/coins, classi, coop/PVP, login/signup (
 - **Fase 2 — Hub (~1.5g)**: F7. DoD: con rete XP/badge da Hub, senza rete app identica (fallback); `gameId` unico documentato.
 - **Fase 3 — Docs (~2.5g)**: F8. DoD: 5 deliverable coerenti con numeri reali (80%=4/5, HP, soglie, soglie livello).
 - **Fase 4 — Consegna (0.5g)**: dry-run da clone fresco (`pub get`→`analyze`→`test`→`build`→demo) + checklist E5.
+
+## Fase 1B — Chiusura gap Octalysis/Toda (prima di F8, ~3-3.5g)
+
+Scope approvato 2026-09-07. Restano tagliati: shop/coins, classi, coop/PVP, eventi random, branching, difficoltà adattiva.
+
+| ID | Feature (gap) | Acceptance | Stima |
+|---|---|---|---|
+| A | Narrativa CD1 | Intro per capitolo + lore boss pre-fight + finale narrativo con stats (chiude bug endgame aperto) | ~1g |
+| B | Titoli + avatar (CD4/Toda) | Titolo per capitolo, avatar picker semplice persistito | ~0.5-1g |
+| C | Boss unici CD7 | 1 passiva distintiva per boss, numeri semplici | ~0.5g |
+| D | Leaderboard CD5/Toda | Classifica XP Hub + schermata con stato vuoto offline | ~1g |
+| E | Daily reward CD6 | Bonus XP una-tantum giornaliero | ~0.25g |
+
+DoD: analyze/test/build verdi, commit per voce.
 
 ## §4 — Rischi
 
