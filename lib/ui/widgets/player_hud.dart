@@ -16,6 +16,7 @@ class PlayerHud extends StatelessWidget {
     final level = progress.level;
     final next = progress.xpForNextLevel;
     final missing = progress.xpToNextLevel;
+    final streak = progress.streak;
 
     return Container(
       key: const Key('player_hud'),
@@ -45,6 +46,14 @@ class PlayerHud extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              if (streak >= 2)
+                Text(
+                  'Serie x$streak',
+                  key: const Key('player_hud_streak'),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
             ],
           ),
           const SizedBox(height: 6),

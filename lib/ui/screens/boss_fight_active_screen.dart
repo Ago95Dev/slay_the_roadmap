@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/boss_fight.dart';
+import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
 import '../view_models/player_view_model.dart';
@@ -29,6 +30,7 @@ class BossFightActiveScreen extends StatefulWidget {
 
 class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
   bool _rewardClaimed = false;
+  bool _defeatRecorded = false;
 
   List<Reward> _inventoryRewards(BuildContext context) {
     try {
@@ -36,6 +38,40 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     } catch (_) {
       return const [];
     }
+  }
+
+  int _lives(BuildContext context) {
+    try {
+      return context.watch<PlayerViewModel>().progress.lives;
+    } catch (_) {
+      return PlayerProgress.maxLives;
+    }
+  }
+
+  /// Vite come cuori (x3): piene ❤️ + vuote 🖤.
+  Widget _buildLivesRow(int lives) {
+    final full = '❤️' * lives;
+    final empty = '🖤' * (PlayerProgress.maxLives - lives);
+    return Text(
+      'Vite: $full$empty',
+      key: const Key('boss_lives'),
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      textAlign: TextAlign.center,
+    );
+  }
+
+  /// Addebita -1 vita UNA sola volta per sconfitta (post-frame per
+  /// non mutare lo stato durante il build).
+  void _recordDefeatOnce(BuildContext context) {
+    if (_defeatRecorded) return;
+    _defeatRecorded = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        context.read<PlayerViewModel>().recordBossDefeat();
+      } catch (_) {
+        // Senza PlayerViewModel (es. test): nessun addebito.
+      }
+    });
   }
   @override
   void initState() {
@@ -150,6 +186,8 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               'HP: ${boss.maxHp}',
               style: const TextStyle(fontSize: 18),
             ),
+            const SizedBox(height: 8),
+            _buildLivesRow(_lives(context)),
             const SizedBox(height: 32),
             const Text(
               'Defeat this boss to earn powerful rewards!',
@@ -158,9 +196,29 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
             ),
             const SizedBox(height: 32),
             ElevatedButton(
-              onPressed: () => viewModel.startBattle(
-                inventory: _inventoryRewards(context),
-              ),
+              onPressed: () {
+                bool canEnter = true;
+                try {
+                  canEnter =
+                      context.read<PlayerViewModel>().canEnterBoss;
+                } catch (_) {
+                  canEnter = true;
+                }
+                if (!canEnter) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Supera un quiz per recuperare una vita',
+                      ),
+                    ),
+                  );
+                  Navigator.pop(context);
+                  return;
+                }
+                viewModel.startBattle(
+                  inventory: _inventoryRewards(context),
+                );
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
                 foregroundColor: Colors.white,
@@ -196,6 +254,10 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
 
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 8),
+          child: _buildLivesRow(_lives(context)),
+        ),
         // Boss section
         Container(
           padding: const EdgeInsets.all(16),
@@ -584,6 +646,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     BossFightViewModel viewModel,
     BossFight boss,
   ) {
+    _recordDefeatOnce(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -610,12 +673,37 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               style: const TextStyle(fontSize: 18),
               textAlign: TextAlign.center,
             ),
+            const SizedBox(height: 8),
+            _buildLivesRow(_lives(context)),
             const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () => viewModel.retryBattle(),
+                  onPressed: () {
+                    bool canEnter = true;
+                    try {
+                      canEnter =
+                          context.read<PlayerViewModel>().canEnterBoss;
+                    } catch (_) {
+                      canEnter = true;
+                    }
+                    if (!canEnter) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Supera un quiz per recuperare una vita',
+                          ),
+                        ),
+                      );
+                      Navigator.pop(context);
+                      return;
+                    }
+                    setState(() {
+                      _defeatRecorded = false;
+                    });
+                    viewModel.retryBattle();
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange,
                     foregroundColor: Colors.white,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_models/boss_fight_view_model.dart';
+import '../view_models/player_view_model.dart';
 import '../../data/repositories/boss_repository.dart';
 import 'boss_fight_active_screen.dart';
 
@@ -49,6 +50,20 @@ class BossFightScreen extends StatelessWidget {
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
+                    final playerVm = Provider.of<PlayerViewModel?>(
+                      context,
+                      listen: false,
+                    );
+                    if (playerVm != null && !playerVm.canEnterBoss) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Supera un quiz per recuperare una vita',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
                     Navigator.push(
                       context,
                       MaterialPageRoute(

@@ -72,8 +72,48 @@ class LocalRewardRepository implements RewardRepository {
   @override
   Future<List<Reward>> getRewardsForTopic(String topicId) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    // Return 3 random rewards for the topic completion
-    final shuffled = List.of(_allRewards)..shuffle();
-    return shuffled.take(3).toList();
+    // 3 carte di 3 TIPI diversi: priorità attack, defense, utility
+    // poi special; random dentro il tipo; fallback se un tipo esaurito.
+    const priority = [
+      RewardType.attack,
+      RewardType.defense,
+      RewardType.utility,
+      RewardType.special,
+    ];
+    final picked = <Reward>[];
+    final pickedIds = <String>{};
+    for (final type in priority) {
+      if (picked.length >= 3) break;
+      final pool = _allRewards.where(
+        (r) => r.type == type && !pickedIds.contains(r.id),
+      ).toList()
+        ..shuffle();
+      if (pool.isNotEmpty) {
+        picked.add(pool.first);
+        pickedIds.add(pool.first.id);
+      }
+    }
+    // Fallback: riempi con le rimanenti se qualche tipo era esaurito.
+    if (picked.length < 3) {
+      final rest = _allRewards.where(
+        (r) => !pickedIds.contains(r.id),
+      ).toList()
+        ..shuffle();
+      for (final r in rest) {
+        if (picked.length >= 3) break;
+        // Evita duplicati di tipo se possibile.
+        if (picked.any((p) => p.type == r.type)) continue;
+        picked.add(r);
+        pickedIds.add(r.id);
+      }
+      // Ultima spiaggia: prendi comunque le rimanenti (tipi ripetuti).
+      for (final r in rest) {
+        if (picked.length >= 3) break;
+        if (pickedIds.contains(r.id)) continue;
+        picked.add(r);
+        pickedIds.add(r.id);
+      }
+    }
+    return picked;
   }
 }

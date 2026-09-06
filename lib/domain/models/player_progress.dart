@@ -9,6 +9,13 @@ class PlayerProgress extends Equatable {
   static const int level3Threshold = 500;
   static const int maxLevel = 3;
 
+  /// Vite per i boss fight (GamiDOC): 3 di default, max 3.
+  static const int maxLives = 3;
+
+  /// Ogni [streakBonusEvery] quiz passati di fila, bonus [streakBonusXp] XP.
+  static const int streakBonusEvery = 3;
+  static const int streakBonusXp = 25;
+
   /// Livello calcolato da [experience] (unica fonte di verità, anche per
   /// l'Hub futuro). 0–99 → 1, 100–499 → 2, 500+ → 3.
   static int levelForXp(int experience) {
@@ -25,6 +32,12 @@ class PlayerProgress extends Equatable {
   final PlayerInventory inventory;
   final Map<String, BossFight> bossFights;
   final DateTime lastSaved;
+
+  /// Vite rimaste per i boss fight (default 3, max 3, persistite).
+  final int lives;
+
+  /// Serie di quiz topic passati di fila (default 0, persistita).
+  final int streak;
 
   /// Livello derivato da [experience] (F6: niente più level salvato).
   int get level => levelForXp(experience);
@@ -65,6 +78,8 @@ class PlayerProgress extends Equatable {
     required this.inventory,
     this.bossFights = const {},
     required this.lastSaved,
+    this.lives = maxLives,
+    this.streak = 0,
   });
 
   factory PlayerProgress.initial() {
@@ -118,6 +133,8 @@ class PlayerProgress extends Equatable {
     PlayerInventory? inventory,
     Map<String, BossFight>? bossFights,
     DateTime? lastSaved,
+    int? lives,
+    int? streak,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -128,6 +145,8 @@ class PlayerProgress extends Equatable {
       inventory: inventory ?? this.inventory,
       bossFights: bossFights ?? this.bossFights,
       lastSaved: lastSaved ?? this.lastSaved,
+      lives: lives ?? this.lives,
+      streak: streak ?? this.streak,
     );
   }
 
@@ -145,6 +164,8 @@ class PlayerProgress extends Equatable {
       },
       'bossFights': bossFights.map((key, value) => MapEntry(key, _bossFightToJson(value))),
       'lastSaved': lastSaved.toIso8601String(),
+      'lives': lives,
+      'streak': streak,
     };
   }
 
@@ -164,6 +185,9 @@ class PlayerProgress extends Equatable {
       ),
       bossFights: (json['bossFights'] as Map).map((key, value) => MapEntry(key, _bossFightFromJson(value))),
       lastSaved: DateTime.parse(json['lastSaved']),
+      // Campi aggiunti dopo il save v1: default per i save vecchi.
+      lives: (json['lives'] as num?)?.toInt() ?? maxLives,
+      streak: (json['streak'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -286,5 +310,7 @@ class PlayerProgress extends Equatable {
     inventory,
     bossFights,
     lastSaved,
+    lives,
+    streak,
   ];
 }

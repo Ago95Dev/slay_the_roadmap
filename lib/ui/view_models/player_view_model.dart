@@ -90,9 +90,22 @@ class PlayerViewModel with ChangeNotifier {
   /// Chiamato solo a quiz passato (verifica in `TopicDetailScreen`): invia
   /// best-effort `quiz_completed {xp_amount:100, badge:topicId}` all'Hub,
   /// mai bloccante, mai un fallimento locale.
+  ///
+  /// Effetti serie/vite (GamiDOC/Toda): streak +1, +1 vita fino a max 3,
+  /// bonus +25 XP a ogni multiplo di 3 (il chiamante mostra
+  /// "Serie xN! +25 XP").
   bool addCompletedTopic(String topicId) {
     final before = _progress.level;
-    _progress = _progress.addCompletedTopic(topicId);
+    final newStreak = _progress.streak + 1;
+    final newLives = (_progress.lives + 1).clamp(0, PlayerProgress.maxLives);
+    final bonus =
+        newStreak % PlayerProgress.streakBonusEvery == 0 ? PlayerProgress.streakBonusXp : 0;
+    final updated = _progress.addCompletedTopic(topicId).copyWith(
+          streak: newStreak,
+          lives: newLives,
+          experience: _progress.experience + 100 + bonus,
+        );
+    _progress = updated;
     _autosave();
     notifyListeners();
     unawaited(
@@ -104,6 +117,26 @@ class PlayerViewModel with ChangeNotifier {
     );
     return _progress.level > before;
   }
+
+  /// Quiz topic fallito: azzera la serie (streak 0). Le vite non cambiano.
+  void recordQuizFail() {
+    if (_progress.streak == 0) return;
+    _progress = _progress.copyWith(streak: 0);
+    _autosave();
+    notifyListeners();
+  }
+
+  /// Sconfitta boss: -1 vita (min 0). Ritorna le vite rimaste.
+  int recordBossDefeat() {
+    final remaining = (_progress.lives - 1).clamp(0, PlayerProgress.maxLives);
+    _progress = _progress.copyWith(lives: remaining);
+    _autosave();
+    notifyListeners();
+    return remaining;
+  }
+
+  /// Ingresso boss bloccato a 0 vite.
+  bool get canEnterBoss => _progress.lives > 0;
 
   bool isBossDefeated(String bossId) =>
       _progress.bossFights.containsKey(bossId);

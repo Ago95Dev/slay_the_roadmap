@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../domain/models/player_progress.dart';
 import '../../domain/models/quiz.dart';
 import '../../domain/models/reward.dart';
 import '../../domain/models/topic.dart';
@@ -76,6 +77,21 @@ class TopicDetailScreen extends StatelessWidget {
                       );
                       if (!context.mounted) return;
                     }
+                    // Streak bonus ogni 3 quiz di fila (+25 XP già accreditati).
+                    if (playerVm.progress.streak >=
+                            PlayerProgress.streakBonusEvery &&
+                        playerVm.progress.streak %
+                                PlayerProgress.streakBonusEvery ==
+                            0) {
+                      if (!context.mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Serie x${playerVm.progress.streak}! +${PlayerProgress.streakBonusXp} XP',
+                          ),
+                        ),
+                      );
+                    }
                     if (!playerVm.isTopicClaimed(topic.id)) {
                       if (playerVm.isInventoryFull) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,6 +114,13 @@ class TopicDetailScreen extends StatelessWidget {
                     }
                   }
                   if (context.mounted) Navigator.pop(context);
+                } else if (result != null && !result.passed) {
+                  // Quiz fallito: azzera la serie (streak 0).
+                  if (!context.mounted) return;
+                  Provider.of<PlayerViewModel?>(
+                    context,
+                    listen: false,
+                  )?.recordQuizFail();
                 }
               },
               tooltip: 'Avvia Quiz',
