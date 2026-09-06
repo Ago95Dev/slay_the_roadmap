@@ -1,0 +1,41 @@
+\chapter{Modello di dominio}
+\label{ch:dominio}
+
+\section{Topic}
+\texttt{Topic(id, title, isOptional, status, subtopics)}.
+\texttt{status} $\in$ \{locked, inProgress, completed\}. I sottotopic ereditano
+la visibilità click-to-expand (US-01). I topic opzionali sono evidenziati ma
+non bloccano l'avanzamento.
+
+\section{Quiz}
+\texttt{Quiz(topicId, questions[5], threshold=0.8)}.
+Soglia di superamento: $required = \lceil 0.8 \times n \rceil$; con $n=5$,
+$required = 4$. Ogni risposta dà feedback immediato (corretto/errato);
+il superamento sblocca il topic successivo e assegna la scelta ricompensa
+(US-02/US-03).
+
+\section{Reward (carta)}
+\texttt{Reward(id, name, damage, effect, rarity, rarityColor)}.
+\texttt{rarity} $\in$ \{common, rare, epic, legendary\}; \texttt{rarityColor}
+è una stringa esadecimale (es.\ \texttt{\#9E9E9E}). Effetti noti: danno
+diretto, cura, veleno. Il giocatore ne sceglie 1 per topic; l'inventory
+è il deck (max 6 carte attive + 2 slot bloccati da sbloccare).
+
+\section{BossFight}
+\texttt{BossFight(boss, playerHp, thresholds=\{25,50,75\}\%)}.
+Parametri consolidati dal prototipo:
+\begin{itemize}[nosep]
+\item danno carta base 15 + \texttt{damage} della carta;
+\item attacco normale boss 10, speciale 20, cura boss $-15$ (al boss),
+veleno 5/turno;
+\item danno da quiz: $\mathit{round}(\mathit{percentuale}/10)$;
+\item alle soglie 25/50/75\% il boss cambia pattern (attacco speciale o cura).
+\end{itemize}
+Esiste un \texttt{TODO} noto (\texttt{victory} in \texttt{boss\_fight\_active},
+riga $\sim$419) sulla gestione della vittoria.
+
+\section{PlayerProgress}
+\texttt{PlayerProgress(xp, level=1, completedTopics, deck, bossStates)}.
+Ogni level-up assegna +100\,XP ma il level è attualmente fisso a 1
+(manca la curva di crescita). Nota: \texttt{fromJson} perde il campo
+\texttt{adaptiveQuizzes} (debito noto, Cap.~\ref{ch:debiti}).

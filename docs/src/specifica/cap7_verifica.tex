@@ -1,0 +1,12 @@
+\chapter{Verifica (stato P0)}
+\label{ch:verifica}
+
+\begin{itemize}
+\item \texttt{flutter build linux}: exit 0.
+\item \texttt{flutter analyze}: 0 error, 247 info (lint informativi, nessun errore).
+\item \texttt{flutter test}: 7/7 superati.
+\item Contenuti: 12 quiz $\times$ 5 domande in \texttt{quiz\_repository.dart};
+8 file morti eliminati (tree-shaking manuale del prototipo).
+\end{itemize}
+La verifica è stata eseguita sul commit \texttt{origin/main 24d8aa3 + P0}.
+Ogni modifica successiva dovrà ripetere i tre comandi sopra prima del merge.

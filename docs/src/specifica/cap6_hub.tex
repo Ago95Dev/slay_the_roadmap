@@ -1,0 +1,52 @@
+\chapter{Integrazione Hub futura}
+\label{ch:hub}
+
+\section{Endpoint}
+Nuova Hub obbligatoria (la vecchia polyglot risponde 530):
+console \url{https://gamification-webapp.createlab-univaq.it},
+API \url{https://gamification-api.createlab-univaq.it/api/v1},
+Swagger \url{https://gamification-api.createlab-univaq.it/swagger-ui/index.html},
+guida \url{https://gamification-api.createlab-univaq.it/docs/api-guide.en.md}.
+Auth: \texttt{POST /auth \{username, password, origin:''GAME''\}}
+$\rightarrow$ Bearer JWT (24\,h). Runtime: \texttt{POST /executions
+\{gameId, playerId, actionId, data:\{\}\}} (il campo \texttt{data} è
+obbligatorio anche se vuoto).
+
+\section{Concetti Hub}
+Actions, point concepts con periodi in millisecondi, badge come collezioni,
+un solo level per point concept, regole Drools con \texttt{/rules/validate}
+e simulazioni, challenge / leaderboard / classifiche.
+\textbf{Migrazione}: i vecchi \texttt{gameId} non sono validi; il gioco va
+ricreato da console e le regole riscritte.
+
+\section{Payload Dart di esempio}
+\begin{lstlisting}[caption={Esempio di chiamata executions con package:http.},label={lst:exec}]
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+Future<void> sendAction({
+  required String base, required String token,
+  required String gameId, required String playerId,
+  required String actionId, Map<String, dynamic> data = const {},
+}) async {
+  final res = await http.post(
+    Uri.parse('$base/api/v1/executions'),
+    headers: {'Content-Type': 'application/json',
+              'Authorization': 'Bearer $token'},
+    body: jsonEncode({'gameId': gameId, 'playerId': playerId,
+                      'actionId': actionId, 'data': data}),
+  );
+  if (res.statusCode != 200 && res.statusCode != 201) {
+    throw StateError('Hub error ${res.statusCode}: ${res.body}');
+  }
+}
+\end{lstlisting}
+
+\section{Strategia di migrazione}
+\texttt{FakeEngineClient} che implementa l'interfaccia dei repository e
+instrada ogni azione locale verso un \texttt{actionId} Hub
+(\texttt{complete\_quiz} $\rightarrow$ punti XP, \texttt{unlock\_topic}
+$\rightarrow$ badge/prerequisiti, \texttt{boss\_hit} $\rightarrow$ punti
+boss, \texttt{earn\_card} $\rightarrow$ collezione). I mock restano come
+fallback offline. Mapping \texttt{actionId} definitivo da fissare in console
+al momento della creazione del gioco.

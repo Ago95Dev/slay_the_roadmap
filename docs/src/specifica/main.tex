@@ -1,0 +1,44 @@
+% Specifica tecnica — Slay the Roadmap / Slay the Code
+\documentclass[a4paper,11pt]{report}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\geometry{a4paper,margin=2.5cm}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue!60!black,urlcolor=blue!60!black,citecolor=blue!60!black}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,frame=single,tabsize=2,language=C}
+\graphicspath{{../../assets/}{./}}
+
+\title{Slay the Roadmap / Slay the Code\\Specifiche Tecniche del Prototipo}
+\author{D'Agostino (matr.\ 303226) \and Di Giacomo (matr.\ 303377)}
+\date{Corso di Esempi di Gamification e Sistemi Intelligenti (EGS)\\A.A.\ 2025/2026 --- \today\\[1ex]
+\small Repository: \url{https://github.com/Ago95Dev/slay_the_roadmap}}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\input{cap1_contesto}
+\input{cap2_architettura}
+\input{cap3_dominio}
+\input{cap4_dati}
+\input{cap5_flussi}
+\input{cap6_hub}
+\input{cap7_verifica}
+\input{cap8_debiti}
+
+\begin{thebibliography}{9}
+\bibitem{hubguide} Gamification Hub, \textit{API Guide}, \url{https://gamification-api.createlab-univaq.it/docs/api-guide.en.md}.
+\bibitem{hubswagger} Gamification Hub, \textit{Swagger UI}, \url{https://gamification-api.createlab-univaq.it/swagger-ui/index.html}.
+\bibitem{hubconsole} Gamification Hub, \textit{Console}, \url{https://gamification-webapp.createlab-univaq.it}.
+\bibitem{hubvideo} Gamification Hub, \textit{Video guida}, \url{https://youtu.be/EJ8l2kcWiFs}.
+\bibitem{flutter} Flutter team, \textit{Flutter documentation}, \url{https://docs.flutter.dev}.
+\end{thebibliography}
+\end{document}

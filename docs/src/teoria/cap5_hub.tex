@@ -1,0 +1,28 @@
+\chapter{Gamification Hub}
+\label{ch:hubteoria}
+La vecchia istanza polyglot è spenta (HTTP 530): l'integrazione obbligatoria
+è la \textbf{nuova Hub} di UniAQ.
+
+\section{Componenti}
+Console: \url{https://gamification-webapp.createlab-univaq.it};
+API: \url{https://gamification-api.createlab-univaq.it/api/v1};
+Swagger: \url{https://gamification-api.createlab-univaq.it/swagger-ui/index.html};
+guida: \url{https://gamification-api.createlab-univaq.it/docs/api-guide.en.md};
+video: \url{https://youtu.be/EJ8l2kcWiFs}.
+
+\section{Modello concettuale}
+Autenticazione \texttt{POST /auth \{username, password, origin:''GAME''\}}
+$\rightarrow$ Bearer JWT valido 24\,h. Runtime
+\texttt{POST /executions \{gameId, playerId, actionId, data:\{\}\}} con
+\texttt{data} obbligatorio. Concetti: \textit{actions} (eventi di gioco),
+\textit{point concepts} con periodi in millisecondi, \textit{badge} come
+collezioni, un solo \textit{level} per point concept, \textit{regole Drools}
+con \texttt{/rules/validate} e simulazioni, \textit{challenge/leaderboard/
+classifiche}.
+
+\section{Migrazione}
+I vecchi \texttt{gameId} non sono validi: il gioco va ricreato da console,
+le regole riscritte in Drools e validate via Swagger prima del go-live.
+Questo sposta su Hub proprio ciò che Toda segnala come gap (leaderboard,
+economia XP/energia) senza riscrivere il client (si veda \texttt{specifica.pdf},
+Cap.~6).

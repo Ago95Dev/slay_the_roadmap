@@ -1,0 +1,46 @@
+\chapter{Architettura}
+\label{ch:architettura}
+
+\section{Stile architetturale}
+Architettura a \textbf{3 layer} con pattern \textbf{Provider} (package
+\texttt{provider}): un unico \texttt{RoadmapViewModel} esposto in
+\texttt{main.dart} (riga 43 circa) notifica i widget tramite
+\texttt{ChangeNotifier}. I repository sono \textbf{mock con ritardo
+simulato} (\texttt{Future.delayed}) per imitare la latenza di rete; la
+navigazione è \textbf{imperativa} (\texttt{Navigator.push}) senza router
+dichiarativo; la dependency injection è manuale (istanze create nel
+\texttt{main} e passate ai repository).
+
+\section{Tabella file $\rightarrow$ responsabilità}
+\begin{table}[h]
+\centering\small
+\begin{tabular}{@{}lp{6cm}r@{}}
+\toprule
+File & Responsabilità & Righe $\sim$ \\
+\midrule
+\texttt{lib/main.dart} & Bootstrap app, unico Provider & 60 \\
+\texttt{lib/viewmodels/roadmap\_viewmodel.dart} & Stato roadmap, quiz, deck & 300+ \\
+\texttt{lib/repositories/roadmap\_repository.dart} & Roadmap mock & 100+ \\
+\texttt{lib/repositories/quiz\_repository.dart} & \textbf{12 quiz $\times$ 5 domande} & 500+ \\
+\texttt{lib/repositories/reward\_repository.dart} & Ricompense (mai chiamato) & 80+ \\
+\texttt{lib/models/topic.dart} & Topic + sottotopic, stati & 60 \\
+\texttt{lib/models/quiz*.dart} & Domande, soglia 80\%, \texttt{required=ceil} & 80 \\
+\texttt{lib/models/reward.dart} & Ricompense, \texttt{rarityColor} hex string & 70 \\
+\texttt{lib/models/boss\_fight.dart} & Boss, soglie, danni, veleno & 150+ \\
+\texttt{lib/models/player\_progress.dart} & XP (+100/level, level fisso 1) & 80 \\
+\texttt{lib/screens/*} & Home, roadmap, topic, quiz, boss, deck & varie \\
+\bottomrule
+\end{tabular}
+\caption{Mappa dei file principali (stime, si veda il codice).}
+\label{tab:file}
+\end{table}
+
+\section{Navigazione e DI}
+Flusso: Home $\rightarrow$ PickPath $\rightarrow$ Roadmap $\rightarrow$
+Topic $\rightarrow$ Quiz $\rightarrow$ RewardChoice $\rightarrow$ BossFight
+$\rightarrow$ Deck. La DI è manuale: i repository vengono istanziati
+all'avvio e iniettati nel ViewModel; non si usa \texttt{get\_it} né
+\texttt{riverpod}. Questo semplifica il prototipo ma rende la futura
+integrazione Hub (Cap.~\ref{ch:hub}) un punto di intervento localizzato:
+basta sostituire i repository mock con client HTTP mantenendo le stesse
+interfacce.

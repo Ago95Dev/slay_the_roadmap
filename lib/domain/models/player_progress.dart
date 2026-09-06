@@ -1,5 +1,4 @@
 import 'package:equatable/equatable.dart';
-import 'topic.dart';
 import 'reward.dart';
 import 'quiz.dart';
 import 'boss_fight.dart';

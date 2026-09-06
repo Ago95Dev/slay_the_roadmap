@@ -1,0 +1,87 @@
+Visualizzazione Roadmap Gerarchica
+
+Come un nuovo giocatore
+Voglio vedere la struttura ad albero della roadmap di Dart
+Per capire il percorso di apprendimento e i prerequisiti
+
+Criteri di Accettazione:
+
+    Visualizzare i topic principali con indentazione per i sottotopic
+
+    Mostrare lo stato di completamento (bloccato/in corso/completato)
+
+    Highlight dei topic opzionali vs obbligatori
+
+    Navigazione click-to-expand per i sottotopic
+
+Completamento Topic con Quiz
+
+Come giocatore
+Voglio completare un topic superando un quiz finale
+Per sbloccare il prossimo argomento e guadagnare ricompense
+
+Criteri di Accettazione:
+
+    Quiz di 3-5 domande per topic
+
+    Soglia di superamento (es. 80% risposte corrette)
+
+    Feedback immediato per ogni risposta
+
+    Badge di completamento visibile
+
+    Sblocco automatico del prossimo topic
+
+Sistema Ricompense e Personalizzazione
+
+Come giocatore che completa un topic
+Voglio scegliere una ricompensa tra diverse opzioni
+Per personalizzare il mio stile di gioco per la boss fight
+
+Criteri di Accettazione (?)
+
+    Tipi diversi di ricompense
+
+    Preview dell'effetto di ogni ricompensa
+
+    Inventory visibile con ricompense ottenute
+
+    Limite di 1 ricompensa per topic completato (?)
+
+Boss Fight - Sistema Combattimento
+
+Come giocatore che ha completato un capitolo
+Voglio affrontare un boss finale con quiz adattivi
+Per testare le conoscenze acquisite e progredire nella storia
+
+Criteri di Accettazione:
+
+    Boss con barra HP
+
+    Turno giocatore: giocare carte ricompensa
+
+    Turno boss: quiz che infliggono danno
+
+    Soglie speciali a 25%/50%/75% HP boss
+
+    Vittoria/sconfitta con conseguenze sul progresso
+
+Persistenza Progresso Giocatore
+
+Come giocatore
+Voglio che il mio progresso sia salvato automaticamente
+Per riprendere esattamente dove ho lasciato in qualsiasi momento
+
+Criteri di Accettazione:
+
+    Salvataggio stato completamento topic
+
+    Salvataggio deck ricompense ottenute
+
+    Salvataggio progresso boss fight
+
+    Recupero stato all'avvio dell'app
+
+    Reset opzionale del progresso
+
+Menu ---> Map ---> static widget and functions for change the status.

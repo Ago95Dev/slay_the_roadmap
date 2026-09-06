@@ -1,0 +1,66 @@
+\chapter{Contesto e requisiti}
+\label{ch:contesto}
+
+\section{Il progetto}
+Slay the Roadmap (alias Slay the Code) è un'app Flutter che trasforma roadmap
+di apprendimento (Dart/Flutter) in un dungeon crawler didattico: la
+\textbf{roadmap è il dungeon}, i \textbf{topic sono i mostri}, i
+\textbf{concetti sono le carte} con cui si combatte il boss di fine capitolo.
+Stack: \textbf{Flutter 3.47.2}; stato consolidato al commit
+\texttt{origin/main 24d8aa3 + P0} (build Linux exit 0, \texttt{flutter analyze}
+0 error / 247 info, test 7/7).
+
+\section{User stories (US-01--US-05)}
+Fonte: \texttt{docs/legacy/EGS\_assignment2\_From User Stories to Sprint 1 Prototype.pdf}
+e file \texttt{docs/legacy/user\_stories}. La soglia di superamento quiz è l'80\%
+(4 risposte corrette su 5).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lp{9cm}@{}}
+\toprule
+ID & Storia (forma breve) \\
+\midrule
+US-01 & Come nuovo giocatore voglio vedere la roadmap ad albero (topic,
+indentazione, stato bloccato/in corso/completato, opzionali vs obbligatori,
+click-to-expand). \\
+US-02 & Come giocatore voglio completare un topic con un quiz (3--5 domande,
+soglia 80\%, feedback immediato, badge, sblocco prossimo topic). \\
+US-03 & Come giocatore voglio scegliere 1 ricompensa per topic (tipi diversi,
+preview effetto, inventory visibile). \\
+US-04 & Come giocatore voglio la boss fight di fine capitolo (HP boss, turno
+carte / turno quiz, soglie 25/50/75\%, vittoria/sconfitta con conseguenze). \\
+US-05 & Come giocatore voglio la persistenza automatica (topic, deck, boss,
+recupero all'avvio, reset opzionale). \\
+\bottomrule
+\end{tabular}
+\caption{Backlog delle user stories.}
+\label{tab:us}
+\end{table}
+
+\section{Sprint 1}
+Sprint 1 copre \textbf{US-01 (taglia P5/M), US-02 (P5/L), US-03 (P4/M)};
+US-04 e US-05 restano fuori dallo Sprint 1 (la boss fight esiste solo come
+prototipo locale, la persistenza è in memoria).
+
+\section{Mockup di riferimento (M1--M7)}
+Fonte: \texttt{docs/legacy/3\_Mockups.pdf} (7 pagine):
+\begin{enumerate}[label=M\arabic*.]
+\item Home: pulsanti CONTINUE, NEW RUN, SETTINGS + SIGN IN.
+\item Pick a PATH: scelta percorso (FLUTTER, OPTION2).
+\item Roadmap: titolo + 99\,XP, vite 3/5, energia 5/5, catena
+BASICS $\rightarrow$ VAR/FUNC $\rightarrow$ nodi bloccati $\rightarrow$
+BASIC TEST + MID BOSS.
+\item Topic: VARIABLES + link OPTIONAL + MINI QUIZ.
+\item Boss (carte): HP boss + soglia, YOUR TURN.
+\item Boss (quiz): domanda 1/3, opzioni A--D.
+\item Deck digitale: Level 12 Rogue, Energy 4, 6 carte + 2 bloccate,
+2 skill + 2 bloccate.
+\end{enumerate}
+
+\section{Vincoli d'esame}
+I 5 deliverable richiesti sono: (1) GamiDOC, (2) User Evaluation
+(metodo, profilo, risultati, riflessioni), (3) repository + README di run,
+(4) video dimostrativo di 3--5 minuti, (5) pianificazione sprint + ruoli.
+La vecchia istanza polyglot è spenta (HTTP 530); l'integrazione va fatta
+sulla \textbf{nuova Hub obbligatoria} (si veda il Cap.~\ref{ch:hub}).

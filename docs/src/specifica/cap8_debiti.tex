@@ -1,0 +1,20 @@
+\chapter{Debiti tecnici e lavori futuri}
+\label{ch:debiti}
+
+\begin{enumerate}
+\item UI ricompense: completare preview effetti e inventory (US-03 parziale).
+\item Persistenza: salvataggio/ripristino topic, deck, boss + reset (US-05).
+\item HUD: mostrare XP/level reali invece dei valori fissi (+100\,XP, level 1).
+\item \texttt{reward\_repository} mai chiamato: collegarlo al ViewModel.
+\item Rimuovere codice morto: \texttt{\_startQuiz}, \texttt{\_buildQuizButton}
+con \texttt{onPressed} vuoto.
+\item Risolvere TODO victory (\texttt{boss\_fight\_active} riga $\sim$419).
+\item Riparare \texttt{PlayerProgress.fromJson} (perde \texttt{adaptiveQuizzes}).
+\item Completare i dettagli dei topic mancanti (5/12) e le 3 schermate
+\texttt{ComingSoon} (altre 2 roadmap, profilo, achievement, impostazioni).
+\item \texttt{rarityColor} come stringa hex: migrare a tipo colore o enum.
+\item Integrazione Hub: creare gioco, regole Drools, client HTTP
+(Cap.~\ref{ch:hub}).
+\item Completare GamiDOC (architettura, valutazione, KPI), Evaluation con
+utenti, README di run e video 3--5\,min (si veda \texttt{docs/assignment/}).
+\end{enumerate}

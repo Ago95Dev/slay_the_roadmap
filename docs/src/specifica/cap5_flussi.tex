@@ -1,0 +1,28 @@
+\chapter{Flussi UI}
+\label{ch:flussi}
+
+\section{US-01: visualizzazione roadmap}
+Home (CONTINUE/NEW RUN) $\rightarrow$ PickPath $\rightarrow$ Roadmap ad
+albero con indentazione, stati e click-to-expand. I nodi bloccati sono
+visibili ma non navigabili.
+
+\section{US-02: quiz di topic}
+Topic (VARIABLES + link OPTIONAL + MINI QUIZ) $\rightarrow$ Quiz 1/3--5
+con opzioni A--D $\rightarrow$ feedback immediato $\rightarrow$ badge +
+sblocco topic successivo. Nota: esistono il metodo morto \texttt{\_startQuiz}
+e un \texttt{\_buildQuizButton} con \texttt{onPressed} vuoto (stub da
+ripulire, Cap.~\ref{ch:debiti}).
+
+\section{US-03: ricompensa}
+A quiz superato: scelta 1 carta su N con preview effetto $\rightarrow$
+aggiunta al deck (Level 12 Rogue, Energy 4, 6 slot + 2 bloccati, 2 skill
++ 2 bloccate).
+
+\section{US-04: boss fight (prototipo)}
+BOSS (HP + soglia, YOUR TURN: gioca carta) $\leftrightarrow$ quiz boss
+(danno in base alla percentuale). Vittoria/sconfitta con conseguenze sul
+progresso; resta il TODO sulla victory citato nel Cap.~\ref{ch:dominio}.
+
+\section{US-05: persistenza (non implementata)}
+Il progresso vive nel ViewModel in memoria; al riavvio si perde. Schermate
+profilo/achievement e reset restano \texttt{ComingSoon}.

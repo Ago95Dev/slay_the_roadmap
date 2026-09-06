@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/boss_fight.dart';
-import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
-import '../view_models/quiz_view_model.dart';
 import '../widgets/boss/boss_health_bar.dart';
 import '../widgets/boss/player_health_bar.dart';
 import '../widgets/boss/action_card.dart';
-import '../../data/repositories/quiz_repository.dart';
 
 class BossFightActiveScreen extends StatefulWidget {
   final String bossId;
