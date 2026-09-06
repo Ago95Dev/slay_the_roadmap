@@ -112,11 +112,6 @@ class TopicDetailScreen extends StatelessWidget {
 
           // Links List
           ...detail.links.map((link) => _buildLinkCard(link)),
-          const SizedBox(height: 20),
-
-          // Quiz Button
-          if (topic.quizId != null && !topic.isCompleted)
-            _buildQuizButton(),
         ],
       ),
     );
@@ -152,9 +147,6 @@ class TopicDetailScreen extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 20),
-          if (topic.quizId != null && !topic.isCompleted)
-            _buildQuizButton(),
         ],
       ),
     );
@@ -222,39 +214,6 @@ class TopicDetailScreen extends StatelessWidget {
         ),
         trailing: const Icon(Icons.open_in_new, size: 16),
         onTap: () => _launchUrl(link.url),
-      ),
-    );
-  }
-
-  Widget _buildQuizButton() {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: () {
-          // La navigazione al quiz è gestita nell'AppBar action
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.purple,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.quiz, size: 20),
-            SizedBox(width: 8),
-            Text(
-              'Avvia Quiz per Completare il Topic',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

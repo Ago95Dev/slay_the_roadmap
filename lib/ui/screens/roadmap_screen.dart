@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/topic.dart';
-import '../../domain/models/quiz.dart';
 import '../view_models/roadmap_view_model.dart';
 import '../widgets/roadmap/roadmap_tree.dart';
-import 'quiz_screen.dart';
 import 'topic_detail_screen.dart';
 
 class RoadmapScreen extends StatefulWidget {
@@ -29,9 +27,21 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     
     if (topic == null) return;
 
+    // Gate F1 (US-01): i topic locked non sono navigabili.
+    if (topic.isLocked) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Completa i prerequisiti per sbloccare questo topic'),
+        ),
+      );
+      return;
+    }
+
     // Mostra sempre i dettagli del topic quando viene cliccato
     final topicWithDetail = await viewModel.getTopicWithDetail(topicId);
-    
+
+    if (!mounted) return;
     if (topicWithDetail != null) {
       _showTopicDetail(topicWithDetail);
     } else {
@@ -48,43 +58,6 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
           topic: topic,
           topicDetail: topic.detail,
         ),
-      ),
-    );
-  }
-
-  void _startQuiz(Topic topic) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => QuizScreen(
-          topicId: topic.id,
-          topicTitle: topic.title,
-        ),
-      ),
-    ).then((result) {
-      if (result is QuizResult && result.passed) {
-        _onQuizPassed(topic, result);
-      }
-    });
-  }
-
-  void _onQuizPassed(Topic topic, QuizResult result) {
-    final viewModel = context.read<RoadmapViewModel>();
-    viewModel.updateTopicStatus(topic.id, TopicStatus.completed);
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Complimenti! 🎉'),
-        content: Text(
-          'Hai superato il quiz "${topic.title}" con il ${result.percentage.toStringAsFixed(1)}%!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Continua'),
-          ),
-        ],
       ),
     );
   }

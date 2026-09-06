@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'roadmap_selection_screen.dart';
+import 'roadmap_screen.dart';
 import 'boss_fight_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -86,7 +86,7 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const RoadmapSelectionScreen(),
+                builder: (context) => const RoadmapScreen(),
               ),
             );
           },
