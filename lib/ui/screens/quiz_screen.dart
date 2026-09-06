@@ -154,6 +154,34 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
           ),
 
+          // Hint dopo 2 errori sulla stessa domanda
+          if (viewModel.shouldShowHintForCurrent)
+            Container(
+              key: const Key('quiz_hint'),
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(Icons.lightbulb_outline,
+                      color: Colors.amber, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      viewModel.currentHint ?? 'Rileggi il topic e riprova.',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
           // Navigation buttons
           Padding(
             padding: const EdgeInsets.only(top: 16),
