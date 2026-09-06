@@ -53,22 +53,22 @@ void main() {
       final progress = PlayerProgress.initial().copyWith(
         playerName: 'Hero',
         experience: 200,
-        completedTopicIds: const ['dart_basics', 'variables'],
+        completedTopicIds: const ['web_network', 'net_client_server'],
         inventory: PlayerInventory(rewards: [_testReward('r1')]),
       );
 
       await persistence.savePlayerProgress(progress);
-      await persistence.saveClaimedRewardTopics({'dart_basics'});
+      await persistence.saveClaimedRewardTopics({'web_network'});
 
       final restored = await persistence.loadPlayerProgress();
       expect(restored, isNotNull);
       expect(restored!.playerName, 'Hero');
       expect(restored.experience, 200);
-      expect(restored.completedTopicIds, ['dart_basics', 'variables']);
+      expect(restored.completedTopicIds, ['web_network', 'net_client_server']);
       expect(restored.inventory.rewards.single.id, 'r1');
       expect(
         await persistence.loadClaimedRewardTopics(),
-        {'dart_basics'},
+        {'web_network'},
       );
       expect(await persistence.hasSave(), isTrue);
     });
@@ -84,7 +84,7 @@ void main() {
         adaptiveQuizzes: [
           const Quiz(
             id: 'q1',
-            topicId: 'dart_basics',
+            topicId: 'web_network',
             questions: [
               Question(
                 text: 'Q?',
@@ -120,14 +120,14 @@ void main() {
       final vm = RoadmapViewModel(LocalRoadmapRepository());
       await vm.loadRoadmap();
 
-      vm.applyCompletedTopics(['dart_basics']);
+      vm.applyCompletedTopics(['web_network']);
 
       expect(
-        _findTopic(vm.topics, 'dart_basics')?.status,
+        _findTopic(vm.topics, 'web_network')?.status,
         TopicStatus.completed,
       );
       expect(
-        _findTopic(vm.topics, 'variables')?.status,
+        _findTopic(vm.topics, 'net_client_server')?.status,
         TopicStatus.inProgress,
       );
       // Id sconosciuti ignorati, senza eccezioni.
@@ -137,20 +137,20 @@ void main() {
     test('resetToInitial torna allo stato seed', () async {
       final vm = RoadmapViewModel(LocalRoadmapRepository());
       await vm.loadRoadmap();
-      vm.applyCompletedTopics(['dart_basics']);
+      vm.applyCompletedTopics(['web_network']);
       expect(
-        _findTopic(vm.topics, 'dart_basics')?.status,
+        _findTopic(vm.topics, 'web_network')?.status,
         TopicStatus.completed,
       );
 
       await vm.resetToInitial();
 
       expect(
-        _findTopic(vm.topics, 'dart_basics')?.status,
+        _findTopic(vm.topics, 'web_network')?.status,
         TopicStatus.inProgress,
       );
       expect(
-        _findTopic(vm.topics, 'variables')?.status,
+        _findTopic(vm.topics, 'net_client_server')?.status,
         TopicStatus.locked,
       );
     });
@@ -160,22 +160,22 @@ void main() {
     test('mutazioni salvano, load() ripristina', () async {
       final persistence = await _persistence();
       final vm = PlayerViewModel(persistence: persistence);
-      vm.addCompletedTopic('dart_basics');
-      vm.claimReward('dart_basics', _testReward('r1'));
+      vm.addCompletedTopic('web_network');
+      vm.claimReward('web_network', _testReward('r1'));
       // Autosave fire-and-forget: attende il flush.
       await Future.delayed(const Duration(milliseconds: 100));
 
       final vm2 = PlayerViewModel(persistence: persistence);
       expect(await vm2.load(), isTrue);
-      expect(vm2.progress.completedTopicIds, ['dart_basics']);
-      expect(vm2.isTopicClaimed('dart_basics'), isTrue);
+      expect(vm2.progress.completedTopicIds, ['web_network']);
+      expect(vm2.isTopicClaimed('web_network'), isTrue);
       expect(vm2.inventory.rewards.single.id, 'r1');
     });
 
     test('wipe pulisce memoria e save', () async {
       final persistence = await _persistence();
       final vm = PlayerViewModel(persistence: persistence);
-      vm.addCompletedTopic('dart_basics');
+      vm.addCompletedTopic('web_network');
       await Future.delayed(const Duration(milliseconds: 100));
       expect(await persistence.hasSave(), isTrue);
 
@@ -217,7 +217,7 @@ void main() {
       expect(find.textContaining('INIZIA IL PERCORSO'), findsOneWidget);
 
       final withProgress = PlayerViewModel();
-      withProgress.addCompletedTopic('dart_basics');
+      withProgress.addCompletedTopic('web_network');
       await pump(withProgress);
       expect(find.textContaining('CONTINUA'), findsOneWidget);
       expect(find.textContaining('NUOVO PERCORSO'), findsOneWidget);
@@ -228,7 +228,7 @@ void main() {
 
     testWidgets('Reset da Settings cancella i progressi', (tester) async {
       final vm = PlayerViewModel(persistence: await _persistence());
-      vm.addCompletedTopic('dart_basics');
+      vm.addCompletedTopic('web_network');
 
       await tester.pumpWidget(
         MultiProvider(

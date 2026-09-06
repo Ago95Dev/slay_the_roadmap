@@ -22,10 +22,10 @@ void main() {
     test('4/5 correct answers passes, 3/5 fails', () async {
       final repository = LocalQuizRepository();
 
-      // Correct answers for quiz_dart_basics: [1, 2, 2, 3, 0]
+      // Correct answers for quiz_web_network: [1, 1, 1, 1, 1]
       final passed = await repository.submitQuizAnswers(
-        'quiz_dart_basics',
-        [1, 2, 2, 3, 1], // last answer wrong -> 4/5
+        'quiz_web_network',
+        [1, 1, 1, 1, 0], // last answer wrong -> 4/5
       );
       expect(passed.correctAnswers, 4);
       expect(passed.totalQuestions, 5);
@@ -33,8 +33,8 @@ void main() {
       expect(passed.passed, isTrue);
 
       final failed = await repository.submitQuizAnswers(
-        'quiz_dart_basics',
-        [1, 2, 0, 3, 1], // Q3 and Q5 wrong -> 3/5
+        'quiz_web_network',
+        [1, 1, 1, 0, 0], // Q4 and Q5 wrong -> 3/5
       );
       expect(failed.correctAnswers, 3);
       expect(failed.percentage, 60.0);
@@ -109,10 +109,10 @@ void main() {
         playerName: 'Tester',
         experience: 100,
         level: 2,
-        completedTopicIds: const ['dart_basics'],
+        completedTopicIds: const ['web_network'],
         quizResults: [
           QuizResult(
-            quizId: 'quiz_dart_basics',
+            quizId: 'quiz_web_network',
             correctAnswers: 4,
             totalQuestions: 5,
             percentage: 80.0,
@@ -130,11 +130,11 @@ void main() {
       expect(restored.playerName, 'Tester');
       expect(restored.experience, 100);
       expect(restored.level, 2);
-      expect(restored.completedTopicIds, ['dart_basics']);
+      expect(restored.completedTopicIds, ['web_network']);
       expect(restored.quizResults.single.passed, isTrue);
       expect(restored.quizResults.single.percentage, 80.0);
-      expect(restored.isTopicCompleted('dart_basics'), isTrue);
-      expect(restored.isTopicCompleted('variables'), isFalse);
+      expect(restored.isTopicCompleted('web_network'), isTrue);
+      expect(restored.isTopicCompleted('net_client_server'), isFalse);
     });
   });
 }

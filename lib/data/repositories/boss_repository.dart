@@ -30,29 +30,29 @@ class BossRepository {
   // Mock data
   static final List<BossFight> _mockBosses = [
     BossFight(
-      id: 'syntax_guardian',
-      chapterId: 'dart_basics',
-      name: 'The Syntax Guardian',
+      id: 'man_in_the_middle',
+      chapterId: 'web_network',
+      name: 'Man-in-the-Middle',
       maxHp: 150,
       currentHp: 150,
       availableRewards: [
         const Reward(
           id: 'reward_1',
           name: 'Quick Learner',
-          description: 'Gain +10% quiz score on Dart basics topics',
+          description: 'Gain +10% quiz score on network topics',
           type: RewardType.utility,
           rarity: RewardRarity.common,
           icon: '📚',
-          effects: {'quizBonus': 0.1, 'topics': ['dart_basics']},
+          effects: {'quizBonus': 0.1, 'topics': ['web_network']},
         ),
         const Reward(
           id: 'reward_2',
           name: 'Syntax Master',
-          description: 'Deal +5 damage on correct syntax questions',
+          description: 'Deal +5 damage on correct network questions',
           type: RewardType.attack,
           rarity: RewardRarity.rare,
           icon: '⚔️',
-          effects: {'damage': 5, 'questionType': 'syntax'},
+          effects: {'damage': 5, 'questionType': 'network'},
         ),
         const Reward(
           id: 'reward_3',
@@ -66,31 +66,26 @@ class BossRepository {
       ],
       adaptiveQuizzes: [
         Quiz(
-          id: 'quiz_boss_dart_1',
-          topicId: 'dart_basics',
+          id: 'quiz_boss_network_1',
+          topicId: 'web_network',
           questions: [
             const Question(
-              text: 'What keyword is used to declare a variable that cannot be reassigned?',
-              options: ['var', 'let', 'final', 'const'],
-              correctAnswerIndex: 2,
-              explanation: 'The "final" keyword in Dart creates a variable that can only be assigned once.',
+              text: 'Apri un sito: chi inizia la conversazione?',
+              options: ['Il server invia la pagina da solo', 'Il client chiede, il server risponde', 'Il DNS crea la pagina', 'Il browser indovina'],
+              correctAnswerIndex: 1,
+              explanation: 'Tutto parte da una richiesta del client.',
             ),
             const Question(
-              text: 'Which of these is NOT a valid Dart data type?',
-              options: ['int', 'String', 'boolean', 'double'],
-              correctAnswerIndex: 2,
-              explanation: 'Dart uses "bool" not "boolean" for boolean values.',
+              text: 'A cosa serve il DNS?',
+              options: ['Cifrare i dati', 'Tradurre nomi di dominio in indirizzi IP', 'Creare pagine web', 'Velocizzare il CSS'],
+              correctAnswerIndex: 1,
+              explanation: 'È la rubrica di Internet.',
             ),
             const Question(
-              text: 'What does the "late" keyword do in Dart?',
-              options: [
-                'Delays variable initialization',
-                'Makes the variable lazy',
-                'Allows non-nullable variable to be initialized later',
-                'Creates a time-based variable'
-              ],
-              correctAnswerIndex: 2,
-              explanation: 'The "late" keyword allows you to declare a non-nullable variable that will be initialized later, before its first use.',
+              text: 'Compili un form con la carta: perché serve HTTPS?',
+              options: ['Il sito carica prima', 'In HTTP chi intercetta legge tutto in chiaro', 'Evita i 404', 'Il browser lo richiede per i colori'],
+              correctAnswerIndex: 1,
+              explanation: 'Cifratura del trasporto, non del sito.',
             ),
           ],
           passingThreshold: 70,
@@ -98,16 +93,16 @@ class BossRepository {
       ],
     ),
     BossFight(
-      id: 'widget_overlord',
-      chapterId: 'oop_dart',
-      name: 'Widget Overlord',
+      id: 'the_amnesiac',
+      chapterId: 'web_data',
+      name: 'The Amnesiac',
       maxHp: 200,
       currentHp: 200,
       availableRewards: [
         const Reward(
           id: 'reward_4',
           name: 'Widget Wisdom',
-          description: 'Gain insight into Flutter widget tree',
+          description: 'Gain insight into where app data lives',
           type: RewardType.utility,
           rarity: RewardRarity.epic,
           icon: '🧠',
@@ -134,25 +129,20 @@ class BossRepository {
       ],
       adaptiveQuizzes: [
         Quiz(
-          id: 'quiz_boss_flutter_1',
-          topicId: 'oop_dart',
+          id: 'quiz_boss_data_1',
+          topicId: 'web_data',
           questions: [
             const Question(
-              text: 'Which widget is stateful?',
-              options: ['Container', 'Text', 'Checkbox', 'Icon'],
-              correctAnswerIndex: 2,
-              explanation: 'Checkbox is a StatefulWidget because it needs to track its checked state.',
+              text: 'Quando conviene pensare a "lista" e quando a "mappa"?',
+              options: ['Sono uguali', 'Lista quando conta l\u2019ordine, mappa quando conta ritrovare per nome', 'Lista per i numeri, mappa per le foto', 'A caso'],
+              correctAnswerIndex: 1,
+              explanation: 'La domanda è "come lo ritroverò?".',
             ),
             const Question(
-              text: 'What does setState() do?',
-              options: [
-                'Creates a new state',
-                'Notifies framework to rebuild widget',
-                'Saves state to disk',
-                'Resets widget to initial state'
-              ],
+              text: 'Come fa un sito a ricordarti il login da una pagina all\u2019altra?',
+              options: ['Indovina', 'Il browser ripresenta un bigliettino (cookie) e il server lo lega alla tua sessione', 'Lo scrive nell\u2019URL in chiaro', 'Lo chiede ogni volta'],
               correctAnswerIndex: 1,
-              explanation: 'setState() notifies the Flutter framework that the internal state has changed and the widget should rebuild.',
+              explanation: 'Riconoscimento = gettone ripresentato + registro lato server.',
             ),
           ],
           passingThreshold: 75,
@@ -160,9 +150,9 @@ class BossRepository {
       ],
     ),
     BossFight(
-      id: 'async_demon',
-      chapterId: 'advanced_dart',
-      name: 'Async Demon',
+      id: 'spaghetti_colossus',
+      chapterId: 'web_building',
+      name: 'Spaghetti Colossus',
       maxHp: 250,
       currentHp: 250,
       availableRewards: [
@@ -178,34 +168,29 @@ class BossRepository {
         const Reward(
           id: 'reward_8',
           name: 'Async Blade',
-          description: 'Deal massive damage on async questions',
+          description: 'Deal massive damage on building questions',
           type: RewardType.attack,
           rarity: RewardRarity.epic,
           icon: '🗡️',
-          effects: {'damage': 15, 'questionType': 'async'},
+          effects: {'damage': 15, 'questionType': 'building'},
         ),
       ],
       adaptiveQuizzes: [
         Quiz(
-          id: 'quiz_boss_async_1',
-          topicId: 'async_programming',
+          id: 'quiz_boss_building_1',
+          topicId: 'build_ship',
           questions: [
             const Question(
-              text: 'What keyword makes a function asynchronous in Dart?',
-              options: ['await', 'async', 'future', 'promise'],
+              text: 'Perché separare cosa c\u2019è, come appare e cosa fa?',
+              options: ['Moda', 'Per cambiare un aspetto senza rompere gli altri', 'Per andare offline', 'Per usare più file'],
               correctAnswerIndex: 1,
-              explanation: 'The "async" keyword marks a function as asynchronous, allowing it to use "await" and return a Future.',
+              explanation: 'Separazione = modifiche indipendenti.',
             ),
             const Question(
-              text: 'What does await do in Dart?',
-              options: [
-                'Pauses execution until Future completes',
-                'Creates a new thread',
-                'Makes code run faster',
-                'Handles errors automatically'
-              ],
-              correctAnswerIndex: 0,
-              explanation: 'The "await" keyword pauses execution until the Future completes and returns its result.',
+              text: 'Perché spedire spesso piccoli passi è più sicuro di un unico grande lancio?',
+              options: ['Non lo è', 'Se qualcosa si rompe, sai quale passo è colpevole e torni indietro di poco', 'Costa meno', 'È più emozionante'],
+              correctAnswerIndex: 1,
+              explanation: 'Piccoli passi = colpevoli piccoli e vicini.',
             ),
           ],
           passingThreshold: 80,

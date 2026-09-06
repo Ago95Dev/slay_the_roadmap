@@ -24,12 +24,12 @@ Topic? _find(List<Topic> topics, String id) {
   return null;
 }
 
-/// Completa l'intero capitolo dart_basics (root + sotto-topic richiesti).
+/// Completa l'intero capitolo web_network (root + sotto-topic richiesti).
 void _completeChapterOne(RoadmapViewModel vm) {
-  vm.updateTopicStatus('dart_basics', TopicStatus.completed);
-  vm.updateTopicStatus('variables', TopicStatus.completed);
-  vm.updateTopicStatus('functions', TopicStatus.completed);
-  vm.updateTopicStatus('control_flow', TopicStatus.completed);
+  vm.updateTopicStatus('web_network', TopicStatus.completed);
+  vm.updateTopicStatus('net_client_server', TopicStatus.completed);
+  vm.updateTopicStatus('net_dns_url', TopicStatus.completed);
+  vm.updateTopicStatus('net_http_https', TopicStatus.completed);
 }
 
 void main() {
@@ -40,33 +40,33 @@ void main() {
       await vm.loadRoadmap();
       expect(vm.topics, hasLength(3));
 
-      final basics = _find(vm.topics, 'dart_basics')!;
-      expect(basics.bossId, 'syntax_guardian');
-      expect(basics.bossName, 'The Syntax Guardian');
+      final basics = _find(vm.topics, 'web_network')!;
+      expect(basics.bossId, 'man_in_the_middle');
+      expect(basics.bossName, 'Man-in-the-Middle');
       expect(basics.requiredBossId, isNull);
 
-      final oop = _find(vm.topics, 'oop_dart')!;
-      expect(oop.bossId, 'widget_overlord');
-      expect(oop.bossName, 'Widget Overlord');
-      expect(oop.requiredBossId, 'syntax_guardian');
+      final oop = _find(vm.topics, 'web_data')!;
+      expect(oop.bossId, 'the_amnesiac');
+      expect(oop.bossName, 'The Amnesiac');
+      expect(oop.requiredBossId, 'man_in_the_middle');
 
-      final advanced = _find(vm.topics, 'advanced_dart')!;
-      expect(advanced.bossId, 'async_demon');
-      expect(advanced.bossName, 'Async Demon');
-      expect(advanced.requiredBossId, 'widget_overlord');
+      final advanced = _find(vm.topics, 'web_building')!;
+      expect(advanced.bossId, 'spaghetti_colossus');
+      expect(advanced.bossName, 'Spaghetti Colossus');
+      expect(advanced.requiredBossId, 'the_amnesiac');
     });
 
     test('chapterId dei boss coerenti coi capitoli, nomi allineati ai Topic',
         () async {
       final bosses = await BossRepository().getAllBosses();
       expect(bosses.map((b) => b.id),
-          containsAll(['syntax_guardian', 'widget_overlord', 'async_demon']));
+          containsAll(['man_in_the_middle', 'the_amnesiac', 'spaghetti_colossus']));
 
       final vm = RoadmapViewModel(LocalRoadmapRepository());
       await vm.loadRoadmap();
       final rootIds = vm.topics.map((t) => t.id).toSet();
       for (final boss in bosses) {
-        // Niente più chapterId orfani (flutter_widgets/async_programming).
+        // Niente più chapterId orfani (es. vecchi id Dart).
         expect(rootIds, contains(boss.chapterId),
             reason: 'boss ${boss.id} -> ${boss.chapterId}');
         final chapter = _find(vm.topics, boss.chapterId)!;
@@ -78,7 +78,7 @@ void main() {
   });
 
   group('Gate capitoli via requiredBossId', () {
-    test('default isBossDefeated=false: oop_dart resta locked dopo dart_basics',
+    test('default isBossDefeated=false: web_data resta locked dopo web_network',
         () async {
       final vm = RoadmapViewModel(LocalRoadmapRepository());
       await vm.loadRoadmap();
@@ -86,41 +86,41 @@ void main() {
 
       // I sotto-topic si sbloccano a catena (nessun gate boss lì)...
       expect(
-          _find(vm.topics, 'control_flow')?.status, TopicStatus.completed);
+          _find(vm.topics, 'net_http_https')?.status, TopicStatus.completed);
       // ...ma il capitolo dopo resta locked senza vittoria sul boss.
-      expect(_find(vm.topics, 'oop_dart')?.status, TopicStatus.locked);
+      expect(_find(vm.topics, 'web_data')?.status, TopicStatus.locked);
       // Il nodo boss invece è sbloccato: capitolo interamente completato
-      // (mixins è opzionale e non blocca).
+      // (data_state è opzionale e non blocca).
       expect(
-          _find(vm.topics, 'dart_basics')?.isChapterComplete, isTrue);
+          _find(vm.topics, 'web_network')?.isChapterComplete, isTrue);
     });
 
     test('nodo boss locked prima del capitolo completato', () async {
       final vm = RoadmapViewModel(LocalRoadmapRepository());
       await vm.loadRoadmap();
       expect(
-          _find(vm.topics, 'dart_basics')?.isChapterComplete, isFalse);
+          _find(vm.topics, 'web_network')?.isChapterComplete, isFalse);
     });
 
-    test('reevaluateUnlocks apre oop_dart quando il boss è sconfitto',
+    test('reevaluateUnlocks apre web_data quando il boss è sconfitto',
         () async {
       var defeated = false;
       final vm = RoadmapViewModel(
         LocalRoadmapRepository(),
         isBossDefeated: (bossId) =>
-            defeated && bossId == 'syntax_guardian',
+            defeated && bossId == 'man_in_the_middle',
       );
       await vm.loadRoadmap();
       _completeChapterOne(vm);
-      expect(_find(vm.topics, 'oop_dart')?.status, TopicStatus.locked);
+      expect(_find(vm.topics, 'web_data')?.status, TopicStatus.locked);
 
       defeated = true;
       vm.reevaluateUnlocks();
       expect(
-          _find(vm.topics, 'oop_dart')?.status, TopicStatus.inProgress);
-      // advanced_dart resta locked: manca widget_overlord + oop incompleto.
+          _find(vm.topics, 'web_data')?.status, TopicStatus.inProgress);
+      // web_building resta locked: manca the_amnesiac + oop incompleto.
       expect(
-          _find(vm.topics, 'advanced_dart')?.status, TopicStatus.locked);
+          _find(vm.topics, 'web_building')?.status, TopicStatus.locked);
     });
 
     test('vittoria reale (PlayerViewModel) sblocca il capitolo dopo',
@@ -132,18 +132,18 @@ void main() {
       );
       await roadmapVm.loadRoadmap();
       _completeChapterOne(roadmapVm);
-      expect(_find(roadmapVm.topics, 'oop_dart')?.status, TopicStatus.locked);
+      expect(_find(roadmapVm.topics, 'web_data')?.status, TopicStatus.locked);
 
       // Vittoria come la registra BossFightActiveScreen al claim.
       final bosses = await BossRepository().getAllBosses();
-      final boss = bosses.firstWhere((b) => b.id == 'syntax_guardian');
+      final boss = bosses.firstWhere((b) => b.id == 'man_in_the_middle');
       expect(playerVm.recordBossVictory(boss), isTrue);
-      expect(playerVm.isBossDefeated('syntax_guardian'), isTrue);
+      expect(playerVm.isBossDefeated('man_in_the_middle'), isTrue);
 
       // Al rientro dalla vittoria la roadmap rivaluta i gate.
       roadmapVm.reevaluateUnlocks();
       expect(
-          _find(roadmapVm.topics, 'oop_dart')?.status, TopicStatus.inProgress);
+          _find(roadmapVm.topics, 'web_data')?.status, TopicStatus.inProgress);
     });
   });
 
@@ -202,9 +202,9 @@ void main() {
       final playerVm = PlayerViewModel();
       await pumpRoadmap(tester, playerVm);
 
-      expect(find.byKey(const Key('boss_tile_syntax_guardian')),
+      expect(find.byKey(const Key('boss_tile_man_in_the_middle')),
           findsOneWidget);
-      await tester.tap(find.byKey(const Key('boss_tile_syntax_guardian')));
+      await tester.tap(find.byKey(const Key('boss_tile_man_in_the_middle')));
       await tester.pumpAndSettle();
 
       expect(
@@ -222,11 +222,11 @@ void main() {
       _completeChapterOne(roadmapVm);
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(const Key('boss_tile_syntax_guardian')));
+      await tester.tap(find.byKey(const Key('boss_tile_man_in_the_middle')));
       await tester.pumpAndSettle();
 
       expect(find.byType(BossFightActiveScreen), findsOneWidget);
-      expect(find.text('The Syntax Guardian'), findsWidgets);
+      expect(find.text('Man-in-the-Middle'), findsWidgets);
     });
   });
 }

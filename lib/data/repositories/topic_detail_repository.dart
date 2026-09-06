@@ -7,279 +7,231 @@ abstract class TopicDetailRepository {
 
 class LocalTopicDetailRepository implements TopicDetailRepository {
   final Map<String, TopicDetail> _topicDetails = {
-    'dart_basics': TopicDetail(
-      id: 'dart_basics',
-      title: 'Basics of Dart',
-      description: 'Dart is an open-source, general-purpose, object-oriented programming language with C-style syntax developed by Google in 2011. The purpose of Dart programming is to create a frontend user interfaces for the web and mobile apps. It can also be used to build server and desktop applications.\\n\\nVisit the following resources to learn more:',
-      quizId: 'quiz_dart_basics',
+    'web_network': TopicDetail(
+      id: 'web_network',
+      title: 'La rete in un quadro',
+      description:
+          'Il web è una rete di computer che si parlano a strati: ogni strato risolve un problema diverso — trovare l\u2019altro (nomi e indirizzi), mettersi d\u2019accordo su come parlare (protocolli), scambiarsi contenuti. Separare i ruoli significa poter rompere e riparare un pezzo senza buttare tutto: se cambia il Wi-Fi, i nomi restano; se cambia un server, il browser resta. Studiare prima la rete ha senso perché ogni scelta dopo (dati, pagine, app) deve fare i conti con come viaggiano le informazioni.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_web_network',
       links: [
         LearningLink(
-          title: 'Dart Overview',
-          url: 'https://dart.dev/overview',
+          title: 'How does the Internet work (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/How_does_the_Internet_work',
           type: LinkType.article,
         ),
         LearningLink(
-          title: 'Explore top posts about Dart',
-          url: 'https://app.daily.dev/tags/dart?ref=roadmapsh',
+          title: 'How does the Internet work (Cloudflare)',
+          url: 'https://www.cloudflare.com/learning/network-layer/how-does-the-internet-work/',
           type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'What is Dart?',
-          url: 'https://www.youtube.com/watch?v=sOSd6G1qXoY',
-          type: LinkType.video,
-        ),
-        LearningLink(
-          title: 'Dart in 100 Seconds',
-          url: 'https://www.youtube.com/watch?v=NrO0CJCbYLA',
-          type: LinkType.video,
         ),
       ],
     ),
-    'variables': TopicDetail(
-      id: 'variables',
-      title: 'Variables and Data Types',
-      description: 'Understanding variables, constants and data types in Dart. Learn about var, final, const, and the different data types available in Dart including int, double, String, bool, List, Map, and more.\\n\\nVisit the following resources to learn more:',
-      quizId: 'quiz_variables',
+    'net_client_server': TopicDetail(
+      id: 'net_client_server',
+      title: 'Client e server',
+      description:
+          'Il web è una conversazione tra due ruoli. Il client (browser) chiede, il server risponde: ogni pagina è una sequenza di richieste e risposte, mai il server che "spinge" da solo. Il codice può girare sul client (interazione immediata) o sul server (dati protetti e condivisi): dove lo metti cambia velocità, sicurezza e chi paga il conto computazionale.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_net_client_server',
       links: [
         LearningLink(
-          title: 'Dart Variables',
-          url: 'https://dart.dev/language/variables',
+          title: 'What is a web server (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_web_server',
           type: LinkType.documentation,
         ),
         LearningLink(
-          title: 'Dart Data Types',
-          url: 'https://dart.dev/language/variables',
+          title: 'How browsers work (web.dev)',
+          url: 'https://web.dev/howbrowserswork/',
           type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Variables Tutorial',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
         ),
       ],
     ),
-    'functions': TopicDetail(
-      id: 'functions',
-      title: 'Functions',
-      description: 'Learn how to write and use functions in Dart. Understand function parameters, return types, arrow functions, and function expressions. Explore optional parameters, named parameters, and default values.\\n\\nVisit the following resources to learn more:',
-      quizId: 'quiz_functions',
+    'net_dns_url': TopicDetail(
+      id: 'net_dns_url',
+      title: 'Indirizzi e nomi',
+      description:
+          'I computer si trovano con indirizzi IP numerici, impossibili da ricordare: il DNS è la rubrica che traduce nomi (es. esempio.it) in IP. L\u2019URL è l\u2019indirizzo completo della risorsa: protocollo, nome, porta, percorso e parametri dicono al browser dove andare e cosa chiedere. Senza DNS digiteremmo numeri; senza URL non sapremmo quale pagina di quel server vogliamo.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_net_dns_url',
       links: [
         LearningLink(
-          title: 'Dart Functions',
-          url: 'https://dart.dev/language/functions',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Functions in Dart',
-          url: 'https://dart.dev/guides/language/language-tour#functions',
+          title: 'What is DNS (Cloudflare)',
+          url: 'https://www.cloudflare.com/learning/dns/what-is-dns/',
           type: LinkType.article,
         ),
         LearningLink(
-          title: 'Dart Functions Tutorial',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
+          title: 'What is a URL (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Howto/Web_mechanics/What_is_a_URL',
+          type: LinkType.documentation,
         ),
       ],
     ),
-    'control_flow': TopicDetail(
-      id: 'control_flow',
-      title: 'Control Flow',
-      description: 'Master control flow statements in Dart including if-else, for loops, while loops, do-while loops, switch statements, and break/continue. Learn how to control the execution flow of your Dart programs.\\n\\nVisit the following resources to learn more:',
-      quizId: 'quiz_control_flow',
+    'net_http_https': TopicDetail(
+      id: 'net_http_https',
+      title: 'HTTP e HTTPS',
+      description:
+          'HTTP è il linguaggio della conversazione web: metodi (GET per leggere, POST per inviare...), status code (200 ok, 404 non trovato, 500 errore server) e header (metadati). Viaggia in chiaro: chi intercetta legge tutto — per questo esiste HTTPS, che cifra il canale con TLS. Il lucchetto non dice "sito onesto", dice "nessuno in mezzo può leggere".\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_net_http_https',
       links: [
         LearningLink(
-          title: 'Control Flow in Dart',
-          url: 'https://dart.dev/language/control-flow',
+          title: 'An overview of HTTP (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Overview',
           type: LinkType.documentation,
         ),
         LearningLink(
-          title: 'Dart Control Flow Tutorial',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
+          title: 'What is HTTPS (Cloudflare)',
+          url: 'https://www.cloudflare.com/learning/ssl/what-is-https/',
+          type: LinkType.article,
         ),
       ],
     ),
-    'oop_dart': TopicDetail(
-      id: 'oop_dart',
-      title: 'Object-Oriented Programming',
-      description: 'Master OOP concepts in Dart including classes, objects, inheritance, polymorphism, encapsulation, and abstraction. Learn about constructors, methods, properties, and access modifiers.\\n\\nVisit the following resources to learn more:',
-      quizId: 'quiz_oop',
+    'web_data': TopicDetail(
+      id: 'web_data',
+      title: 'I dati in un quadro',
+      description:
+          'Tutto ciò che vedi sul web è dati in viaggio: testi, immagini, prezzi, messaggi. Prima di mostrarli bisogna decidere come rappresentarli (in che forma), dove tenerli (chi li custodisce) e come ricordare da dove eravamo rimasti (lo stato). Queste tre domande tornano in ogni app: un social, un negozio, un gioco. Capirle a livello di idee — senza sintassi — ti permette di valutare qualsiasi tecnologia dopo.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_web_data',
       links: [
         LearningLink(
-          title: 'Dart Classes',
-          url: 'https://dart.dev/language/classes',
+          title: 'JSON e dati sul web (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON',
           type: LinkType.documentation,
         ),
         LearningLink(
-          title: 'Object-Oriented Programming in Dart',
-          url: 'https://dart.dev/guides/language/language-tour#classes',
+          title: 'Database roadmap (roadmap.sh)',
+          url: 'https://roadmap.sh/databases',
+          type: LinkType.article,
+        ),
+      ],
+    ),
+    'data_represent': TopicDetail(
+      id: 'data_represent',
+      title: 'Rappresentare i dati',
+      description:
+          'I computer in fondo conoscono solo numeri binari, ma noi ragioniamo in testi, immagini, elenchi: servono formati che facciano da ponte. Il testo è il ponte più universale — leggibile da persone e programmi — ed è per questo che i formati testuali leggeri dominano lo scambio web. Per organizzare le informazioni bastano poche forme mentali: liste (ordine), mappe (nome→valore), alberi (gerarchie di contenuti dentro contenuti). La pagina stessa è un albero (il DOM): nodi annidati che il browser attraversa per mostrare e aggiornare.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_data_represent',
+      links: [
+        LearningLink(
+          title: 'JSON e dati sul web (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/JSON',
+          type: LinkType.documentation,
+        ),
+        LearningLink(
+          title: 'Introduction to the DOM (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction',
+          type: LinkType.article,
+        ),
+      ],
+    ),
+    'data_where': TopicDetail(
+      id: 'data_where',
+      title: 'Dove vivono i dati',
+      description:
+          'Un\u2019app web divide il lavoro in tre case: il frontend (ciò che vedi e tocchi nel browser), il backend (la logica che decide e protegge sul server), il database (la memoria che custodisce e ritrova). Separarli non è burocrazia: ognuno scala e si rompe per conto suo — puoi cambiare i colori senza toccare i pagamenti, o spostare il database senza riscrivere le pagine. Il prezzo è il viaggio: ogni confine attraversato è una richiesta in più, quindi si mette in ogni casa solo ciò che lì ha senso.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_data_where',
+      links: [
+        LearningLink(
+          title: 'Introduction to the server side (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Extensions/Server-side/First_steps/Introduction',
+          type: LinkType.documentation,
+        ),
+        LearningLink(
+          title: 'Backend roadmap (roadmap.sh)',
+          url: 'https://roadmap.sh/backend',
+          type: LinkType.article,
+        ),
+      ],
+    ),
+    'data_state': TopicDetail(
+      id: 'data_state',
+      title: 'Ricordare (stato, sessioni, cache)',
+      description:
+          'HTTP è smemorato per disegno: ogni richiesta è nuova, il server non ti riconosce tra una pagina e l\u2019altra. Per questo il web ha inventato memorie aggiuntive: i cookie (bigliettini che il browser ripresenta), le sessioni (il server lega quei bigliettini a un utente collegato), la cache (copie di risposte riusate per non richiederle). Ogni memoria ha un prezzo: i cookie viaggiano sempre, le sessioni vanno protette, le cache possono mostrare copie vecchie. Il mestiere è scegliere cosa ricordare, dove, e per quanto.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_data_state',
+      links: [
+        LearningLink(
+          title: 'HTTP cookies (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies',
+          type: LinkType.documentation,
+        ),
+        LearningLink(
+          title: 'HTTP caching (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching',
+          type: LinkType.article,
+        ),
+      ],
+    ),
+    'web_building': TopicDetail(
+      id: 'web_building',
+      title: 'Costruire in un quadro',
+      description:
+          'Costruire sul web significa tre cose: trasformare dati in pagine che il browser sa mostrare, domare la complessità quando le pagine diventano app, e spedire il tutto dal proprio computer ai server degli utenti. Ogni fase ha un suo ostacolo: il browser che interpreta, il caos dell\u2019interfaccia che cresce, il rischio di rompere tutto pubblicando. Questo capitolo ti dà i modelli mentali per non perderti: come ragiona un browser, perché nascono gli strumenti moderni, perché si versiona e si pubblica con cura.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_web_building',
+      links: [
+        LearningLink(
+          title: 'What will your website look like (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Your_first_website/What_will_your_website_look_like',
           type: LinkType.article,
         ),
         LearningLink(
-          title: 'Dart OOP Tutorial',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
+          title: 'Frontend roadmap (roadmap.sh)',
+          url: 'https://roadmap.sh/frontend',
+          type: LinkType.article,
         ),
       ],
     ),
-    'classes': TopicDetail(
-      id: 'classes',
-      title: 'Classi e Oggetti',
-      description: 'Le classi sono i mattoni della programmazione a oggetti in Dart: raggruppano dati (campi) e comportamento (metodi) in un unico tipo. Imparerai costruttori generativi e named, membri statici, getter/setter e costruttori factory e const per istanze immutabili.\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_classes',
+    'build_browser': TopicDetail(
+      id: 'build_browser',
+      title: 'Come ragiona il browser',
+      description:
+          'Il browser non "apre file", interpreta: legge il testo della pagina, lo trasforma in albero di nodi (parsing→DOM), poi decide aspetto e posizione di ogni nodo (render) e lo dipinge. Struttura, presentazione e comportamento sono tre mestieri separati: cosa c\u2019è (contenuti e gerarchia), come appare (stili e layout), cosa fa quando interagisci (reazioni). Mescolarli sembra veloce all\u2019inizio, ma ogni modifica tocca tutto: separarli significa cambiare i colori senza rompere i contenuti, o rifare un\u2019interazione senza riscrivere la pagina.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_build_browser',
       links: [
         LearningLink(
-          title: 'Classi in Dart',
-          url: 'https://dart.dev/language/classes',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Costruttori: guida alla sintassi',
-          url: 'https://dart.dev/language/constructors',
+          title: 'How browsers work (web.dev)',
+          url: 'https://web.dev/howbrowserswork/',
           type: LinkType.article,
         ),
         LearningLink(
-          title: 'Dart Classes Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
+          title: 'How browsers work (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Web/Performance/How_browsers_work',
+          type: LinkType.documentation,
         ),
       ],
     ),
-    'inheritance': TopicDetail(
-      id: 'inheritance',
-      title: 'Ereditarietà',
-      description: 'Con extends crei una sottoclasse che riusa ed estende il comportamento della superclasse, ridefinendo i membri con @override. Le classi astratte definiscono contratti non istanziabili, mentre implements adotta solo l\u2019interfaccia senza ereditare l\u2019implementazione. Il costruttore della superclasse si richiama con super(...).\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_inheritance',
+    'build_framework': TopicDetail(
+      id: 'build_framework',
+      title: 'Domare la complessità',
+      description:
+          'Quando le pagine diventano app — decine di schermate che si aggiornano da sole — tenere tutto a mano diventa caos: ogni pezzo tocca gli altri. Gli strumenti moderni rispondono con due idee: i componenti (pezzi riusabili con un mestiere chiaro: pulsante, scheda prodotto, carrello) e lo stato dell\u2019interfaccia (una fonte di verità da cui la vista discende). Il problema vero non è il colore del pulsante, è "quando i dati cambiano, cosa si aggiorna e perché quella cosa lì". Capire il problema vale più di qualsiasi nome di strumento.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_build_framework',
       links: [
         LearningLink(
-          title: 'Extend a class (ereditarietà)',
-          url: 'https://dart.dev/language/extend',
+          title: 'Introduction to frameworks (MDN)',
+          url: 'https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Frameworks/Introduction',
           type: LinkType.documentation,
         ),
         LearningLink(
-          title: 'Class modifiers: abstract, interface, final',
-          url: 'https://dart.dev/language/class-modifiers',
+          title: 'Frontend roadmap (roadmap.sh)',
+          url: 'https://roadmap.sh/frontend',
           type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Inheritance Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
         ),
       ],
     ),
-    'mixins': TopicDetail(
-      id: 'mixins',
-      title: 'Mixin',
-      description: 'I mixin permettono di riusare codice tra gerarchie di classi diverse senza ereditarietà multipla: si dichiarano con mixin e si applicano con with. Con on puoi vincolare un mixin alle sole sottoclassi di un tipo, e con mixin class (Dart 3) lo stesso tipo funziona sia come mixin sia come classe.\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_mixins',
+    'build_ship': TopicDetail(
+      id: 'build_ship',
+      title: 'Versionare e spedire',
+      description:
+          'Costruire da soli senza rete di sicurezza significa aver paura di ogni modifica: per questo si versiona — ogni tappa salvata è un punto a cui tornare e confrontare. I rami (branch) sono idee parallele che vivono senza disturbarsi, la fusione (merge) è il momento in cui si decide cosa entra nella storia principale. Spedire (dal repo al server) è l\u2019ultimo miglio: impacchettare il lavoro e consegnarlo dove gli utenti lo useranno, con lo stesso risultato ogni volta. Chi versiona e spedisce con cura può osare di più, perché sbagliare costa poco.\n\nVisita le seguenti risorse per approfondire:',
+      quizId: 'quiz_build_ship',
       links: [
         LearningLink(
-          title: 'Mixins in Dart',
-          url: 'https://dart.dev/language/mixins',
+          title: 'About Version Control (git-scm)',
+          url: 'https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control',
           type: LinkType.documentation,
         ),
         LearningLink(
-          title: 'Dart: cosa sono i mixin',
-          url: 'https://dart.dev/guides/language/language-tour#adding-features-to-a-class-mixins',
+          title: 'Git & GitHub roadmap (roadmap.sh)',
+          url: 'https://roadmap.sh/git-github',
           type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Mixins Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
-        ),
-      ],
-    ),
-    'advanced_dart': TopicDetail(
-      id: 'advanced_dart',
-      title: 'Dart Avanzato',
-      description: 'Panoramica dei temi avanzati di Dart: programmazione asincrona con Future e Stream, null safety sound, generics per codice type-safe, late per inizializzazione differita e Isolate per esecuzione concorrente senza memoria condivisa. È il ponte verso i tre sotto-topic dedicati.\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_advanced_dart',
-      links: [
-        LearningLink(
-          title: 'Dart: tour del linguaggio',
-          url: 'https://dart.dev/language',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Effective Dart: design e buone pratiche',
-          url: 'https://dart.dev/effective-dart/design',
-          type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart in 100 Seconds (video)',
-          url: 'https://www.youtube.com/watch?v=NrO0CJCbYLA',
-          type: LinkType.video,
-        ),
-      ],
-    ),
-    'async_programming': TopicDetail(
-      id: 'async_programming',
-      title: 'Programmazione Asincrona',
-      description: 'In Dart il codice asincrono usa Future per valori futuri singoli e Stream per sequenze di eventi nel tempo. Una funzione async restituisce un Future e può sospendersi con await senza bloccare l\u2019event loop; gli errori si gestiscono con try/catch e più Future si attendono insieme con Future.wait.\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_async',
-      links: [
-        LearningLink(
-          title: 'Asincronia in Dart: Future e async/await',
-          url: 'https://dart.dev/libraries/async/async-await',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Stream: sequenze di eventi asincroni',
-          url: 'https://dart.dev/libraries/async/using-streams',
-          type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Async Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
-        ),
-      ],
-    ),
-    'generics': TopicDetail(
-      id: 'generics',
-      title: 'Generics',
-      description: 'I generics rendono il codice type-safe e riusabile su più tipi: List<String> o Map<String, int> vengono controllati a compile time dall\u2019analyzer. Imparerai a dichiarare funzioni e classi generiche (T first<T>(...)), a vincolare i parametri con extends (T extends num) e a preferirli a dynamic per trovare gli errori prima del run.\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_generics',
-      links: [
-        LearningLink(
-          title: 'Generics in Dart',
-          url: 'https://dart.dev/language/generics',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Tour del linguaggio: tipi generici',
-          url: 'https://dart.dev/guides/language/language-tour#generics',
-          type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Generics Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
-        ),
-      ],
-    ),
-    'null_safety': TopicDetail(
-      id: 'null_safety',
-      title: 'Null Safety',
-      description: 'La sound null safety garantisce che nessuna variabile non-nullable contenga mai null a run time. Dichiarerai i tipi annullabili con ? (String?), accederai in sicurezza con ?. e ??, forzerai con ! solo quando sei certo, e sfrutterai la promotion dell\u2019analyzer dopo un controllo if (x != null).\\n\\nConsulta le seguenti risorse per approfondire:',
-      quizId: 'quiz_null_safety',
-      links: [
-        LearningLink(
-          title: 'Sound null safety in Dart',
-          url: 'https://dart.dev/null-safety',
-          type: LinkType.documentation,
-        ),
-        LearningLink(
-          title: 'Capire la null safety',
-          url: 'https://dart.dev/null-safety/understanding-null-safety',
-          type: LinkType.article,
-        ),
-        LearningLink(
-          title: 'Dart Null Safety Tutorial (video)',
-          url: 'https://www.youtube.com/watch?v=0CTaksOIDeI',
-          type: LinkType.video,
         ),
       ],
     ),

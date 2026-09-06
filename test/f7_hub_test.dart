@@ -101,13 +101,13 @@ void main() {
       final ok = await engine.execute(
         actionId: HubConfig.quizCompletedAction,
         playerId: 'slay_42',
-        data: {'xp_amount': 100, 'badge': 'dart_basics'},
+        data: {'xp_amount': 100, 'badge': 'web_network'},
       );
       expect(ok, isTrue);
       expect(sent!['gameId'], HubConfig.gameId);
       expect(sent!['actionId'], 'quiz_completed');
       expect(sent!['playerId'], 'slay_42');
-      expect(sent!['data'], {'xp_amount': 100, 'badge': 'dart_basics'});
+      expect(sent!['data'], {'xp_amount': 100, 'badge': 'web_network'});
     });
 
     test('execute: data sempre presente anche {}', () async {
@@ -167,9 +167,9 @@ void main() {
 
   group('Cablaggio PlayerViewModel (best-effort)', () {
     BossFight boss() => const BossFight(
-          id: 'syntax_guardian',
+          id: 'man_in_the_middle',
           chapterId: 'c1',
-          name: 'Syntax Guardian',
+          name: 'Man-in-the-Middle',
           maxHp: 150,
           currentHp: 150,
         );
@@ -178,7 +178,7 @@ void main() {
         () async {
       final fake = FakeEngineClient();
       final vm = PlayerViewModel(engine: fake, hubPlayerId: 'slay_7');
-      final leveledUp = vm.addCompletedTopic('dart_basics');
+      final leveledUp = vm.addCompletedTopic('web_network');
       expect(leveledUp, isTrue); // 0 → 100 XP = L2
       expect(vm.progress.experience, 100);
       // Fire-and-forget: un microtask per far completare l'invio.
@@ -188,7 +188,7 @@ void main() {
       expect(fake.calls.single['playerId'], 'slay_7');
       expect(
         fake.calls.single['data'],
-        {'xp_amount': 100, 'badge': 'dart_basics'},
+        {'xp_amount': 100, 'badge': 'web_network'},
       );
     });
 
@@ -200,7 +200,7 @@ void main() {
       await Future<void>.delayed(Duration.zero);
       expect(fake.calls, hasLength(1));
       expect(fake.calls.single['actionId'], 'boss_defeated');
-      expect(fake.calls.single['data'], {'badge': 'syntax_guardian'});
+      expect(fake.calls.single['data'], {'badge': 'man_in_the_middle'});
       // Seconda vittoria: flusso locale ok, nessun nuovo evento.
       expect(vm.recordBossVictory(boss()), isFalse);
       await Future<void>.delayed(Duration.zero);
@@ -213,7 +213,7 @@ void main() {
       expect(vm.addCompletedTopic('t1'), isTrue);
       expect(vm.progress.completedTopicIds, contains('t1'));
       expect(vm.recordBossVictory(boss()), isTrue);
-      expect(vm.isBossDefeated('syntax_guardian'), isTrue);
+      expect(vm.isBossDefeated('man_in_the_middle'), isTrue);
       await Future<void>.delayed(Duration.zero);
       expect(fake.calls, hasLength(2));
     });

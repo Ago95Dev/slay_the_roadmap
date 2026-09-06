@@ -9,13 +9,13 @@ import 'package:slay_the_roadmap/ui/screens/topic_detail_screen.dart';
 import 'package:slay_the_roadmap/ui/view_models/roadmap_view_model.dart';
 
 /// Regression test: passare il quiz dal TopicDetailScreen deve completare
-/// il topic e sbloccare i dipendenti (dart_basics -> variables).
+/// il topic e sbloccare i dipendenti (web_network -> net_client_server).
 /// Sul codice vecchio (push senza await, risultato scartato) questo test
-/// fallisce: dart_basics resta inProgress e variables resta locked.
+/// fallisce: web_network resta inProgress e net_client_server resta locked.
 void main() {
   group('TopicDetailScreen quiz unlock-chain (regressione bug critico)', () {
     testWidgets(
-        'quiz dart_basics passato -> completed + variables sbloccato',
+        'quiz web_network passato -> completed + net_client_server sbloccato',
         (tester) async {
       final vm = RoadmapViewModel(LocalRoadmapRepository());
 
@@ -32,7 +32,7 @@ void main() {
                 body: ElevatedButton(
                   onPressed: () {
                     final t = vm.topics
-                        .firstWhere((e) => e.id == 'dart_basics');
+                        .firstWhere((e) => e.id == 'web_network');
                     Navigator.push(
                       ctx,
                       MaterialPageRoute(
@@ -63,8 +63,8 @@ void main() {
       }
 
       // Precondizioni dai dati reali.
-      expect(findTopic('dart_basics').status, TopicStatus.inProgress);
-      expect(findTopic('variables').status, TopicStatus.locked);
+      expect(findTopic('web_network').status, TopicStatus.inProgress);
+      expect(findTopic('net_client_server').status, TopicStatus.locked);
 
       // 1. Apri il detail (simula tap sulla roadmap) e avvia il quiz.
       await tester.tap(find.text('OPEN_DETAIL'));
@@ -75,13 +75,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(QuizScreen), findsOneWidget);
 
-      // 2. Risponde correttamente a tutte le 5 domande di quiz_dart_basics.
+      // 2. Risponde correttamente a tutte le 5 domande di quiz_web_network.
       const correctOptions = [
-        'Mobile app development with Flutter',
-        "name: 'John';",
-        'The variable can only be set once',
-        'foreach loop (but has for-in)',
-        'dart run <file.dart>',
+        'Ogni strato risolve un problema diverso e si può cambiare senza rompere gli altri',
+        'Tutto ciò che costruirai dopo (dati, pagine, app) si appoggia su di essi',
+        'Permette di isolare il colpevole: il nome? l’indirizzo? il server? la risposta?',
+        'Specializzazione: se uno cambia tecnologia, gli altri non si rompono',
+        'Prima capisci come viaggiano le informazioni, poi cosa sono e come impacchettarle',
       ];
 
       for (var i = 0; i < correctOptions.length; i++) {
@@ -100,10 +100,10 @@ void main() {
       await tester.tap(find.widgetWithText(ElevatedButton, 'Continua'));
       await tester.pumpAndSettle();
 
-      // 4. Unlock-chain: dart_basics completed, variables inProgress,
+      // 4. Unlock-chain: web_network completed, net_client_server inProgress,
       //    quiz e detail chiusi (ritorno alla "roadmap").
-      expect(findTopic('dart_basics').status, TopicStatus.completed);
-      expect(findTopic('variables').status, TopicStatus.inProgress);
+      expect(findTopic('web_network').status, TopicStatus.completed);
+      expect(findTopic('net_client_server').status, TopicStatus.inProgress);
       expect(find.byType(QuizScreen), findsNothing);
       expect(find.byType(TopicDetailScreen), findsNothing);
       expect(find.text('OPEN_DETAIL'), findsOneWidget);

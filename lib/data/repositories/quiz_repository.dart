@@ -7,747 +7,747 @@ abstract class QuizRepository {
 
 class LocalQuizRepository implements QuizRepository {
   final Map<String, Quiz> _quizzes = {
-    'quiz_dart_basics': Quiz(
-      id: 'quiz_dart_basics',
-      topicId: 'dart_basics',
+    'quiz_web_network': Quiz(
+      id: 'quiz_web_network',
+      topicId: 'web_network',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What is Dart primarily used for?",
+          text: 'Perché la rete è organizzata a strati invece che in un unico blocco?',
           options: [
-            "Web development only",
-            "Mobile app development with Flutter",
-            "Game development",
-            "Data science"
+            'Per consumare più energia',
+            'Ogni strato risolve un problema diverso e si può cambiare senza rompere gli altri',
+            'Perché è più lenta e sicura',
+            'Perché lo impone la legge',
           ],
           correctAnswerIndex: 1,
-          explanation: "Dart is primarily used for building mobile, web, and desktop apps with Flutter.",
+          explanation: 'Separare i problemi rende la rete riparabile ed evolvibile.',
         ),
         Question(
-          text: "Which of the following is NOT a valid Dart variable declaration?",
+          text: 'Cosa significa che client, DNS e HTTP sono "fondamenta"?',
           options: [
-            "var name = 'John';",
-            "String name = 'John';",
-            "name: 'John';",
-            "final name = 'John';"
+            'Sono tecnologie vecchie e superate',
+            'Tutto ciò che costruirai dopo (dati, pagine, app) si appoggia su di essi',
+            'Vanno imparati a memoria',
+            'Funzionano solo con un unico fornitore',
           ],
-          correctAnswerIndex: 2,
-          explanation: "The syntax 'name: 'John'' is not valid for variable declaration in Dart.",
+          correctAnswerIndex: 1,
+          explanation: 'Le fondamenta non si vedono ma reggono i piani alti.',
         ),
         Question(
-          text: "What does the 'final' keyword mean in Dart?",
+          text: 'Il sito non si apre: perché il modello a ruoli aiuta a capire il guasto?',
           options: [
-            "The variable can be changed later",
-            "The variable must be initialized at compile time",
-            "The variable can only be set once",
-            "The variable is globally accessible"
+            'Non aiuta, bisogna reinstallare tutto',
+            'Permette di isolare il colpevole: il nome? l\u2019indirizzo? il server? la risposta?',
+            'Dice sempre di cambiare browser',
+            'Rende tutto più veloce',
           ],
-          correctAnswerIndex: 2,
-          explanation: "'final' means a variable can only be set once and is immutable after initialization.",
+          correctAnswerIndex: 1,
+          explanation: 'Ruoli separati = colpevoli separati.',
         ),
         Question(
-          text: "Which type of loop does Dart NOT support?",
+          text: 'Perché ogni attore fa solo il suo mestiere (il DNS traduce, HTTP conversa, il browser mostra)?',
           options: [
-            "for loop",
-            "while loop",
-            "do-while loop",
-            "foreach loop (but has for-in)"
+            'Per pigrizia',
+            'Specializzazione: se uno cambia tecnologia, gli altri non si rompono',
+            'Per risparmiare elettricità',
+            'Per caso storico',
           ],
-          correctAnswerIndex: 3,
-          explanation: "Dart has for-in loops for iterating over collections, but not a specific 'foreach' keyword.",
+          correctAnswerIndex: 1,
+          explanation: 'Interfacce stabili tra ruoli permettono innovazione indipendente.',
         ),
         Question(
-          text: "How do you run a Dart program from the command line?",
+          text: 'Perché studiare la rete prima dei dati e della costruzione?',
           options: [
-            "dart run <file.dart>",
-            "dart execute <file.dart>",
-            "dart start <file.dart>",
-            "dart compile <file.dart>"
+            'Ordine alfabetico',
+            'Prima capisci come viaggiano le informazioni, poi cosa sono e come impacchettarle',
+            'Perché la rete è più facile',
+            'È indifferente, l\u2019ordine è casuale',
           ],
-          correctAnswerIndex: 0,
-          explanation: "'dart run <file.dart>' executes a Dart program directly.",
+          correctAnswerIndex: 1,
+          explanation: 'Il viaggio spiega i vincoli di tutto il resto.',
         ),
       ],
     ),
-    'quiz_variables': Quiz(
-      id: 'quiz_variables',
-      topicId: 'variables',
+    'quiz_net_client_server': Quiz(
+      id: 'quiz_net_client_server',
+      topicId: 'net_client_server',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What is the default value of an uninitialized variable in Dart?",
+          text: 'Apri un sito: chi inizia la conversazione?',
           options: [
-            "0",
-            "null",
-            "undefined",
-            "It causes a compile error"
+            'Il server invia la pagina da solo',
+            'Il client chiede, il server risponde',
+            'Il DNS crea la pagina',
+            'Il browser indovina',
           ],
           correctAnswerIndex: 1,
-          explanation: "In Dart, uninitialized variables have an initial value of null.",
+          explanation: 'Tutto parte da una richiesta del client.',
         ),
         Question(
-          text: "Which keyword is used to declare a compile-time constant?",
+          text: 'Perché il codice dei pagamenti gira sul server e non nel browser?',
           options: [
-            "final",
-            "const",
-            "static",
-            "constant"
+            'È più veloce',
+            'Nel browser chiunque potrebbe leggerlo e manometterlo',
+            'Il browser non esegue codice',
+            'Costa meno',
           ],
           correctAnswerIndex: 1,
-          explanation: "'const' is used for compile-time constants, while 'final' is for run-time constants.",
+          explanation: 'Il client è ispezionabile, i segreti stanno sul server.',
         ),
         Question(
-          text: "What is the type of 'var number = 42;' in Dart?",
+          text: 'Il server può aggiornare la tua pagina senza che tu chieda nulla?',
           options: [
-            "dynamic",
-            "var",
-            "int",
-            "Object"
-          ],
-          correctAnswerIndex: 2,
-          explanation: "The type is inferred as 'int' because 42 is an integer literal.",
-        ),
-        Question(
-          text: "What is the difference between 'final' and 'const'?",
-          options: [
-            "There is no difference",
-            "'const' is compile-time, 'final' is set once at run-time",
-            "'final' is compile-time, 'const' is set once at run-time",
-            "Both must be initialized at compile time"
+            'Sì, quando vuole',
+            'No: HTTP è richiesta→risposta, serve una nuova richiesta (o canali apposta)',
+            'Solo di notte',
+            'Solo con HTTPS',
           ],
           correctAnswerIndex: 1,
-          explanation: "'const' values must be known at compile time; 'final' values are assigned once at run-time.",
+          explanation: 'Il modello base è pull, non push.',
         ),
         Question(
-          text: "Which of these is a valid 'double' literal in Dart?",
+          text: 'Cosa distingue un client da un server?',
           options: [
-            "42",
-            "'42.0'",
-            "42.0",
-            "Double(42)"
+            'La potenza del computer',
+            'Il ruolo nella conversazione: chi chiede vs chi risponde',
+            'Il sistema operativo',
+            'Il linguaggio usato',
           ],
-          correctAnswerIndex: 2,
-          explanation: "42.0 is a double literal; 42 alone is inferred as int.",
+          correctAnswerIndex: 1,
+          explanation: 'Sono ruoli, non macchine (una macchina può fare entrambi).',
+        ),
+        Question(
+          text: 'Un sito lento a mostrare i vestiti filtrati: dove conviene filtrare, client o server, se il catalogo è enorme?',
+          options: [
+            'Client, è più moderno',
+            'Server: evita di spedire tutto il catalogo nel browser',
+            'Nel DNS',
+            'Nel CSS',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Meno dati viaggiano, prima vedi risultati.',
         ),
       ],
     ),
-    'quiz_functions': Quiz(
-      id: 'quiz_functions',
-      topicId: 'functions',
+    'quiz_net_dns_url': Quiz(
+      id: 'quiz_net_dns_url',
+      topicId: 'net_dns_url',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "Which syntax is correct for a function that returns nothing?",
+          text: 'A cosa serve il DNS?',
           options: [
-            "void functionName() {}",
-            "functionName(): void {}",
-            "functionName() void {}",
-            "None of the above"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "In Dart, 'void' is placed before the function name to indicate no return value.",
-        ),
-        Question(
-          text: "What is a fat arrow (=>) used for in Dart functions?",
-          options: [
-            "For asynchronous functions",
-            "For function expressions with a single expression",
-            "For generator functions",
-            "For factory constructors"
+            'Cifrare i dati',
+            'Tradurre nomi di dominio in indirizzi IP',
+            'Creare pagine web',
+            'Velocizzare il CSS',
           ],
           correctAnswerIndex: 1,
-          explanation: "The fat arrow syntax is shorthand for functions that contain just one expression.",
+          explanation: 'È la rubrica di Internet.',
         ),
         Question(
-          text: "Which is NOT a valid function parameter type in Dart?",
+          text: 'In `https://shop.it:443/scarpe?taglia=42`, cosa dice DOVE si trova la risorsa?',
           options: [
-            "Required positional",
-            "Optional positional",
-            "Required named",
-            "Optional named (all are valid)"
-          ],
-          correctAnswerIndex: 3,
-          explanation: "All these parameter types are valid in Dart functions.",
-        ),
-        Question(
-          text: "What does the 'required' keyword do in Dart?",
-          options: [
-            "Makes a parameter non-nullable",
-            "Makes a named parameter mandatory",
-            "Forces immediate initialization",
-            "Both 1 and 2"
-          ],
-          correctAnswerIndex: 3,
-          explanation: "'required' makes a named parameter mandatory and non-nullable.",
-        ),
-        Question(
-          text: "How do you declare an optional positional parameter?",
-          options: [
-            "{int? x}",
-            "[int? x]",
-            "(int? x)?",
-            "<int? x>"
+            'Solo `https`',
+            'Nome + percorso (`shop.it/scarpe`)',
+            'Solo `?taglia=42`',
+            'Niente, è casuale',
           ],
           correctAnswerIndex: 1,
-          explanation: "Optional positional parameters are wrapped in square brackets: void f([int? x]) {}.",
+          explanation: 'Nome e path localizzano, i parametri filtrano.',
+        ),
+        Question(
+          text: 'Se il DNS non risponde, cosa succede?',
+          options: [
+            'Navigo più lento',
+            'Il browser non sa che IP contattare: il sito non si apre',
+            'Si apre in HTTP',
+            'Vedo il sito di ieri',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Senza traduzione nome→IP non si parte.',
+        ),
+        Question(
+          text: 'Perché esistono le porte (es. :443)?',
+          options: [
+            'Decorazione',
+            'Distinguono i servizi sulla stessa macchina (web, mail...)',
+            'Cifrano',
+            'Comprimono',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Un IP, tanti servizi: la porta sceglie quale.',
+        ),
+        Question(
+          text: 'HTTP vs HTTPS nell\u2019URL: cosa cambia per l\u2019utente?',
+          options: [
+            'Niente',
+            'La connessione è cifrata: dati illeggibili a chi intercetta',
+            'Il sito è più bello',
+            'Serve password',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'La S = trasporto cifrato.',
         ),
       ],
     ),
-    'quiz_control_flow': Quiz(
-      id: 'quiz_control_flow',
-      topicId: 'control_flow',
+    'quiz_net_http_https': Quiz(
+      id: 'quiz_net_http_https',
+      topicId: 'net_http_https',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "Which statement executes a block only when a condition is true?",
+          text: 'Compili un form con la carta: perché serve HTTPS?',
           options: [
-            "for",
-            "if",
-            "switch",
-            "while"
+            'Il sito carica prima',
+            'In HTTP chi intercetta legge tutto in chiaro',
+            'Evita i 404',
+            'Il browser lo richiede per i colori',
           ],
           correctAnswerIndex: 1,
-          explanation: "'if' executes its block only when the condition evaluates to true.",
+          explanation: 'Cifratura del trasporto, non del sito.',
         ),
         Question(
-          text: "What does the '??' operator do in Dart?",
+          text: 'Il sito risponde 404: di chi è "colpa"?',
           options: [
-            "Null-aware: returns the left side unless it is null",
-            "Compares two values for equality",
-            "Declares a nullable variable",
-            "Throws if the value is null"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "'a ?? b' evaluates to 'a' unless 'a' is null, in which case it evaluates to 'b'.",
-        ),
-        Question(
-          text: "Which loop always executes its body at least once?",
-          options: [
-            "for",
-            "while",
-            "do-while",
-            "for-in"
-          ],
-          correctAnswerIndex: 2,
-          explanation: "do-while checks the condition after the body, so it runs at least once.",
-        ),
-        Question(
-          text: "How do you skip to the next iteration of a loop?",
-          options: [
-            "break",
-            "continue",
-            "return",
-            "skip"
+            'Del server rotto',
+            'Della risorsa chiesta: non esiste a quell\u2019indirizzo',
+            'Del DNS',
+            'Di HTTPS',
           ],
           correctAnswerIndex: 1,
-          explanation: "'continue' jumps to the next iteration; 'break' exits the loop entirely.",
+          explanation: '4xx = errore del client/richiesta, 5xx = server.',
         ),
         Question(
-          text: "What is a collection-for in Dart?",
+          text: 'GET vs POST: differenza di idea?',
           options: [
-            "A for loop that iterates collections only",
-            "A for element inside a list/set/map literal",
-            "A foreach method on Iterable",
-            "A deprecated loop syntax"
+            'Nessuna',
+            'GET legge (ripetibile, nei log/URL), POST invia dati che cambiano stato',
+            'POST è più veloce',
+            'GET cifra',
           ],
           correctAnswerIndex: 1,
-          explanation: "Collection-for lets you build collections with for elements: [for (var i in list) i * 2].",
+          explanation: 'Semantica, non velocità.',
+        ),
+        Question(
+          text: 'Il lucchetto del browser garantisce che il negozio è onesto?',
+          options: [
+            'Sì',
+            'No: garantisce solo canale cifrato e identità verificata del dominio',
+            'Sì se verde',
+            'Solo per le banche',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Cifratura ≠ affidabilità.',
+        ),
+        Question(
+          text: 'Un Wi-Fi pubblico con Man-in-the-Middle: cosa rischia chi usa HTTP?',
+          options: [
+            'Nulla',
+            'Lettura e modifica del traffico in chiaro',
+            'Solo lentezza',
+            'Virus nel DNS',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Il mostro del capitolo esiste davvero.',
         ),
       ],
     ),
-    'quiz_oop': Quiz(
-      id: 'quiz_oop',
-      topicId: 'oop_dart',
+    'quiz_web_data': Quiz(
+      id: 'quiz_web_data',
+      topicId: 'web_data',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What are the four pillars of OOP?",
+          text: 'Perché si dice che "il web è dati in viaggio"?',
           options: [
-            "Classes, objects, methods, fields",
-            "Encapsulation, inheritance, polymorphism, abstraction",
-            "Variables, functions, loops, conditions",
-            "Public, private, protected, static"
+            'Perché i cavi si muovono',
+            'Pagine, prezzi e messaggi sono dati spediti tra client e server e poi mostrati',
+            'Perché tutto è video',
+            'Perché i dati si cancellano da soli',
           ],
           correctAnswerIndex: 1,
-          explanation: "The four pillars are encapsulation, inheritance, polymorphism, and abstraction.",
+          explanation: 'La pagina è solo l\u2019ultima tappa di dati in movimento.',
         ),
         Question(
-          text: "How do you make a field private to its library in Dart?",
+          text: 'Perché la rappresentazione dei dati conta più di quanto sembri?',
           options: [
-            "With the 'private' keyword",
-            "By prefixing the name with an underscore (_)",
-            "By declaring it inside the constructor",
-            "Dart has no privacy mechanism"
+            'Non conta nulla',
+            'La stessa informazione in forme diverse cambia peso, leggibilità e chi può capirla (persone o programmi)',
+            'Conta solo per i colori',
+            'Serve solo ai database',
           ],
           correctAnswerIndex: 1,
-          explanation: "Identifiers starting with '_' are library-private in Dart.",
+          explanation: 'La forma decide costo di viaggio e facilità d\u2019uso.',
         ),
         Question(
-          text: "What is a constructor in Dart?",
+          text: 'Perché non tenere tutti i dati nel browser dell\u2019utente?',
           options: [
-            "A method that destroys objects",
-            "A special method that creates and initializes instances",
-            "A static utility function",
-            "An async callback"
+            'Perché è vietato',
+            'Il browser si chiude, si perde e non è condiviso: serve un custode stabile e comune',
+            'Perché il browser è lento a mostrare',
+            'Perché costa di più',
           ],
           correctAnswerIndex: 1,
-          explanation: "Constructors create and initialize new instances of a class.",
+          explanation: 'Ciò che deve durare e valere per tutti vive altrove.',
         ),
         Question(
-          text: "What does 'extends' do in a class declaration?",
+          text: 'Perché il problema "ricordarsi di me" esiste sul web?',
           options: [
-            "Implements an interface",
-            "Creates a subclass that inherits from a superclass",
-            "Adds a mixin",
-            "Marks the class as abstract"
+            'Perché gli utenti sono smemorati',
+            'La conversazione base non ha memoria: ogni richiesta riparte da zero',
+            'Perché i server sono spenti',
+            'Perché i browser cancellano tutto per dispetto',
           ],
           correctAnswerIndex: 1,
-          explanation: "'class B extends A' makes B inherit members from A.",
+          explanation: 'Senza memoria aggiuntiva, il server non riconosce nessuno.',
         ),
         Question(
-          text: "What is polymorphism?",
+          text: 'Cosa accomuna un negozio, un social e un gioco online dal punto di vista dei dati?',
           options: [
-            "Having many constructors",
-            "Objects of different classes responding to the same interface",
-            "Using many libraries",
-            "Writing code without classes"
+            'I colori usati',
+            'Tutti devono rappresentare, custodire e ricordare dati',
+            'Lo stesso fornitore',
+            'Niente',
           ],
           correctAnswerIndex: 1,
-          explanation: "Polymorphism lets subclasses be treated through a common interface with specialized behavior.",
+          explanation: 'Cambia il contenuto, il trittico di problemi resta.',
         ),
       ],
     ),
-    'quiz_classes': Quiz(
-      id: 'quiz_classes',
-      topicId: 'classes',
+    'quiz_data_represent': Quiz(
+      id: 'quiz_data_represent',
+      topicId: 'data_represent',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "How do you create an instance of 'class Point { Point(this.x, this.y); }'?",
+          text: 'Perché i computer usano il binario ma sul web viaggia tanto testo?',
           options: [
-            "Point.new(1, 2)",
-            "new Point(1, 2) or Point(1, 2)",
-            "Point.create(1, 2)",
-            "Point{1, 2}"
+            'Il testo è più moderno',
+            'Il testo è leggibile da persone e programmi diversi: fa da ponte universale',
+            'Il binario è vietato',
+            'Il testo pesa sempre meno',
           ],
           correctAnswerIndex: 1,
-          explanation: "Instances are created with 'Point(1, 2)'; 'new' is optional in modern Dart.",
+          explanation: 'Interoperabilità batte compattezza nello scambio.',
         ),
         Question(
-          text: "What is a named constructor?",
+          text: 'Un catalogo deve scambiare prodotti tra negozio e fornitori con sistemi diversi: perché un formato testuale standard aiuta?',
           options: [
-            "A constructor with a name like 'Point.origin()'",
-            "A constructor assigned to a variable",
-            "A factory that returns null",
-            "A private constructor"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Named constructors like 'Point.origin()' give additional ways to create instances.",
-        ),
-        Question(
-          text: "What does a 'factory' constructor allow?",
-          options: [
-            "Only const instances",
-            "Returning an existing instance or a subtype instead of always creating new",
-            "Async initialization",
-            "Private fields only"
+            'È più colorato',
+            'Ogni sistema lo legge e lo produce senza accordi segreti',
+            'È più veloce del binario',
+            'Non serve Internet',
           ],
           correctAnswerIndex: 1,
-          explanation: "Factory constructors can return cached instances or subtype instances.",
+          explanation: 'Lo standard elimina il bisogno di parlare la stessa lingua madre.',
         ),
         Question(
-          text: "How do you declare a getter in Dart?",
+          text: 'Quando conviene pensare a "lista" e quando a "mappa"?',
           options: [
-            "get area => width * height;",
-            "getter area() {}",
-            "property area => ...;",
-            "func get area() {}"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Getters use the 'get' keyword: 'double get area => width * height;'.",
-        ),
-        Question(
-          text: "What does 'static' mean for a class member?",
-          options: [
-            "It cannot be changed",
-            "It belongs to the class itself, not to instances",
-            "It is private",
-            "It is initialized lazily"
+            'Sono uguali',
+            'Lista quando conta l\u2019ordine (commenti in sequenza), mappa quando conta ritrovare per nome (utente→profilo)',
+            'Lista per i numeri, mappa per le foto',
+            'A caso',
           ],
           correctAnswerIndex: 1,
-          explanation: "Static members are accessed on the class (ClassName.member), not on instances.",
+          explanation: 'La domanda è "come lo ritroverò?".',
+        ),
+        Question(
+          text: 'Perché dire che una pagina è "un albero" (DOM)?',
+          options: [
+            'È verde',
+            'È fatta di nodi annidati (pagina→sezioni→titoli→testi) che si possono attraversare e aggiornare pezzo per pezzo',
+            'Cresce da sola',
+            'Ha radici nel server',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'La gerarchia permette di toccare un ramo senza abbattere il bosco.',
+        ),
+        Question(
+          text: 'Spedisci una foto in un formato che il destinatario non apre: dov\u2019è il problema?',
+          options: [
+            'Nella foto',
+            'Nella rappresentazione scelta: senza formato condiviso, il dato è muto',
+            'Nel cavo',
+            'Nel browser',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Il dato esiste solo se entrambe le parti lo interpretano.',
         ),
       ],
     ),
-    'quiz_inheritance': Quiz(
-      id: 'quiz_inheritance',
-      topicId: 'inheritance',
+    'quiz_data_where': Quiz(
+      id: 'quiz_data_where',
+      topicId: 'data_where',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "Which keyword is used to inherit from a class in Dart?",
+          text: 'Perché dividere frontend, backend e database invece di fare tutto in un unico posto?',
           options: [
-            "implements",
-            "extends",
-            "with",
-            "inherits"
+            'Per usare più computer',
+            'Ogni parte evolve e si rompe per conto suo: si cambia un pezzo senza riscrivere tutto',
+            'Perché è più veloce sempre',
+            'Perché lo chiede il browser',
           ],
           correctAnswerIndex: 1,
-          explanation: "'extends' creates a subclass inheriting from a superclass.",
+          explanation: 'Separare permette di riparare e far crescere pezzo per pezzo.',
         ),
         Question(
-          text: "What does '@override' indicate?",
+          text: 'Dove terresti il saldo del conto corrente: nel browser o nel backend col database?',
           options: [
-            "The method is deprecated",
-            "The method redefines a superclass member intentionally",
-            "The method is static",
-            "The method is async"
+            'Nel browser, è più comodo',
+            'Nel backend: è condiviso, protetto e sopravvive alla chiusura del browser',
+            'Nel DNS',
+            'Nel CSS',
           ],
           correctAnswerIndex: 1,
-          explanation: "'@override' marks a member that replaces a superclass declaration.",
+          explanation: 'Ciò che deve essere vero per tutti vive sotto custodia.',
         ),
         Question(
-          text: "What is an abstract class?",
+          text: 'Perché il frontend chiede i dati invece di possederli?',
           options: [
-            "A class that cannot be instantiated and may declare abstract methods",
-            "A class with only static members",
-            "A class without constructors",
-            "A class that cannot be extended"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Abstract classes cannot be instantiated; they define interfaces for subclasses.",
-        ),
-        Question(
-          text: "How do you call the superclass constructor?",
-          options: [
-            "With 'super(...)' in the initializer list",
-            "With 'this.super()'",
-            "Automatically, always",
-            "With 'base()'"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Use ': super(args)' to forward arguments to the superclass constructor.",
-        ),
-        Question(
-          text: "What does 'implements' do?",
-          options: [
-            "Inherits implementation from a superclass",
-            "Requires the class to provide its own implementation of the interface",
-            "Mixes in reusable code",
-            "Marks the class final"
+            'Pigrizia',
+            'Mostra una copia fresca al momento del bisogno, senza portarsi dietro tutto il mondo',
+            'Non sa contare',
+            'Costa meno il server',
           ],
           correctAnswerIndex: 1,
-          explanation: "'implements' adopts the interface without inheriting any implementation.",
+          explanation: 'Chiedere all\u2019occorrenza evita copie vecchie e pesanti.',
+        ),
+        Question(
+          text: 'Il sito mostra prezzi vecchi dopo un cambio: quale confine sospetti?',
+          options: [
+            'I colori',
+            'La copia tra database, backend e frontend non si è aggiornata lungo il viaggio',
+            'Il DNS',
+            'La tastiera',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Più case = più copie: bisogna capire quale è rimasta indietro.',
+        ),
+        Question(
+          text: 'Cosa succede se il database cade ma frontend e backend sono accesi?',
+          options: [
+            'Nulla',
+            'Le pagine si aprono ma i dati veri (prodotti, profili, ordini) mancano',
+            'Il browser si chiude',
+            'Il DNS smette',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Ogni casa è un singolo punto di rottura per il suo mestiere.',
         ),
       ],
     ),
-    'quiz_mixins': Quiz(
-      id: 'quiz_mixins',
-      topicId: 'mixins',
+    'quiz_data_state': Quiz(
+      id: 'quiz_data_state',
+      topicId: 'data_state',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What is a mixin in Dart?",
+          text: 'Perché HTTP è "smemorato" e perché è un problema?',
           options: [
-            "A way to reuse code across class hierarchies without inheritance",
-            "A type of constructor",
-            "A collection literal",
-            "An async primitive"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Mixins let you reuse methods across unrelated classes.",
-        ),
-        Question(
-          text: "Which keyword applies a mixin to a class?",
-          options: [
-            "extends",
-            "implements",
-            "with",
-            "mixin"
-          ],
-          correctAnswerIndex: 2,
-          explanation: "'class C extends B with M' applies mixin M to C.",
-        ),
-        Question(
-          text: "How is a mixin declared?",
-          options: [
-            "class M {}",
-            "mixin M {}",
-            "abstract M {}",
-            "extension M {}"
+            'È rotto',
+            'Ogni richiesta riparte da zero: senza aiuti il server non sa chi sei né a che punto eri',
+            'Dimentica le password apposta',
+            'Solo di notte',
           ],
           correctAnswerIndex: 1,
-          explanation: "Mixins are declared with the 'mixin' keyword.",
+          explanation: 'La semplicità del protocollo scarica la memoria su altri meccanismi.',
         ),
         Question(
-          text: "What is 'mixin class' in Dart 3?",
+          text: 'Come fa un sito a ricordarti il login da una pagina all\u2019altra?',
           options: [
-            "A mixin that can also be used as a regular class",
-            "A deprecated syntax",
-            "A mixin with no members",
-            "A final class"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "'mixin class' can be used both as a mixin and as a superclass.",
-        ),
-        Question(
-          text: "What does 'on' mean in a mixin declaration ('mixin M on C')?",
-          options: [
-            "The mixin runs on startup",
-            "The mixin can only be applied to subclasses of C",
-            "The mixin is enabled conditionally",
-            "The mixin overrides C"
+            'Indovina',
+            'Il browser ripresenta un bigliettino (cookie) e il server lo lega alla tua sessione',
+            'Lo scrive nell\u2019URL in chiaro',
+            'Lo chiede ogni volta',
           ],
           correctAnswerIndex: 1,
-          explanation: "'on' constrains a mixin to classes extending/implementing the given type.",
+          explanation: 'Riconoscimento = gettone ripresentato + registro lato server.',
+        ),
+        Question(
+          text: 'Perché il carrello sopravvive se ricarichi ma sparisce in un altro browser?',
+          options: [
+            'Magia',
+            'La memoria vive in quel browser (cookie/spazio locale), non legata al tuo account server',
+            'Il server è pieno',
+            'Il DNS filtra',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Conta DOVE vive la memoria: dispositivo o account.',
+        ),
+        Question(
+          text: 'A cosa serve la cache e qual è il suo rischio?',
+          options: [
+            'A nulla',
+            'Riusa copie per velocità e risparmio, ma rischia di mostrare contenuti vecchi',
+            'Cifra i dati',
+            'Sostituisce il database',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Velocità contro freschezza, sempre.',
+        ),
+        Question(
+          text: 'Un sito bancario su PC condiviso: perché il logout conta?',
+          options: [
+            'Spegne il PC',
+            'Invalida la sessione: il bigliettino da solo non basta più a entrare',
+            'Cancella Internet',
+            'Cambia password',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Chiudere la sessione brucia il gettone agli occhi del server.',
         ),
       ],
     ),
-    'quiz_advanced_dart': Quiz(
-      id: 'quiz_advanced_dart',
-      topicId: 'advanced_dart',
+    'quiz_web_building': Quiz(
+      id: 'quiz_web_building',
+      topicId: 'web_building',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What does 'async' mark on a function?",
+          text: 'Perché "costruire sul web" non significa solo "scrivere pagine"?',
           options: [
-            "That it runs on another isolate",
-            "That it returns a Future and can use 'await'",
-            "That it is a generator",
-            "That it never completes"
+            'Perché le pagine non servono',
+            'Perché bisogna anche gestire la complessità crescente e portare il lavoro sui server degli utenti',
+            'Perché serve un server in casa',
+            'Perché i browser scrivono da soli',
           ],
           correctAnswerIndex: 1,
-          explanation: "'async' functions return Futures and may use 'await' for asynchronous operations.",
+          explanation: 'Mostrare, organizzare e spedire sono tre mestieri diversi.',
         ),
         Question(
-          text: "What is sound null safety?",
+          text: 'Perché il browser è il primo "giudice" del tuo lavoro?',
           options: [
-            "A linter rule",
-            "A guarantee that no non-nullable variable is ever null at run-time",
-            "Automatic null checks in the IDE only",
-            "Disabling null entirely"
+            'Perché paga lo stipendio',
+            'Qualunque cosa costruisci, è lui a interpretarla e mostrarla all\u2019utente',
+            'Perché scrive il codice',
+            'Perché sceglie i colori',
           ],
           correctAnswerIndex: 1,
-          explanation: "Sound null safety guarantees non-nullable variables can never hold null.",
+          explanation: 'Il traguardo è sempre ciò che il browser capisce.',
         ),
         Question(
-          text: "What are generics used for?",
+          text: 'Perché un progetto piccolo resta semplice e uno grande diventa caos?',
           options: [
-            "Generating code automatically",
-            "Writing type-safe code that works with multiple types",
-            "Creating generic error messages",
-            "Speeding up compilation"
+            'Per sfortuna',
+            'Più pagine e interazioni = più pezzi che si influenzano: serve organizzazione apposta',
+            'Perché i computer rallentano',
+            'Perché Internet è lento',
           ],
           correctAnswerIndex: 1,
-          explanation: "Generics like 'List<T>' provide compile-time type safety for many types.",
+          explanation: 'La complessità cresce con le connessioni tra pezzi.',
         ),
         Question(
-          text: "What is an Isolate in Dart?",
+          text: 'Perché "spedire" (pubblicare) è parte del costruire?',
           options: [
-            "A quarantined package",
-            "An independent unit of execution with its own memory",
-            "A test sandbox",
-            "A UI widget"
+            'Non lo è',
+            'Finché sta solo sul tuo computer, nessun utente può usarlo: il viaggio verso il server completa il lavoro',
+            'Solo per fare backup',
+            'Solo per i siti grandi',
           ],
           correctAnswerIndex: 1,
-          explanation: "Isolates are Dart's threads: independent workers with separate memory communicating via messages.",
+          explanation: 'Costruire include mettere il lavoro nelle mani degli utenti.',
         ),
         Question(
-          text: "What does the 'late' keyword do?",
+          text: 'Perché serve tenere traccia delle versioni mentre costruisci?',
           options: [
-            "Delays compilation",
-            "Declares a non-nullable variable initialized after declaration",
-            "Marks deprecated code",
-            "Makes a variable nullable"
+            'Per occupare disco',
+            'Per poter sbagliare senza paura: tornare indietro e confrontare idee',
+            'Perché è obbligatorio per legge',
+            'Per andare più veloci',
           ],
           correctAnswerIndex: 1,
-          explanation: "'late' promises Dart the variable will be assigned before it is read.",
+          explanation: 'Le versioni sono la memoria del progetto.',
         ),
       ],
     ),
-    'quiz_async': Quiz(
-      id: 'quiz_async',
-      topicId: 'async_programming',
+    'quiz_build_browser': Quiz(
+      id: 'quiz_build_browser',
+      topicId: 'build_browser',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What does 'await' do?",
+          text: 'Cosa fa il browser quando "apre" una pagina?',
           options: [
-            "Blocks the whole thread",
-            "Suspends the async function until the Future completes",
-            "Cancels the Future",
-            "Runs code in parallel"
+            'Mostra il file così com\u2019è',
+            'Legge il testo, costruisce l\u2019albero dei nodi e poi calcola aspetto, posizioni e pittura',
+            'Chiede all\u2019utente',
+            'Lancia il server',
           ],
           correctAnswerIndex: 1,
-          explanation: "'await' suspends execution of the async function without blocking the event loop.",
+          explanation: 'Interpretare, non fotocopiare.',
         ),
         Question(
-          text: "What is a Future in Dart?",
+          text: 'Perché separare cosa c\u2019è, come appare e cosa fa?',
           options: [
-            "A value available immediately",
-            "An object representing a value available at some point",
-            "A scheduled timer",
-            "A stream of events"
+            'Moda',
+            'Per cambiare un aspetto senza rompere gli altri: nuovi colori, stessi contenuti',
+            'Per andare offline',
+            'Per usare più file',
           ],
           correctAnswerIndex: 1,
-          explanation: "A Future represents a computation whose result will be available later.",
+          explanation: 'Separazione = modifiche indipendenti.',
         ),
         Question(
-          text: "What is a Stream?",
+          text: 'Cambi i colori e sparisce un paragrafo: cosa sospetti?',
           options: [
-            "A single async value",
-            "A sequence of asynchronous events",
-            "A file reader only",
-            "A synchronous list"
+            'Il server',
+            'Presentazione e struttura erano mescolate: toccando l\u2019aspetto hai rotto il contenuto',
+            'Il DNS',
+            'Il Wi-Fi',
           ],
           correctAnswerIndex: 1,
-          explanation: "Streams deliver multiple async events over time; listen with 'await for' or 'listen()'.",
+          explanation: 'L\u2019intreccio trasforma ogni ritocco in rischio.',
         ),
         Question(
-          text: "How do you handle errors in an async function?",
+          text: 'Perché un errore in un punto può lasciare mezza pagina visibile?',
           options: [
-            "With try/catch around 'await'",
-            "Errors cannot be caught",
-            "With if/else on the Future",
-            "With switch on error codes"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "try/catch works with awaited Futures just like synchronous code.",
-        ),
-        Question(
-          text: "What does 'Future.wait' do?",
-          options: [
-            "Waits forever",
-            "Runs multiple futures concurrently and completes with all results",
-            "Runs futures one after another",
-            "Cancels all futures"
+            'Fortuna',
+            'Il browser costruisce e mostra pezzo per pezzo: ciò che ha capito lo dipinge',
+            'Il server aiuta',
+            'La cache nasconde',
           ],
           correctAnswerIndex: 1,
-          explanation: "'Future.wait([f1, f2])' completes when all given futures complete.",
+          explanation: 'Il render è progressivo, non tutto-o-niente.',
+        ),
+        Question(
+          text: 'Due siti con stessi contenuti ma aspetto ed extra diversi: cosa condividono?',
+          options: [
+            'Niente',
+            'La struttura di base: stessi nodi, diversa veste e diverso comportamento',
+            'Il server',
+            'Il database',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Una struttura, molte presentazioni.',
         ),
       ],
     ),
-    'quiz_generics': Quiz(
-      id: 'quiz_generics',
-      topicId: 'generics',
+    'quiz_build_framework': Quiz(
+      id: 'quiz_build_framework',
+      topicId: 'build_framework',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "What does 'List<String>' mean?",
+          text: 'Quando una pagina diventa "app" e perché tutto si complica?',
           options: [
-            "A list that only holds Strings, checked at compile time",
-            "A list of any type",
-            "A list of characters",
-            "A nullable list"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "The type argument restricts elements to String with compile-time checking.",
-        ),
-        Question(
-          text: "How do you declare a generic function?",
-          options: [
-            "T first<T>(List<T> items) => items.first;",
-            "generic first(items) => items.first;",
-            "first<T>(items) => items.first;",
-            "T first(items<T>) => items.first;"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Type parameters go after the function name: 'T first<T>(List<T> items)'.",
-        ),
-        Question(
-          text: "What is a type bound like 'T extends num'?",
-          options: [
-            "T must be num or a subtype of num",
-            "T cannot be num",
-            "T is always num",
-            "num extends T"
-          ],
-          correctAnswerIndex: 0,
-          explanation: "Bounds restrict which types can be used as type arguments.",
-        ),
-        Question(
-          text: "What is 'Map<String, int>'?",
-          options: [
-            "A list of strings",
-            "A map from String keys to int values",
-            "A set of pairs",
-            "A function type"
+            'Quando è lunga',
+            'Quando molti pezzi si aggiornano da soli e si influenzano: ogni cambio ne tocca altri',
+            'Quando ha immagini',
+            'Quando è online',
           ],
           correctAnswerIndex: 1,
-          explanation: "Map<K, V> maps keys of type K to values of type V.",
+          explanation: 'La complessità è nelle connessioni tra pezzi.',
         ),
         Question(
-          text: "Why use generics instead of 'dynamic'?",
+          text: 'A cosa serve l\u2019idea di componente (pulsante, scheda, carrello)?',
           options: [
-            "Generics are faster to write",
-            "Generics catch type errors at compile time instead of run-time",
-            "dynamic is deprecated",
-            "There is no difference"
+            'A scrivere di più',
+            'A impacchettare un pezzo con un mestiere chiaro e riusarlo senza ricopiare',
+            'A colorare',
+            'A velocizzare Internet',
           ],
           correctAnswerIndex: 1,
-          explanation: "Generics preserve type information so mistakes are caught by the analyzer.",
+          explanation: 'Un pezzo, un mestiere, riuso invece di copia-incolla.',
+        ),
+        Question(
+          text: 'Cos\u2019è lo "stato dell\u2019interfaccia" in una riga?',
+          options: [
+            'La nazione dell\u2019utente',
+            'La fonte di verità del momento (cosa selezionato, cosa nel carrello) da cui la vista discende',
+            'La velocità',
+            'Il server',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Prima i fatti, poi ciò che si vede li riflette.',
+        ),
+        Question(
+          text: 'Il contatore del carrello dice 3 ma dentro ci sono 2 oggetti: dov\u2019è il problema?',
+          options: [
+            'Nei colori',
+            'Vista e stato si sono disallineati: la vista non riflette più la verità',
+            'Nel DNS',
+            'Nel Wi-Fi',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'Il bug classico è la doppia verità.',
+        ),
+        Question(
+          text: 'Perché "copiare e adattare" lo stesso pezzo in 10 punti diventa un incubo?',
+          options: [
+            'Occupa disco',
+            'Ogni correzione va rifatta 10 volte e una verrà dimenticata',
+            'È vietato',
+            'Rallenta il browser',
+          ],
+          correctAnswerIndex: 1,
+          explanation: 'La duplicazione moltiplica il futuro lavoro di riparazione.',
         ),
       ],
     ),
-    'quiz_null_safety': Quiz(
-      id: 'quiz_null_safety',
-      topicId: 'null_safety',
+    'quiz_build_ship': Quiz(
+      id: 'quiz_build_ship',
+      topicId: 'build_ship',
       passingThreshold: 80,
       questions: [
         Question(
-          text: "How do you declare a nullable String?",
+          text: 'Perché salvare tappe (versioni) invece del solo file finale?',
           options: [
-            "String s;",
-            "String? s;",
-            "nullable String s;",
-            "String! s;"
+            'Per nostalgia',
+            'Per tornare indietro, confrontare idee e capire quando si è rotto cosa',
+            'Per occupare spazio',
+            'Per legge',
           ],
           correctAnswerIndex: 1,
-          explanation: "The '?' suffix marks a type as nullable: 'String?'.",
+          explanation: 'La storia rende gli errori economici.',
         ),
         Question(
-          text: "What does '!' (bang operator) do?",
+          text: 'A cosa serve un ramo (branch) come idea, senza tecnicismi?',
           options: [
-            "Declares a nullable type",
-            "Asserts a nullable value is non-null, throwing if it is null",
-            "Compares for inequality",
-            "Marks async code"
+            'A decorare',
+            'A provare un\u2019idea in parallelo senza disturbare il lavoro che funziona',
+            'A duplicare il server',
+            'A cancellare',
           ],
           correctAnswerIndex: 1,
-          explanation: "The null-assertion operator casts away nullability and throws on null.",
+          explanation: 'Sperimentare al sicuro.',
         ),
         Question(
-          text: "What does '?.' do?",
+          text: 'Due persone cambiano la stessa parte e poi fondono (merge): cosa può succedere?',
           options: [
-            "Unconditional member access",
-            "Null-aware access: short-circuits to null if the receiver is null",
-            "Optional function call",
-            "Declares a nullable variable"
+            'Nulla mai',
+            'Le idee cozzano (conflitto): bisogna decidere a mano cosa tenere',
+            'Il server esplode',
+            'Il DNS cambia',
           ],
           correctAnswerIndex: 1,
-          explanation: "'obj?.method()' skips the call and evaluates to null when obj is null.",
+          explanation: 'Il merge unisce, ma le contraddizioni si risolvono a mano.',
         ),
         Question(
-          text: "What is flow promotion (type promotion)?",
+          text: 'Perché "sul mio computer funziona" non basta?',
           options: [
-            "Automatic UI updates",
-            "The analyzer treating a nullable variable as non-nullable after a null check",
-            "Promoting packages",
-            "Upgrading the SDK"
+            'Perché mente',
+            'Il tuo computer non è quello degli utenti: manca la consegna uguale-per-tutti dal server',
+            'Perché è lento',
+            'Perché manca il DNS',
           ],
           correctAnswerIndex: 1,
-          explanation: "After 'if (s != null)', Dart promotes 's' to non-nullable within that scope.",
+          explanation: 'Finché non è impacchettato e consegnato, non esiste per gli altri.',
         ),
         Question(
-          text: "What does 'required' do for null safety in constructors?",
+          text: 'Perché spedire spesso piccoli passi è più sicuro di un unico grande lancio?',
           options: [
-            "Nothing",
-            "Forces callers to pass a named argument so non-nullable fields are initialized",
-            "Makes the field nullable",
-            "Generates a default value"
+            'Non lo è',
+            'Se qualcosa si rompe, sai quale passo è colpevole e torni indietro di poco',
+            'Costa meno',
+            'È più emozionante',
           ],
           correctAnswerIndex: 1,
-          explanation: "'required' named parameters must be supplied, satisfying non-nullable initialization.",
+          explanation: 'Piccoli passi = colpevoli piccoli e vicini.',
         ),
       ],
     ),

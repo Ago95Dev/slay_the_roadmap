@@ -7,18 +7,18 @@ import 'package:slay_the_roadmap/ui/screens/quiz_screen.dart';
 import 'package:slay_the_roadmap/ui/view_models/quiz_view_model.dart';
 
 const _allTopicIds = [
-  'dart_basics',
-  'variables',
-  'functions',
-  'control_flow',
-  'oop_dart',
-  'classes',
-  'inheritance',
-  'mixins',
-  'advanced_dart',
-  'async_programming',
-  'generics',
-  'null_safety',
+  'web_network',
+  'net_client_server',
+  'net_dns_url',
+  'net_http_https',
+  'web_data',
+  'data_represent',
+  'data_where',
+  'data_state',
+  'web_building',
+  'build_browser',
+  'build_framework',
+  'build_ship',
 ];
 
 void main() {
@@ -49,7 +49,7 @@ void main() {
   group('F2 — submit bloccato senza risposta', () {
     test('next/submit non avanzano senza selezione', () async {
       final vm = QuizViewModel(LocalQuizRepository());
-      await vm.loadQuiz('dart_basics');
+      await vm.loadQuiz('web_network');
 
       expect(vm.totalQuestions, 5);
       expect(vm.canProceed, isFalse);
@@ -71,7 +71,7 @@ void main() {
 
     test('nessun fallback null->0: unanswered non completa', () async {
       final vm = QuizViewModel(LocalQuizRepository());
-      await vm.loadQuiz('dart_basics');
+      await vm.loadQuiz('web_network');
       // Risponde solo a 4 domande su 5: submit bloccato.
       for (var i = 0; i < 4; i++) {
         vm.selectAnswer(vm.currentQuiz!.questions[i].correctAnswerIndex);
@@ -86,7 +86,7 @@ void main() {
   group('F2 — hint dopo 2 errori (ViewModel)', () {
     test('hint assente prima di 2 errori, visibile dopo', () async {
       final vm = QuizViewModel(LocalQuizRepository());
-      await vm.loadQuiz('dart_basics');
+      await vm.loadQuiz('web_network');
 
       expect(vm.shouldShowHintForCurrent, isFalse);
       expect(vm.currentHint, isNull);
@@ -108,7 +108,7 @@ void main() {
 
     test('cambiando domanda il contatore si azzera', () async {
       final vm = QuizViewModel(LocalQuizRepository());
-      await vm.loadQuiz('dart_basics');
+      await vm.loadQuiz('web_network');
 
       final q0 = vm.currentQuiz!.questions[0];
       final wrong0 = (q0.correctAnswerIndex + 1) % q0.options.length;
@@ -128,7 +128,7 @@ void main() {
     testWidgets('Avanti disabilitato senza risposta', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: QuizScreen(topicId: 'dart_basics', topicTitle: 'Dart Basics'),
+          home: QuizScreen(topicId: 'web_network', topicTitle: 'La Rete'),
         ),
       );
       await tester.pumpAndSettle();
@@ -142,7 +142,7 @@ void main() {
     testWidgets('hint visibile dopo 2 errori e non prima', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: QuizScreen(topicId: 'dart_basics', topicTitle: 'Dart Basics'),
+          home: QuizScreen(topicId: 'web_network', topicTitle: 'La Rete'),
         ),
       );
       await tester.pumpAndSettle();
@@ -150,16 +150,16 @@ void main() {
       // Q1: corretta = indice 1, quindi la prima opzione è errata.
       expect(find.byKey(const Key('quiz_hint')), findsNothing);
 
-      await tester.tap(find.text('Web development only'));
+      await tester.tap(find.text('Per consumare più energia'));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('quiz_hint')), findsNothing);
 
-      await tester.tap(find.text('Web development only'));
+      await tester.tap(find.text('Per consumare più energia'));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('quiz_hint')), findsOneWidget);
       expect(
         find.text(
-            'Dart is primarily used for building mobile, web, and desktop apps with Flutter.'),
+            'Separare i problemi rende la rete riparabile ed evolvibile.'),
         findsOneWidget,
       );
     });

@@ -34,7 +34,7 @@ Future<BossFightViewModel> _loadedVm() async {
     BossRepository(),
     bossTurnDelay: Duration.zero,
   );
-  await vm.loadBoss('syntax_guardian');
+  await vm.loadBoss('man_in_the_middle');
   expect(vm.currentBoss, isNotNull);
   return vm;
 }
@@ -258,7 +258,7 @@ void main() {
             ),
           ],
           child: const MaterialApp(
-            home: BossFightActiveScreen(bossId: 'syntax_guardian'),
+            home: BossFightActiveScreen(bossId: 'man_in_the_middle'),
           ),
         ),
       );
