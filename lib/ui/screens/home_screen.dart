@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../view_models/player_view_model.dart';
+import '../view_models/roadmap_view_model.dart';
 import 'roadmap_screen.dart';
 import 'boss_fight_screen.dart';
+import 'settings_screen.dart';
 
+/// Home (F5, US-05): CONTINUA solo se esiste un save con progressi,
+/// NUOVO PERCORSO con conferma se esiste un save, Settings reale.
+/// Profilo/achievements rimossi (§2 OUT).
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -9,6 +16,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = screenWidth > 600 ? 400.0 : screenWidth * 0.85;
+    final hasProgress = context.watch<PlayerViewModel>().hasProgress;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -34,8 +42,8 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 32),
 
                 // Menu Cards Column
-                _buildMenuColumn(context, cardWidth),
-                
+                _buildMenuColumn(context, cardWidth, hasProgress),
+
                 // Footer
                 const SizedBox(height: 30),
                 _buildFooter(context),
@@ -73,23 +81,41 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuColumn(BuildContext context, double cardWidth) {
+  Widget _buildMenuColumn(
+    BuildContext context,
+    double cardWidth,
+    bool hasProgress,
+  ) {
     return Column(
       children: [
+        if (hasProgress) ...[
+          _buildMenuCard(
+            context,
+            '▶ CONTINUA IL PERCORSO',
+            'Riprendi da dove avevi lasciato',
+            Icons.play_arrow,
+            [Colors.green, Colors.teal],
+            () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RoadmapScreen(),
+                ),
+              );
+            },
+            cardWidth,
+          ),
+          const SizedBox(height: 16),
+        ],
         _buildMenuCard(
           context,
-          '🗺️ CHOOSE ROADMAP',
-          'Select your learning path and begin your coding journey',
+          hasProgress ? '🗺️ NUOVO PERCORSO' : '🗺️ INIZIA IL PERCORSO',
+          hasProgress
+              ? 'Cancella il salvataggio e ricomincia da capo'
+              : 'Select your learning path and begin your coding journey',
           Icons.map,
           [Colors.blue, Colors.lightBlue],
-          () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const RoadmapScreen(),
-              ),
-            );
-          },
+          () => _startNewRun(context, hasProgress),
           cardWidth,
         ),
         const SizedBox(height: 16),
@@ -112,40 +138,65 @@ class HomeScreen extends StatelessWidget {
         const SizedBox(height: 16),
         _buildMenuCard(
           context,
-          '📊 PROFILE & STATS',
-          'Track your progress, statistics, and learning achievements',
-          Icons.person,
-          [Colors.green, Colors.lightGreen],
-          () {
-            _showComingSoon(context);
-          },
-          cardWidth,
-        ),
-        const SizedBox(height: 16),
-        _buildMenuCard(
-          context,
-          '🏆 ACHIEVEMENTS',
-          'Unlock badges, rewards, and special accomplishments',
-          Icons.emoji_events,
-          [Colors.orange, Colors.amber],
-          () {
-            _showComingSoon(context);
-          },
-          cardWidth,
-        ),
-        const SizedBox(height: 16),
-        _buildMenuCard(
-          context,
           '⚙️ SETTINGS',
-          'Customize your app experience and preferences',
+          'Reset progressi e informazioni sull\u2019app',
           Icons.settings,
           [Colors.purple, Colors.pink],
           () {
-            _showComingSoon(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsScreen(),
+              ),
+            );
           },
           cardWidth,
         ),
       ],
+    );
+  }
+
+  /// Nuovo percorso: se esiste un save chiede conferma, poi wipe + reset
+  /// roadmap a iniziale e naviga alla roadmap.
+  Future<void> _startNewRun(BuildContext context, bool hasProgress) async {
+    if (hasProgress) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          title: const Text(
+            'Nuovo percorso?',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text(
+            'Hai già un percorso salvato: ricominciando perderai '
+            'topic completati, XP, reward e boss sconfitti. Continuare?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('ANNULLA'),
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('RICOMINCIA'),
+            ),
+          ],
+        ),
+      );
+      if (confirmed != true || !context.mounted) return;
+      await context.read<PlayerViewModel>().wipe();
+      if (!context.mounted) return;
+      await context.read<RoadmapViewModel>().resetToInitial();
+      if (!context.mounted) return;
+    }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const RoadmapScreen(),
+      ),
     );
   }
 
@@ -257,33 +308,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  void _showComingSoon(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        title: const Text(
-          '🚧 Coming Soon!',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: const Text(
-          'This awesome feature is currently in development and will be available in the next update!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'EXPLORE MORE',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

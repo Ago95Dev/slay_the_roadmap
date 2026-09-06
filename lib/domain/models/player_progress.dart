@@ -176,6 +176,7 @@ class PlayerProgress extends Equatable {
     'playerDeck': boss.playerDeck.map(_rewardToJson).toList(),
     'availableRewards': boss.availableRewards.map(_rewardToJson).toList(),
     'state': boss.state.index,
+    'adaptiveQuizzes': boss.adaptiveQuizzes.map(_quizToJson).toList(),
     'currentTurn': boss.currentTurn,
     'lastAction': boss.lastAction,
     'maxEnergy': boss.maxEnergy,
@@ -193,11 +194,43 @@ class PlayerProgress extends Equatable {
     playerDeck: (json['playerDeck'] as List).map((r) => _rewardFromJson(r)).toList(),
     availableRewards: (json['availableRewards'] as List).map((r) => _rewardFromJson(r)).toList(),
     state: BossFightState.values[json['state']],
-    adaptiveQuizzes: [], // Simplified for now
+    adaptiveQuizzes: ((json['adaptiveQuizzes'] as List?) ?? const [])
+        .map((q) => _quizFromJson(Map<String, dynamic>.from(q as Map)))
+        .toList(),
     currentTurn: json['currentTurn'],
     lastAction: json['lastAction'],
     maxEnergy: (json['maxEnergy'] as num?)?.toInt() ?? 3,
     currentEnergy: (json['currentEnergy'] as num?)?.toInt() ?? 3,
+  );
+
+  static Map<String, dynamic> _quizToJson(Quiz quiz) => {
+    'id': quiz.id,
+    'topicId': quiz.topicId,
+    'passingThreshold': quiz.passingThreshold,
+    'questions': quiz.questions.map(_questionToJson).toList(),
+  };
+
+  static Quiz _quizFromJson(Map<String, dynamic> json) => Quiz(
+    id: json['id'],
+    topicId: json['topicId'],
+    passingThreshold: (json['passingThreshold'] as num?)?.toInt() ?? 80,
+    questions: ((json['questions'] as List?) ?? const [])
+        .map((q) => _questionFromJson(Map<String, dynamic>.from(q as Map)))
+        .toList(),
+  );
+
+  static Map<String, dynamic> _questionToJson(Question q) => {
+    'text': q.text,
+    'options': q.options,
+    'correctAnswerIndex': q.correctAnswerIndex,
+    'explanation': q.explanation,
+  };
+
+  static Question _questionFromJson(Map<String, dynamic> json) => Question(
+    text: json['text'],
+    options: List<String>.from(json['options'] as List? ?? const []),
+    correctAnswerIndex: (json['correctAnswerIndex'] as num?)?.toInt() ?? 0,
+    explanation: json['explanation'] ?? '',
   );
 
   @override

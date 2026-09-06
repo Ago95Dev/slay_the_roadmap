@@ -48,14 +48,28 @@ class RoadmapViewModel with ChangeNotifier {
   }
 
   void updateTopicStatus(String topicId, TopicStatus status) {
+    if (_findTopic(topicId) == null) return;
     _updateTopic(topicId, (topic) => topic.copyWith(status: status));
     _repository.updateTopicStatus(topicId, status);
-    
+
     if (status == TopicStatus.completed) {
       _repository.unlockNextTopic(topicId);
       _unlockDependentTopics(topicId);
     }
   }
+
+  /// Applica i topic completati ripristinati dal save (F5, US-05):
+  /// segna ciascuno come completato e ricalcola gli unlock a catena.
+  /// Gli id sconosciuti vengono ignorati.
+  void applyCompletedTopics(Iterable<String> completedTopicIds) {
+    for (final topicId in completedTopicIds) {
+      updateTopicStatus(topicId, TopicStatus.completed);
+    }
+  }
+
+  /// Torna allo stato iniziale (Nuovo percorso / Reset): ricarica dal
+  /// repository, i cui dati seed non vengono mai mutati dal ViewModel.
+  Future<void> resetToInitial() => loadRoadmap();
 
   void _unlockDependentTopics(String completedTopicId) {
     _topics = _updateTopicsRecursive(_topics, (topic) {
