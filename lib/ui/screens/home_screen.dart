@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
 import 'boss_fight_screen.dart';
 import 'settings_screen.dart';
@@ -39,7 +40,13 @@ class HomeScreen extends StatelessWidget {
               children: [
                 // Subtitle Section
                 _buildSubtitleSection(context),
-                const SizedBox(height: 32),
+                const SizedBox(height: 12),
+
+                // HUD globale (F6): XP bar + livello sotto il titolo.
+                PlayerHud(
+                  progress: context.watch<PlayerViewModel>().progress,
+                ),
+                const SizedBox(height: 20),
 
                 // Menu Cards Column
                 _buildMenuColumn(context, cardWidth, hasProgress),

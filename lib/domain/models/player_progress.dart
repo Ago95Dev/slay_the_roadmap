@@ -4,21 +4,62 @@ import 'quiz.dart';
 import 'boss_fight.dart';
 
 class PlayerProgress extends Equatable {
+  /// Soglie XP (F6, uguali al futuro Hub): L1 0 / L2 100 / L3 500.
+  static const int level2Threshold = 100;
+  static const int level3Threshold = 500;
+  static const int maxLevel = 3;
+
+  /// Livello calcolato da [experience] (unica fonte di verità, anche per
+  /// l'Hub futuro). 0–99 → 1, 100–499 → 2, 500+ → 3.
+  static int levelForXp(int experience) {
+    if (experience >= level3Threshold) return 3;
+    if (experience >= level2Threshold) return 2;
+    return 1;
+  }
+
   final String playerId;
   final String playerName;
   final int experience;
-  final int level;
   final List<String> completedTopicIds;
   final List<QuizResult> quizResults;
   final PlayerInventory inventory;
   final Map<String, BossFight> bossFights;
   final DateTime lastSaved;
 
+  /// Livello derivato da [experience] (F6: niente più level salvato).
+  int get level => levelForXp(experience);
+
+  /// Soglia XP del prossimo livello (null al livello massimo).
+  int? get xpForNextLevel {
+    if (level >= maxLevel) return null;
+    return level == 1 ? level2Threshold : level3Threshold;
+  }
+
+  /// XP mancanti al prossimo livello (null al livello massimo).
+  int? get xpToNextLevel {
+    final next = xpForNextLevel;
+    if (next == null) return null;
+    return next - experience;
+  }
+
+  /// Frazione 0..1 verso il prossimo livello (1.0 al livello massimo).
+  /// L1: xp/100; L2: (xp-100)/400.
+  double get xpProgress {
+    if (level >= maxLevel) return 1.0;
+    if (level == 1) {
+      return (experience / level2Threshold).clamp(0.0, 1.0);
+    }
+    final span = level3Threshold - level2Threshold;
+    return ((experience - level2Threshold) / span).clamp(0.0, 1.0);
+  }
+
   const PlayerProgress({
     required this.playerId,
     required this.playerName,
     this.experience = 0,
-    this.level = 1,
+    // Parametro conservato per compatibilità con i save v1 e il codice
+    // esistente: ignorato, il livello è sempre ricalcolato da experience.
+    int? level,
     this.completedTopicIds = const [],
     this.quizResults = const [],
     required this.inventory,
@@ -31,7 +72,6 @@ class PlayerProgress extends Equatable {
       playerId: 'player_${DateTime.now().millisecondsSinceEpoch}',
       playerName: 'Adventurer',
       experience: 0,
-      level: 1,
       completedTopicIds: [],
       quizResults: [],
       inventory: const PlayerInventory(rewards: []),
@@ -71,6 +111,7 @@ class PlayerProgress extends Equatable {
     String? playerId,
     String? playerName,
     int? experience,
+    // Ignorato (compat): il livello è sempre derivato da experience.
     int? level,
     List<String>? completedTopicIds,
     List<QuizResult>? quizResults,
@@ -82,7 +123,6 @@ class PlayerProgress extends Equatable {
       playerId: playerId ?? this.playerId,
       playerName: playerName ?? this.playerName,
       experience: experience ?? this.experience,
-      level: level ?? this.level,
       completedTopicIds: completedTopicIds ?? this.completedTopicIds,
       quizResults: quizResults ?? this.quizResults,
       inventory: inventory ?? this.inventory,
@@ -109,11 +149,13 @@ class PlayerProgress extends Equatable {
   }
 
   factory PlayerProgress.fromJson(Map<String, dynamic> json) {
+    // Save v1: il campo 'level' salvato viene ignorato, il livello è
+    // sempre ricalcolato da experience (F6).
+    final experience = (json['experience'] as num).toInt();
     return PlayerProgress(
       playerId: json['playerId'],
       playerName: json['playerName'],
-      experience: json['experience'],
-      level: json['level'],
+      experience: experience,
       completedTopicIds: List<String>.from(json['completedTopicIds']),
       quizResults: (json['quizResults'] as List).map((r) => _quizResultFromJson(r)).toList(),
       inventory: PlayerInventory(

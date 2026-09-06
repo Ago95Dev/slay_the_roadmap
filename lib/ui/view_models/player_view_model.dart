@@ -64,10 +64,14 @@ class PlayerViewModel with ChangeNotifier {
   }
 
   /// Delega a [PlayerProgress.addCompletedTopic] (+100xp).
-  void addCompletedTopic(String topicId) {
+  /// Ritorna true se l'XP ha fatto scattare un level-up (il chiamante
+  /// mostra il dialog "Livello N raggiunto!" una sola volta).
+  bool addCompletedTopic(String topicId) {
+    final before = _progress.level;
     _progress = _progress.addCompletedTopic(topicId);
     _autosave();
     notifyListeners();
+    return _progress.level > before;
   }
 
   bool isBossDefeated(String bossId) =>

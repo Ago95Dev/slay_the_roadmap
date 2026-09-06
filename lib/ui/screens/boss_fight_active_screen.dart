@@ -4,6 +4,7 @@ import '../../domain/models/boss_fight.dart';
 import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
 import '../view_models/player_view_model.dart';
+import '../widgets/player_hud.dart';
 import 'reward_choice_screen.dart';
 import '../widgets/boss/boss_health_bar.dart';
 import '../widgets/boss/player_health_bar.dart';
@@ -542,12 +543,33 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
       ),
     );
     if (!context.mounted || reward == null) return;
+    // F6: level-up (solo alla prima vittoria, unica a dare +100 XP)
+    // mostrato una sola volta confrontando il level prima/dopo.
+    int? levelBefore;
+    try {
+      levelBefore = context.read<PlayerViewModel>().progress.level;
+    } catch (_) {
+      levelBefore = null;
+    }
     try {
       context.read<PlayerViewModel>().recordBossVictory(
             viewModel.currentBoss ?? boss,
           );
     } catch (_) {
       // Senza PlayerViewModel (es. test): nessun XP, ma la vittoria resta.
+    }
+    if (!context.mounted) return;
+    int? levelAfter;
+    try {
+      levelAfter = context.read<PlayerViewModel>().progress.level;
+    } catch (_) {
+      levelAfter = null;
+    }
+    if (levelBefore != null &&
+        levelAfter != null &&
+        levelAfter > levelBefore) {
+      await showLevelUpDialog(context, levelAfter);
+      if (!context.mounted) return;
     }
     setState(() {
       _rewardClaimed = true;

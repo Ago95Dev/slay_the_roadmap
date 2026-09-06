@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../domain/models/topic.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../widgets/player_hud.dart';
 import '../widgets/roadmap/roadmap_tree.dart';
 import 'topic_detail_screen.dart';
 
@@ -187,6 +188,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
 
           return Column(
             children: [
+              // HUD globale (F6): XP bar + livello, sopra le stats.
+              _buildHudSlot(),
               // Stats header
               Container(
                 width: double.infinity,
@@ -233,6 +236,22 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
           );
         },
       ),
+    );
+  }
+
+  /// HUD globale (F6): nascosto se PlayerViewModel non è registrato
+  /// (es. vecchi test che forniscono solo RoadmapViewModel).
+  Widget _buildHudSlot() {
+    return Builder(
+      builder: (context) {
+        try {
+          final progress =
+              Provider.of<PlayerViewModel>(context).progress;
+          return PlayerHud(progress: progress);
+        } catch (_) {
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 

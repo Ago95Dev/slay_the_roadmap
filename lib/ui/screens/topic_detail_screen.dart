@@ -7,6 +7,7 @@ import '../../domain/models/topic.dart';
 import '../../domain/models/topic_detail.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../widgets/player_hud.dart';
 import 'quiz_screen.dart';
 import 'reward_choice_screen.dart';
 
@@ -64,7 +65,17 @@ class TopicDetailScreen extends StatelessWidget {
                     listen: false,
                   );
                   if (playerVm != null) {
-                    playerVm.addCompletedTopic(topic.id);
+                    final leveledUp =
+                        playerVm.addCompletedTopic(topic.id);
+                    if (leveledUp) {
+                      if (!context.mounted) return;
+                      // F6: level-up mostrato una sola volta (al crossing).
+                      await showLevelUpDialog(
+                        context,
+                        playerVm.progress.level,
+                      );
+                      if (!context.mounted) return;
+                    }
                     if (!playerVm.isTopicClaimed(topic.id)) {
                       if (playerVm.isInventoryFull) {
                         ScaffoldMessenger.of(context).showSnackBar(
