@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'ui/screens/screens.dart';
+import 'ui/view_models/player_view_model.dart';
 import 'ui/view_models/roadmap_view_model.dart';
 import 'data/repositories/roadmap_repository.dart';
 
@@ -17,6 +18,9 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(
           create: (context) => RoadmapViewModel(LocalRoadmapRepository()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PlayerViewModel(),
         ),
       ],
       child: MaterialApp(

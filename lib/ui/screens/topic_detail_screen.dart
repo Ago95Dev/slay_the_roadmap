@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../domain/models/quiz.dart';
+import '../../domain/models/reward.dart';
 import '../../domain/models/topic.dart';
 import '../../domain/models/topic_detail.dart';
+import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 import 'quiz_screen.dart';
+import 'reward_choice_screen.dart';
 
 class TopicDetailScreen extends StatelessWidget {
   final Topic topic;
@@ -51,6 +54,38 @@ class TopicDetailScreen extends StatelessWidget {
                 );
                 if (result?.passed == true) {
                   vm.updateTopicStatus(topic.id, TopicStatus.completed);
+                  if (!context.mounted) return;
+                  // F3 (US-03): prima del pop a roadmap mostra la scelta
+                  // reward (solo se il topic non ha già riscosso).
+                  // Se PlayerViewModel non è registrato (es. vecchi test),
+                  // si mantiene il comportamento precedente.
+                  final playerVm = Provider.of<PlayerViewModel?>(
+                    context,
+                    listen: false,
+                  );
+                  if (playerVm != null) {
+                    playerVm.addCompletedTopic(topic.id);
+                    if (!playerVm.isTopicClaimed(topic.id)) {
+                      if (playerVm.isInventoryFull) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Inventario pieno: ricompensa non riscattata',
+                            ),
+                          ),
+                        );
+                      } else {
+                        await Navigator.push<Reward>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => RewardChoiceScreen(
+                              topicId: topic.id,
+                            ),
+                          ),
+                        );
+                      }
+                    }
+                  }
                   if (context.mounted) Navigator.pop(context);
                 }
               },

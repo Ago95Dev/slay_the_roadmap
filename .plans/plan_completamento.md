@@ -2,6 +2,18 @@
 
 Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignment e le meccaniche del nostro GamiDOC (dungeon-crawler deck-building). Niente feature extra. Team 2 persone, stima ~8-10 giorni effettivi.
 
+## Stato avanzamento (aggiornato 2026-09-06)
+
+- [x] F1 gate roadmap + single path Dart (`fa540af`) — gate locked con SnackBar, morti rimossi, test 11/11
+- [x] F2 detail 12/12 + risposta obbligatoria + hint (`47d9575`) — test 19/19
+- [x] Fix completamento quiz→topic (`2423c38`) — bug critico: QuizResult scartato, nessun topic si completava; regression test, 20/20
+- [ ] F3 reward pick-1-of-3 ← PROSSIMO
+- [ ] F4 boss fight completo
+- [ ] F5 autosave
+- [ ] F6 HUD + livelli
+- [ ] F7 Hub minimo
+- [ ] F8 docs esame
+
 ## §0 — Convenzione commit (obbligatoria a fine fase/sottofase)
 
 Ogni commit in italiano, esplicativo anche di cosa verrà dopo:
@@ -45,6 +57,7 @@ Leaderboard/social/share/deck-code, shop/coins, classi, coop/PVP, login/signup (
 - R2 Save parziale → spec `Save v1` + test restore in F5.
 - R3 Scope creep → ogni proposta fuori §1 va in §2 (future work), mai nel codice.
 - R4 HUD incoerente → F6 unica fonte `PlayerProgress`.
+- R5 Test widget flaky in suite parallela (osservato 1 flake su regressione quiz) → se ricapita, stabilizzare con delay virtuali prima della consegna.
 
 ## §5 — Milestone
 

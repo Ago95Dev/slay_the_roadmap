@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/topic.dart';
+import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 import '../widgets/roadmap/roadmap_tree.dart';
 import 'topic_detail_screen.dart';
@@ -80,6 +81,45 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     return null;
   }
 
+  void _showInventory(BuildContext context) {
+    final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+    final rewards = playerVm?.inventory.rewards ?? [];
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Inventario'),
+        content: rewards.isEmpty
+            ? const Text(
+                'Nessuna ricompensa ancora. Completa un quiz!',
+              )
+            : SizedBox(
+                width: double.maxFinite,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: rewards.length,
+                  itemBuilder: (context, index) {
+                    final reward = rewards[index];
+                    return ListTile(
+                      leading: Text(
+                        reward.icon,
+                        style: const TextStyle(fontSize: 24),
+                      ),
+                      title: Text(reward.name),
+                      subtitle: Text(reward.rarity.name),
+                    );
+                  },
+                ),
+              ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Chiudi'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,6 +132,11 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         foregroundColor: Theme.of(context).colorScheme.onPrimary,
         elevation: 0,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.style),
+            onPressed: () => _showInventory(context),
+            tooltip: 'Inventario (deck)',
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<RoadmapViewModel>().loadRoadmap(),
