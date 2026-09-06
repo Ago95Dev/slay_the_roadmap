@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../../config/hub.dart';
 import '../../data/repositories/persistence_repository.dart';
+import '../../data/services/engine_client.dart';
 import '../../domain/models/boss_fight.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
@@ -19,14 +21,33 @@ class PlayerViewModel with ChangeNotifier {
   PlayerProgress _progress;
   final Set<String> _claimedRewardTopics = {};
 
+  /// Hub best-effort (F7): null = offline, flussi locali invariati.
+  EngineClient? _engine;
+
+  /// playerId stabile `slay_<...>`; fallback: `progress.playerId`.
+  String _hubPlayerId = '';
+
   PlayerViewModel({
     PlayerProgress? initialProgress,
     Set<String>? claimedTopics,
     PersistenceRepository? persistence,
+    EngineClient? engine,
+    String hubPlayerId = '',
   })  : _progress = initialProgress ?? PlayerProgress.initial(),
-        _persistence = persistence {
+        _persistence = persistence,
+        _engine = engine,
+        _hubPlayerId = hubPlayerId {
     if (claimedTopics != null) _claimedRewardTopics.addAll(claimedTopics);
   }
+
+  /// Collega l'Hub dopo la costruzione (bootstrap in `main`).
+  void attachEngine(EngineClient engine, {String hubPlayerId = ''}) {
+    _engine = engine;
+    _hubPlayerId = hubPlayerId;
+  }
+
+  String get _effectiveHubPlayerId =>
+      _hubPlayerId.isNotEmpty ? _hubPlayerId : _progress.playerId;
 
   PlayerProgress get progress => _progress;
   PlayerInventory get inventory => _progress.inventory;
@@ -66,11 +87,21 @@ class PlayerViewModel with ChangeNotifier {
   /// Delega a [PlayerProgress.addCompletedTopic] (+100xp).
   /// Ritorna true se l'XP ha fatto scattare un level-up (il chiamante
   /// mostra il dialog "Livello N raggiunto!" una sola volta).
+  /// Chiamato solo a quiz passato (verifica in `TopicDetailScreen`): invia
+  /// best-effort `quiz_completed {xp_amount:100, badge:topicId}` all'Hub,
+  /// mai bloccante, mai un fallimento locale.
   bool addCompletedTopic(String topicId) {
     final before = _progress.level;
     _progress = _progress.addCompletedTopic(topicId);
     _autosave();
     notifyListeners();
+    unawaited(
+      _engine?.execute(
+        actionId: HubConfig.quizCompletedAction,
+        playerId: _effectiveHubPlayerId,
+        data: {'xp_amount': HubConfig.quizXpAmount, 'badge': topicId},
+      ),
+    );
     return _progress.level > before;
   }
 
@@ -82,6 +113,8 @@ class PlayerViewModel with ChangeNotifier {
   /// le vittorie successive aggiornano il fight ma senza XP.
   /// Non assegna reward: il claim passa da [claimReward] via
   /// RewardChoiceScreen (topicId = bossId).
+  /// Solo alla prima vittoria invia best-effort `boss_defeated
+  /// {badge:bossId}` all'Hub, mai bloccante, mai un fallimento locale.
   bool recordBossVictory(BossFight boss) {
     final isFirst = !isBossDefeated(boss.id);
     final victorious = boss.copyWith(state: BossFightState.victory);
@@ -91,6 +124,15 @@ class PlayerViewModel with ChangeNotifier {
     );
     _autosave();
     notifyListeners();
+    if (isFirst) {
+      unawaited(
+        _engine?.execute(
+          actionId: HubConfig.bossDefeatedAction,
+          playerId: _effectiveHubPlayerId,
+          data: {'badge': boss.id},
+        ),
+      );
+    }
     return isFirst;
   }
 

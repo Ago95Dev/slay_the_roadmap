@@ -27,7 +27,11 @@ POST /api/v1/executions
 - `data` sempre presente (anche `{}`); chiavi snake_case (`xp_amount`, non `xpAmount`).
 - `quiz_completed` si invia SOLO se passato (soglia 80% verificata in app).
 - `boss_defeated` aggiunge +100 XP lato Hub + badge.
-- Auth: `POST /api/v1/auth {username, password, origin: "GAME"}` → Bearer 24h (`Authorization: Bearer <token>`). Credenziali MAI nel repo: login a runtime con fallback offline.
+- Auth: `POST /api/v1/auth {username, password, origin: "GAME"}` → Bearer 24h (`Authorization: Bearer <token>`). Credenziali MAI nel repo: a runtime via `--dart-define`, con fallback offline.
+```bash
+flutter run -d linux --dart-define=HUB_USER=slay --dart-define=HUB_PASS='<password>'
+```
+Senza define, nessuna chiamata di rete (Fake/offline).
 - `playerId`: id libero scelto dall'app (es. `slay_<uuid>` salvato in SharedPreferences); auto-creato al primo evento.
 
 ## Verifica E2E (player test_slay/test_slay2, poi cancellati)

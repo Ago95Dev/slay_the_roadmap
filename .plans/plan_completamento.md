@@ -7,11 +7,16 @@ Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignme
 - [x] F1 gate roadmap + single path Dart (`fa540af`) — gate locked con SnackBar, morti rimossi, test 11/11
 - [x] F2 detail 12/12 + risposta obbligatoria + hint (`47d9575`) — test 19/19
 - [x] Fix completamento quiz→topic (`2423c38`) — bug critico: QuizResult scartato, nessun topic si completava; regression test, 20/20
-- [ ] F3 reward pick-1-of-3 ← PROSSIMO
+- [x] F3 reward pick-1-of-3 (`cb8d425`)
+- [x] F4 boss fight (`edffc83`) — numeri semplici, bilanciamento rinviato
+- [x] F5 autosave (`bd29b8f`)
+- [x] F6 HUD + livelli (`1e78dd8`) — Fase 1 CHIUSA
+- [x] Fix battle-log dark mode (`b20b827`)
 - [ ] F4 boss fight completo
 - [ ] F5 autosave
 - [ ] F6 HUD + livelli
-- [ ] F7 Hub minimo
+- [x] F7 Hub minimo (`6ece7d0` console: action/xp/level/badge/3 rule verificate E2E)
+- [x] F7-app EngineClient offline-first (`dart-define`, Fake fallback)
 - [ ] F8 docs esame
 
 ## §0 — Convenzione commit (obbligatoria a fine fase/sottofase)

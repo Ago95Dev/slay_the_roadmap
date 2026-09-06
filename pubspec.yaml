@@ -13,6 +13,7 @@ dependencies:
   equatable: ^2.0.5
   url_launcher: ^6.1.11
   shared_preferences: ^2.5.5
+  http: ^1.6.0
 
 dev_dependencies:
   flutter_test:

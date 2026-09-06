@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'data/repositories/roadmap_repository.dart';
+import 'data/services/engine_client.dart';
+import 'data/services/hub_identity.dart';
 import 'data/services/shared_preferences_persistence.dart';
 import 'domain/models/player_progress.dart';
 import 'ui/screens/screens.dart';
@@ -10,6 +15,12 @@ import 'ui/view_models/roadmap_view_model.dart';
 /// Avvio (F5, US-05): carica il save PRIMA di runApp e passa lo stato
 /// iniziale ai ViewModel (progress ripristinato; roadmap con completed
 /// applicati + unlock ricalcolato). Save assente/corroto → partenza fresca.
+///
+/// F7 (Hub, offline-first): playerId stabile `slay_<...>` da
+/// SharedPreferences + [HttpEngineClient] con login fire-and-forget a ogni
+/// avvio (re-login trasparente contro la scadenza 24h del token). Senza
+/// credenziali `--dart-define` assenti nessuna chiamata parte e l'app
+/// è identica all'offline.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -24,10 +35,23 @@ Future<void> main() async {
     savedClaimed = {};
   }
 
+  final engine = HttpEngineClient();
+  unawaited(engine.login());
+  String hubPlayerId = '';
+  try {
+    hubPlayerId = await HubIdentity.loadOrCreate(
+      await SharedPreferences.getInstance(),
+    );
+  } catch (_) {
+    hubPlayerId = '';
+  }
+
   final playerViewModel = PlayerViewModel(
     initialProgress: savedProgress,
     claimedTopics: savedClaimed,
     persistence: persistence,
+    engine: engine,
+    hubPlayerId: hubPlayerId,
   );
   final roadmapViewModel = RoadmapViewModel(LocalRoadmapRepository());
   await roadmapViewModel.loadRoadmap();
