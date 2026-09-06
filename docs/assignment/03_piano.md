@@ -1,60 +1,55 @@
-# 03 — Piano di completamento Slay the Roadmap
+# Piano di completamento — Slay the Roadmap (v2, scope ridotto)
 
-Obiettivo: da P0 (build verde offline) a consegna esame. Team 2 persone. Stima totale ~10-12 giorni effettivi.
+Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignment e le meccaniche del nostro GamiDOC (dungeon-crawler deck-building). Niente feature extra. Team 2 persone, stima ~8-10 giorni effettivi.
 
-## Principi
-1. Prima giocabile offline (filmabile anche senza rete), poi Hub reale con fallback.
-2. Ogni fase chiude con comando verificabile. Niente fase successiva se la precedente è rossa.
-3. I 5 deliverable restano coerenti allo stato finale (regola esame).
-4. Tagli dichiarati subito se il tempo stringe (vedi §6), mai a sorpresa nel video.
+## §0 — Convenzione commit (obbligatoria a fine fase/sottofase)
 
-## Fase 0 — Consolidamento (0.5g) — DoD: repo pulito
-- Commit P0 + docs/ riordinata (`git add lib test docs/assignment docs/README docs/*.pdf docs/src docs/assets; commit`).
-- Decidi e annota in `02_stato.md`: `shared_preferences/get_it` rientrano solo in Fase 1 (save), `go_router` NO (resta Navigator.push).
-- DoD: `flutter analyze` 0 error, `flutter test` 7/7, `flutter build linux` ok, `ls docs/*.pdf` 3 file.
+Ogni commit in italiano, esplicativo anche di cosa verrà dopo:
 
-## Fase 1 — Giocabile offline (3-4g) — DoD: video filmabile senza rete
-Obiettivo: US-01..05 dimostrabili in locale, anche se XP/level ancora finti.
-1. **Reward UI (1g)** — `quiz_screen` + `boss_fight_active_screen:419`: pick-1-of-3 con preview effetti, `isSelected`, vincolo 1/topic, inventory visibile (usa `reward.dart`, `reward_repository take(3)`, `PlayerInventory maxSlots 20`). Chiude TODO victory (oggi solo `pop`).
-2. **Save/restore (1g)** — `flutter pub add shared_preferences` (+ `get_it` solo se serve), `PersistenceRepository` implementato, autosave dopo quiz/boss/topic, `Continue` + `New Run` con confirm in `home_screen`, fix `player_progress fromJson` (oggi perde `adaptiveQuizzes`). Test restore.
-3. **Contenuti + HUD (1g)** — `topic_detail_repository` da 5/12 a 12/12 (togli placeholder), HUD unico XP/Level/cuori/energia (oggi M3 vs M7 incoerenti), `_startQuiz` morto e `_buildQuizButton onPressed` vuoto: o collega o elimina.
-4. **Bilanciamento (0.5g)** — tabella pubblica in specifica: costi 1-3, danni carta `15+damage`, danno quiz `round(%/10)`, boss 150/200/250 vs player 100, heal 15, soglie 25/50/75 solo visive + log. Verifica che nessuna carta costi 9 con energia 4/5.
-- DoD: `flutter test` (aggiungi quiz/boss/save) verde, walkthrough Home→Path→Roadmap→Topic→Quiz→Reward→Boss→Win/Lose filmabile offline.
+```
+[Fase N] Titolo breve in italiano
 
-## Fase 2 — Hub reale (2-3g) — DoD: XP/badge da servizio esterno
-Prerequisito: account Hub + gioco creato da console (non in app).
-1. **Setup Hub (0.5g)** — console `gamification-webapp.createlab-univaq.it`: game, actions (`quiz_completed, claim_reward, play_card, boss_quiz_answer, boss_defeated, boss_lost, unlock_area`), Point `xp` + Levels `experience` (0/100/500), badge collection (almeno `variables_badge, mid_boss_badge`), 5 rule Drools minime con `/rules/validate` (snake_case, salience badge dopo punti).
-2. **EngineClient (1g)** — `package:http`, `POST /auth {origin:GAME}` Bearer 24h + `POST /executions {gameId,playerId,actionId,data:{}}` (data sempre presente). `FakeEngineClient` fallback offline: HUD/XP sempre da store locale, sync best-effort. `playerId` locale (M1 sign-in = stub o rimosso).
-3. **Cablaggio (1g)** — quiz pass → `quiz_completed {score,passed,xpAmount}`, reward → `claim_reward {card_id}`, boss → `play_card/boss_defeated {damage}`. Nessun setter diretto punti/badge (solo eventi → regole).
-- DoD: con rete, XP/livelli/badge arrivano da Hub; senza rete, app gira uguale (dati locali). `gameId` canonico in `lib/env.dart` + README (chiude discrepanza README vs Postman).
+Contesto: perché questo lavoro (US-XX / GamiDOC § / debito noto)
+Cosa implementa: file toccati + comportamento ottenuto
+Verifica: comandi lanciati ed esito (analyze / test / build)
+Prossimo: cosa resta fuori e quale fase/sottofase lo copre
+```
 
-## Fase 3 — Docs esame (3g) — DoD: 5 deliverable coerenti
-1. **GamiDOC finale (1g)** — parte da `docs/gamidoc.pdf`: aggiungi Architettura reale (rimanda a `specifica.pdf`, niente duplicati), engine Hub (endpoint + mapping actionId), persistenza, KPI/analytics, limiti. Dichiara tagli (leaderboard `?`, TITLE vs Level, Coins/shop, Coop/PVP) come scelte.
-2. **User Evaluation (1-1.5g)** — protocollo Bassanelli: 5 autodidatti principianti, task Path→Topic→Quiz→Boss, think-aloud + questionario (SUS + engagement/motivazione), tabella success rate/tempo/citazioni + 3 riflessioni + fix applicati. Senza questo il deliverable 2 è nullo.
-3. **README + Sprint + video (0.5-1g)** — README (descrizione, `pub get/run -d linux`, gameId demo, link video), Sprint1 reale + Sprint2 + ruoli D'Agostino/Di Giacomo + retro, video 3-5min (problema 30s, demo offline 2-3min, meccaniche Octalysis/Toda/Hub 60s). Registra solo ciò che Fase 1-2 ha reso cliccabile.
+## §1 — Scope IN: solo queste 8 feature
 
-## Fase 4 — Consegna (0.5g) — DoD: checklist E5 verde
-- Coerenza GamiDOC ↔ codice ↔ video ↔ README (stessi numeri: 80%=4/5, HP, soglie, XP).
-- Dry-run: clone fresco → `pub get` → `analyze` 0 error → `test` verde → `build` ok → demo 5 min senza rete + 5 min con Hub.
-- Consegna secondo `EGS_Exam_Deliverables.pdf` + link repo/video.
+| ID | Feature (US / GamiDOC §) | Acceptance | File coinvolti |
+|---|---|---|---|
+| F1 | Roadmap con gate (US-01) | Tap su topic `locked` bloccato con messaggio; rimosso `_startQuiz` morto e bottone quiz morto; via Option2 (single path Dart) | `roadmap_screen`, `roadmap_view_model`, `roadmap_selection_screen` |
+| F2 | Topic + quiz completi (US-02) | Detail reali 12/12 (via placeholder); unico ingresso quiz (AppBar); submit bloccato senza risposta (mai più `null→0`); feedback immediato (già ok); dopo 2 errori sulla stessa domanda mostra `explanation` (campo già esistente = hint) | `topic_detail_repository`, `topic_detail_screen`, `quiz_screen`, `quiz_view_model` |
+| F3 | Reward pick-1-of-3 (US-03) | Schermata scelta 1 su 3 con preview effetti; limite 1/topic; inventory visibile (`maxSlots 20` già); `isSelected` cablato | `quiz_screen`/`boss_fight_active_screen`, `reward_repository` (oggi mai chiamato), `reward.dart` |
+| F4 | Boss fight (US-04) | Energia 3/turno (1 per carta); HP 100 vs boss 150/200/250; quiz obbligatorio a fine turno (giusta = danno `round(%/10)`, errata = danno player); soglie 25/50/75 cambiano mosse boss (già); schermata vittoria (claim 1 reward + sblocco capitolo + badge) / sconfitta (retry full HP, **senza XP** = tentativi illimitati ma penalizzati); deck = reward guadagnate (oggi `[]`) | `boss_fight_view_model`, `boss_fight_active_screen`, `boss_fight.dart` |
+| F5 | Autosave (US-05) | `Save v1 {completedNodes, deck, xp, level, bossUnlocks}`; `Continue` ripristina, `New Run` wipe+confirm, Reset in Settings minima; fix `fromJson` (oggi perde `adaptiveQuizzes`) | `persistence_repository` (+ implementazione `shared_preferences`), `player_progress`, `home_screen` |
+| F6 | HUD unico + livelli | XP bar + Level con soglie **L1 0 / L2 100 / L3 500** (stesse dell'Hub, così locale e remoto coincidono); vite/energia visibili nel boss | `player_progress` (level-up oggi assente), `home/roadmap/boss` HUD |
+| F7 | Hub minimo | Game su console + Point `xp` + badge collection (`topic_badge`, `boss_badge`) + 3 rule (`quiz_pass`, `unlock`, `boss_defeat`); `EngineClient` (`POST /auth` + `POST /executions`) con `FakeEngineClient` offline; `gameId` canonico in `env` + README | nuovo `data/services/engine_client.dart`, `quiz/boss_view_model` (chiamate best-effort) |
+| F8 | Docs esame | GamiDOC finale, User Evaluation 5 utenti, README run, video 3-5min, Sprint1 reale + Sprint2 + ruoli | `docs/` |
 
-## Rischi e mitigazioni
-- R1 Hub irraggiungibile/credenziali → fallback locale sempre, video offline pronto.
-- R2 Soglia 80% ambigua → 5 domande/topic, `pass = percentage>=80` (già così dopo P0).
-- R3 Save parziale → spec `Save v1 {completedNodes, deck, xp, bossHp, energy, hearts}` + test restore.
-- R4 Scope creep (Option2 path, login/settings, leaderboard) → stub `ComingSoon` esistenti: o implementi stub vero o rimuovi voce prima di valutazione/video.
+## §2 — Scope OUT: tagliati (dichiarati nel GamiDOC come future work)
 
-## §6 — Tagli accettabili (se tempo corto, in ordine)
-1. Taglia Option2/secondo path (resta solo Dart/Flutter).
-2. Taglia login/signup (playerId locale fisso).
-3. Taglia leaderboard/classifiche Hub (resta XP/badge/livelli).
-4. Taglia animazioni/audio/custom estetici (resta dark fantasy minimale).
-5. NON tagliare mai: quiz 80%, reward 1/3, boss win/lose, save, video demo reale.
+Leaderboard/social/share/deck-code, shop/coins, classi, coop/PVP, login/signup (playerId locale fisso), roadmap extra, profilo/achievements avanzati, eventi testuali random, branching campagna, difficoltà adattiva oltre le soglie, monthly quest/login reward, animazioni extra. Voci mockup M1 Sign-in e M2 Option2: rimosse o disattivate prima di valutazione e video.
 
-## Milestone riepilogo
+## §3 — Fasi e DoD
+
+- **Fase 1 — Core offline (~4g)**: F1→F6 in ordine. DoD: walkthrough completo filmabile **senza rete** (Home→Roadmap→Topic→Quiz→Reward→Boss win/lose→Continue); `analyze` 0 error, `test` verdi (nuovi test reward/save/boss/livelli), `build linux` ok. Commit a ogni sottofase F1..F6.
+- **Fase 2 — Hub (~1.5g)**: F7. DoD: con rete XP/badge da Hub, senza rete app identica (fallback); `gameId` unico documentato.
+- **Fase 3 — Docs (~2.5g)**: F8. DoD: 5 deliverable coerenti con numeri reali (80%=4/5, HP, soglie, soglie livello).
+- **Fase 4 — Consegna (0.5g)**: dry-run da clone fresco (`pub get`→`analyze`→`test`→`build`→demo) + checklist E5.
+
+## §4 — Rischi
+
+- R1 Hub down/credenziali → fallback locale già in Fase 1, video girabile offline.
+- R2 Save parziale → spec `Save v1` + test restore in F5.
+- R3 Scope creep → ogni proposta fuori §1 va in §2 (future work), mai nel codice.
+- R4 HUD incoerente → F6 unica fonte `PlayerProgress`.
+
+## §5 — Milestone
+
 | Milestone | DoD | Sblocca |
 |---|---|---|
-| M0 repo pulito | analyze/test/build verdi | Fase 1 |
-| M1 offline giocabile | demo senza rete filmabile | video bozza |
-| M2 Hub reale | XP/badge da API + fallback | gamification vera |
+| M1 offline | demo senza rete + test verdi | video bozza, valutazione |
+| M2 hub | XP/badge remoti + fallback | gamification esterna |
 | M3 docs | 5 deliverable coerenti | consegna |
