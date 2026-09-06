@@ -1,18 +1,58 @@
 import '../../domain/models/boss_fight.dart';
 import '../../domain/models/reward.dart';
 import '../../domain/models/quiz.dart';
+import 'quiz_repository.dart';
+import 'package:flutter/foundation.dart';
 
 class BossRepository {
+  final QuizRepository _quizRepository;
+
+  BossRepository({QuizRepository? quizRepository})
+      : _quizRepository = quizRepository ?? LocalQuizRepository();
+
+  /// Topic del capitolo: da qui si pescano le domande del turno boss.
+  static List<String> chapterTopicIds(String chapterId) {
+    switch (chapterId) {
+      case 'web_network':
+        return const [
+          'web_network',
+          'net_client_server',
+          'net_dns_url',
+          'net_http_https',
+        ];
+      case 'web_data':
+        return const [
+          'web_data',
+          'data_represent',
+          'data_where',
+          'data_state',
+        ];
+      case 'web_building':
+        return const [
+          'web_building',
+          'build_browser',
+          'build_framework',
+          'build_ship',
+        ];
+      default:
+        return const [];
+    }
+  }
+
   // Mock boss fights for now
   Future<List<BossFight>> getAllBosses() async {
     await Future.delayed(const Duration(milliseconds: 300));
-    return _mockBosses;
+    return [
+      for (final boss in _mockBosses) await _withChapterQuizzes(boss),
+    ];
   }
 
   Future<BossFight?> getBossById(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
-      return _mockBosses.firstWhere((boss) => boss.id == id);
+      return await _withChapterQuizzes(
+        _mockBosses.firstWhere((boss) => boss.id == id),
+      );
     } catch (e) {
       return null;
     }
@@ -21,10 +61,32 @@ class BossRepository {
   Future<BossFight?> getBossByChapterId(String chapterId) async {
     await Future.delayed(const Duration(milliseconds: 200));
     try {
-      return _mockBosses.firstWhere((boss) => boss.chapterId == chapterId);
+      return await _withChapterQuizzes(
+        _mockBosses.firstWhere((boss) => boss.chapterId == chapterId),
+      );
     } catch (e) {
       return null;
     }
+  }
+
+  /// Se il boss non ha adaptiveQuizzes, li popola con i quiz dei topic
+  /// del suo capitolo (fallback per il turno boss).
+  @visibleForTesting
+  Future<BossFight> populateChapterQuizzes(BossFight boss) =>
+      _withChapterQuizzes(boss);
+
+  Future<BossFight> _withChapterQuizzes(BossFight boss) async {
+    if (boss.adaptiveQuizzes.isNotEmpty) return boss;
+    final quizzes = <Quiz>[];
+    for (final topicId in chapterTopicIds(boss.chapterId)) {
+      try {
+        quizzes.add(await _quizRepository.getQuizForTopic(topicId));
+      } catch (_) {
+        // Topic senza quiz: si salta, le altre domande bastano.
+      }
+    }
+    if (quizzes.isEmpty) return boss;
+    return boss.copyWith(adaptiveQuizzes: quizzes);
   }
 
   // Mock data
@@ -33,8 +95,10 @@ class BossRepository {
       id: 'man_in_the_middle',
       chapterId: 'web_network',
       name: 'Man-in-the-Middle',
-      maxHp: 150,
-      currentHp: 150,
+      maxHp: 10,
+      currentHp: 10,
+      maxPlayerHp: 3,
+      currentPlayerHp: 3,
       availableRewards: [
         const Reward(
           id: 'reward_1',
@@ -96,8 +160,10 @@ class BossRepository {
       id: 'the_amnesiac',
       chapterId: 'web_data',
       name: 'The Amnesiac',
-      maxHp: 200,
-      currentHp: 200,
+      maxHp: 10,
+      currentHp: 10,
+      maxPlayerHp: 3,
+      currentPlayerHp: 3,
       availableRewards: [
         const Reward(
           id: 'reward_4',
@@ -153,8 +219,10 @@ class BossRepository {
       id: 'spaghetti_colossus',
       chapterId: 'web_building',
       name: 'Spaghetti Colossus',
-      maxHp: 250,
-      currentHp: 250,
+      maxHp: 10,
+      currentHp: 10,
+      maxPlayerHp: 3,
+      currentPlayerHp: 3,
       availableRewards: [
         const Reward(
           id: 'reward_7',

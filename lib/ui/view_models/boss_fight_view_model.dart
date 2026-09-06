@@ -3,10 +3,13 @@ import '../../domain/models/boss_fight.dart';
 import '../../domain/models/reward.dart';
 import '../../domain/models/quiz.dart';
 import '../../data/repositories/boss_repository.dart';
+import '../../data/repositories/quiz_repository.dart';
 import 'dart:math';
 
 class BossFightViewModel extends ChangeNotifier {
   final BossRepository _repository;
+  final QuizRepository _quizRepository;
+  final Random _random;
   final Duration bossTurnDelay;
 
   BossFight? _currentBoss;
@@ -17,9 +20,15 @@ class BossFightViewModel extends ChangeNotifier {
   List<int?> _selectedAnswers = [];
   String _combatLog = '';
   List<Reward> _initialDeck = const [];
+  int _shield = 0;
 
-  BossFightViewModel(this._repository,
-      {this.bossTurnDelay = const Duration(milliseconds: 1500)});
+  BossFightViewModel(
+    this._repository, {
+    this.bossTurnDelay = const Duration(milliseconds: 1500),
+    QuizRepository? quizRepository,
+    Random? random,
+  })  : _quizRepository = quizRepository ?? LocalQuizRepository(),
+        _random = random ?? Random();
 
   // Getters
   BossFight? get currentBoss => _currentBoss;
@@ -62,16 +71,20 @@ class BossFightViewModel extends ChangeNotifier {
   }
 
   // Start the battle. Il deck è popolato dall'inventario del giocatore
-  // (solo attack/defense, copie single-use per il fight).
+  // (attack/defense + utility con heal, copie single-use per il fight).
   void startBattle({List<Reward> inventory = const []}) {
     if (_currentBoss == null) return;
 
     final deck = inventory
         .where((r) =>
-            r.type == RewardType.attack || r.type == RewardType.defense)
+            r.type == RewardType.attack ||
+            r.type == RewardType.defense ||
+            (r.type == RewardType.utility &&
+                ((r.effects['heal'] as num?)?.toDouble() ?? 0) > 0))
         .map((r) => r.copyWith(isSelected: false))
         .toList();
     _initialDeck = List.unmodifiable(deck);
+    _shield = 0;
 
     _currentBoss = _currentBoss!.copyWith(
       state: BossFightState.playerTurn,
@@ -85,9 +98,11 @@ class BossFightViewModel extends ChangeNotifier {
   }
 
   // Player chooses to use a card from their deck (costo: 1 energia,
-  // single-use per fight). Si possono giocare più carte per turno finché
-  // c'è energia; a energia 0 le carte sono bloccate. Il turno finisce con
-  // il quiz ("quiz di fine turno", sempre disponibile) o con la vittoria.
+  // single-use per fight). Effetti semplici clampati a max 2:
+  // damage -> boss, block -> scudo sul prossimo attacco, heal -> player.
+  // Si possono giocare più carte per turno finché c'è energia; a energia 0
+  // le carte sono bloccate. Il turno finisce con il quiz ("quiz di fine
+  // turno", sempre disponibile) o con la vittoria.
   void useCard(Reward card) {
     if (_currentBoss == null || !canAttack) return;
     if (_currentBoss!.currentEnergy <= 0) {
@@ -105,20 +120,35 @@ class BossFightViewModel extends ChangeNotifier {
       playerDeck: newDeck,
     );
 
-    int damage = _calculateCardDamage(card);
-    _dealDamageToBoss(damage);
+    final damage = _clampedEffect(card, 'damage');
+    final block = _clampedEffect(card, 'block');
+    final heal = _clampedEffect(card, 'heal');
+    final parts = <String>[];
+    if (damage > 0) {
+      _dealDamageToBoss(damage);
+      parts.add('dealt $damage damage');
+    }
+    if (block > 0) {
+      _shield += block;
+      parts.add('gained $block shield');
+    }
+    if (heal > 0) {
+      _healPlayer(heal);
+      parts.add('healed $heal HP');
+    }
 
     // Lethal card -> vittoria immediata
     if (_currentBoss!.isBossDefeated) {
       _currentBoss = _currentBoss!.copyWith(state: BossFightState.victory);
       _addToCombatLog(
-          '💥 You used ${card.name}! Dealt $damage damage. 🎉 Victory! You defeated ${_currentBoss!.name}!');
+          '💥 You used ${card.name}! ${parts.join(', ')}. 🎉 Victory! You defeated ${_currentBoss!.name}!');
       notifyListeners();
       return;
     }
 
+    final effect = parts.isEmpty ? 'no effect' : parts.join(', ');
     _addToCombatLog(
-        '💥 You used ${card.name}! Dealt $damage damage. (⚡$newEnergy/${_currentBoss!.maxEnergy} — play another card or answer the quiz)');
+        '💥 You used ${card.name}! $effect. (⚡$newEnergy/${_currentBoss!.maxEnergy} — play another card or answer the quiz)');
     notifyListeners();
   }
 
@@ -150,8 +180,16 @@ class BossFightViewModel extends ChangeNotifier {
     }
   }
 
+  /// Il quiz chiude il turno del player (1 danno per risposta giusta)
+  /// oppure risolve il turno del boss (domanda singola: giusta -> boss -1,
+  /// errata -> mossa del boss).
   void submitQuiz() {
     if (_currentQuiz == null) return;
+
+    if (_currentBoss?.state == BossFightState.bossTurn) {
+      _resolveBossQuiz();
+      return;
+    }
 
     int correctAnswers = 0;
     for (int i = 0; i < _currentQuiz!.questions.length; i++) {
@@ -160,17 +198,62 @@ class BossFightViewModel extends ChangeNotifier {
       }
     }
 
-    double percentage = (correctAnswers / _currentQuiz!.questions.length) * 100;
-    int damage = (percentage / 10).round(); // 1 damage per 10%
-    
+    // Danni riscalati: 1 per risposta giusta (niente più formula %/10).
+    final damage = correctAnswers;
+
     _dealDamageToBoss(damage);
-    _addToCombatLog('✅ Quiz complete! Score: ${percentage.toStringAsFixed(0)}%. Dealt $damage damage.');
-    
+    _addToCombatLog('✅ Quiz complete! Score: $correctAnswers/${_currentQuiz!.questions.length}. Dealt $damage damage.');
+
     _currentQuiz = null;
     _currentQuestionIndex = 0;
     _selectedAnswers = [];
-    
+
     _endPlayerTurn();
+  }
+
+  /// Risolve la domanda singola del turno boss: giusta -> boss -1 HP,
+  /// errata -> SEMPRE danno al player (-1 normale, -2 se il boss è
+  /// enraged a HP ≤50%). Mai heal come risposta a un errore.
+  void _resolveBossQuiz() {
+    final question = _currentQuiz!.questions.first;
+    final selected =
+        _selectedAnswers.isNotEmpty ? _selectedAnswers.first : null;
+    final correct = selected == question.correctAnswerIndex;
+
+    _currentQuiz = null;
+    _currentQuestionIndex = 0;
+    _selectedAnswers = [];
+
+    if (correct) {
+      _dealDamageToBoss(1);
+      _addToCombatLog(
+          '✅ Correct! You counter ${_currentBoss!.name} for 1 damage.');
+    } else {
+      _strikePlayer();
+    }
+
+    if (_currentBoss!.isBossDefeated) {
+      _currentBoss = _currentBoss!.copyWith(state: BossFightState.victory);
+      _addToCombatLog('🎉 Victory! You defeated ${_currentBoss!.name}!');
+      notifyListeners();
+      return;
+    }
+
+    if (_currentBoss!.isPlayerDefeated) {
+      _currentBoss = _currentBoss!.copyWith(state: BossFightState.defeat);
+      _addToCombatLog('💀 Defeat! You were defeated by ${_currentBoss!.name}.');
+      notifyListeners();
+      return;
+    }
+
+    // Back to player turn, energia ripristinata
+    _currentBoss = _currentBoss!.copyWith(
+      state: BossFightState.playerTurn,
+      currentTurn: _currentBoss!.currentTurn + 1,
+      currentEnergy: _currentBoss!.maxEnergy,
+    );
+    _addToCombatLog('⚔️ Your turn again! (⚡${_currentBoss!.maxEnergy}/${_currentBoss!.maxEnergy})');
+    notifyListeners();
   }
 
   void _endPlayerTurn() {
@@ -197,80 +280,93 @@ class BossFightViewModel extends ChangeNotifier {
     });
   }
 
-  void _executeBossTurn() {
+  /// Turno boss: se HP ≤25% il boss si rigenera +2 PRIMA di porre la
+  /// domanda (tratto di soglia, clamp a maxHp), poi pesca 1 domanda RANDOM
+  /// dai quiz dei topic del capitolo (adaptiveQuizzes del boss, o fallback
+  /// ai quiz del capitolo via QuizRepository). Giusta -> boss -1,
+  /// errata -> danno al player. Senza domande, il boss colpisce subito.
+  Future<void> _executeBossTurn() async {
     if (_currentBoss == null) return;
 
-    final bossAction = _selectBossAction();
-    int damage = bossAction.damage;
-    
-    _dealDamageToPlayer(damage);
-    _addToCombatLog('👹 ${_currentBoss!.name} used ${bossAction.description}! You took $damage damage.');
-
-    // Check if player is defeated
-    if (_currentBoss!.isPlayerDefeated) {
+    if (_currentBoss!.bossHpPercentage <= 0.25) {
       _currentBoss = _currentBoss!.copyWith(
-        state: BossFightState.defeat,
+        currentHp: _currentBoss!.currentHp + 2,
       );
-      _addToCombatLog('💀 Defeat! You were defeated by ${_currentBoss!.name}.');
+      _addToCombatLog(
+          '👹 ${_currentBoss!.name} si rigenera (+2 HP)!');
+    }
+
+    final question = await _drawChapterQuestion();
+    if (_currentBoss == null) return;
+    if (question == null) {
+      _strikePlayer();
+      if (_currentBoss!.isPlayerDefeated) {
+        _currentBoss = _currentBoss!.copyWith(state: BossFightState.defeat);
+        _addToCombatLog('💀 Defeat! You were defeated by ${_currentBoss!.name}.');
+        notifyListeners();
+        return;
+      }
+      _currentBoss = _currentBoss!.copyWith(
+        state: BossFightState.playerTurn,
+        currentTurn: _currentBoss!.currentTurn + 1,
+        currentEnergy: _currentBoss!.maxEnergy,
+      );
       notifyListeners();
       return;
     }
 
-    // Back to player turn, energia ripristinata
-    _currentBoss = _currentBoss!.copyWith(
-      state: BossFightState.playerTurn,
-      currentTurn: _currentBoss!.currentTurn + 1,
-      currentEnergy: _currentBoss!.maxEnergy,
+    _currentQuiz = Quiz(
+      id: 'boss_turn_${_currentBoss!.id}_${_currentBoss!.currentTurn}',
+      topicId: _currentBoss!.chapterId,
+      questions: [question],
     );
-    _addToCombatLog('⚔️ Your turn again! (⚡${_currentBoss!.maxEnergy}/${_currentBoss!.maxEnergy})');
+    _currentQuestionIndex = 0;
+    _selectedAnswers = [null];
+    _addToCombatLog(
+        '👹 ${_currentBoss!.name} challenges you! Answer to counter (right: boss -1, wrong: boss strikes).');
     notifyListeners();
   }
 
-  BossAction _selectBossAction() {
-    final random = Random();
-    final availableActions = _currentBoss!.availableBossActions;
-    final actionType = availableActions[random.nextInt(availableActions.length)];
-
-    switch (actionType) {
-      case BossActionType.normalAttack:
-        return const BossAction(
-          type: BossActionType.normalAttack,
-          damage: 10,
-          description: 'Normal Attack',
-        );
-      case BossActionType.specialAttack:
-        return const BossAction(
-          type: BossActionType.specialAttack,
-          damage: 20,
-          description: 'Special Attack',
-        );
-      case BossActionType.heal:
-        int healAmount = 15;
-        _currentBoss = _currentBoss!.copyWith(
-          currentHp: min(_currentBoss!.currentHp + healAmount, _currentBoss!.maxHp),
-        );
-        return BossAction(
-          type: BossActionType.heal,
-          damage: -healAmount,
-          description: 'Heal ($healAmount HP)',
-        );
-      case BossActionType.statusEffect:
-        return const BossAction(
-          type: BossActionType.statusEffect,
-          damage: 5,
-          description: 'Poison Effect',
-        );
+  /// Pesca una domanda random dal pool del capitolo.
+  Future<Question?> _drawChapterQuestion() async {
+    if (_currentBoss == null) return null;
+    var pool = _currentBoss!.adaptiveQuizzes
+        .expand((q) => q.questions)
+        .toList();
+    if (pool.isEmpty) {
+      // Fallback: quiz dei topic del capitolo via QuizRepository.
+      final quizzes = <Quiz>[];
+      for (final topicId
+          in BossRepository.chapterTopicIds(_currentBoss!.chapterId)) {
+        try {
+          quizzes.add(await _quizRepository.getQuizForTopic(topicId));
+        } catch (_) {
+          // Topic senza quiz: si salta.
+        }
+      }
+      if (quizzes.isEmpty) return null;
+      _currentBoss = _currentBoss!.copyWith(adaptiveQuizzes: quizzes);
+      pool = quizzes.expand((q) => q.questions).toList();
+      if (pool.isEmpty) return null;
     }
+    return pool[_random.nextInt(pool.length)];
   }
 
-  int _calculateCardDamage(Reward card) {
-    int baseDamage = 15;
-    
-    if (card.type == RewardType.attack) {
-      baseDamage += (card.effects['damage'] as num?)?.toInt() ?? 0;
-    }
-    
-    return baseDamage;
+  /// Colpo del boss su errore: SEMPRE danno al player — -1 normale,
+  /// -2 special se enraged (boss HP ≤50%). Mai heal qui.
+  void _strikePlayer() {
+    final enraged = _currentBoss!.bossHpPercentage <= 0.5;
+    final damage = enraged ? 2 : 1;
+    final moveName = enraged ? 'Special Attack' : 'Normal Attack';
+    _dealDamageToPlayer(damage);
+    _addToCombatLog(
+        '👹 ${_currentBoss!.name} used $moveName! You took $damage damage.');
+  }
+
+  /// Effetto carta clampato a max 2 (sicurezza numeri: i save vecchi
+  /// possono avere damage 15+).
+  int _clampedEffect(Reward card, String key) {
+    return ((card.effects[key] as num?)?.toInt() ?? 0).clamp(0, 2);
   }
 
   void _dealDamageToBoss(int damage) {
@@ -282,8 +378,25 @@ class BossFightViewModel extends ChangeNotifier {
 
   void _dealDamageToPlayer(int damage) {
     if (_currentBoss == null) return;
-    
-    int newHp = max(0, _currentBoss!.currentPlayerHp - damage);
+
+    var remaining = damage;
+    if (_shield > 0 && remaining > 0) {
+      final absorbed = min(_shield, remaining);
+      _shield -= absorbed;
+      remaining -= absorbed;
+      _addToCombatLog('🛡️ Shield absorbed $absorbed damage!');
+    }
+
+    int newHp = max(0, _currentBoss!.currentPlayerHp - remaining);
+    _currentBoss = _currentBoss!.copyWith(currentPlayerHp: newHp);
+  }
+
+  void _healPlayer(int amount) {
+    if (_currentBoss == null) return;
+    final newHp = min(
+      _currentBoss!.currentPlayerHp + amount,
+      _currentBoss!.maxPlayerHp,
+    );
     _currentBoss = _currentBoss!.copyWith(currentPlayerHp: newHp);
   }
 
@@ -297,7 +410,8 @@ class BossFightViewModel extends ChangeNotifier {
   void retryBattle() {
     if (_currentBoss == null) return;
 
-    // Reset battle state: full HP + energia, deck ripristinato
+    // Reset battle state: full HP + energia + scudo, deck ripristinato
+    _shield = 0;
     _currentBoss = _currentBoss!.copyWith(
       currentHp: _currentBoss!.maxHp,
       currentPlayerHp: _currentBoss!.maxPlayerHp,

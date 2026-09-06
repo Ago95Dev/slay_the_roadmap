@@ -27,7 +27,7 @@ Reward _testReward(String id, String name) => Reward(
       type: RewardType.attack,
       rarity: RewardRarity.common,
       icon: '🔥',
-      effects: {'damage': 10},
+      effects: {'damage': 2},
     );
 
 void main() {

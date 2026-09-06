@@ -61,14 +61,37 @@ void main() {
     });
   });
 
-  group('BossFight damage formula', () {
-    int quizDamage(double percentage) => (percentage / 10).round();
+  group('BossFight numeri (boss HP 10, player HP 3)', () {
+    test('default player HP 3/3', () {
+      const boss = BossFight(
+        id: 'boss_test',
+        chapterId: 'ch1',
+        name: 'Test Boss',
+        maxHp: 10,
+        currentHp: 10,
+      );
+      expect(boss.maxPlayerHp, 3);
+      expect(boss.currentPlayerHp, 3);
+    });
 
-    test('quiz damage is 1 per 10% score', () {
-      expect(quizDamage(100), 10);
-      expect(quizDamage(80), 8);
-      expect(quizDamage(60), 6);
-      expect(quizDamage(0), 0);
+    test('soglie 25/50/75% con HP 10 (niente veleno)', () {
+      BossFight at(int hp) => BossFight(
+            id: 'b',
+            chapterId: 'c',
+            name: 'B',
+            maxHp: 10,
+            currentHp: hp,
+          );
+      expect(at(10).availableBossActions, [BossActionType.normalAttack]);
+      expect(
+        at(7).availableBossActions,
+        [BossActionType.normalAttack, BossActionType.heal],
+      );
+      expect(
+        at(5).availableBossActions,
+        [BossActionType.specialAttack, BossActionType.normalAttack],
+      );
+      expect(at(2).availableBossActions, [BossActionType.specialAttack]);
     });
 
     test('dealing damage reduces boss HP and defeats at 0', () {
@@ -76,18 +99,19 @@ void main() {
         id: 'boss_test',
         chapterId: 'ch1',
         name: 'Test Boss',
-        maxHp: 100,
-        currentHp: 100,
+        maxHp: 10,
+        currentHp: 10,
       );
-      final damaged = boss.copyWith(currentHp: boss.currentHp - quizDamage(100));
-      expect(damaged.currentHp, 90);
+      // Domanda boss giusta: -1 al boss.
+      final damaged = boss.copyWith(currentHp: boss.currentHp - 1);
+      expect(damaged.currentHp, 9);
       expect(damaged.isBossDefeated, isFalse);
 
       final defeated = damaged.copyWith(currentHp: 0);
       expect(defeated.isBossDefeated, isTrue);
     });
 
-    test('card base damage is 15 plus attack bonus', () {
+    test('card effects clampati a max 2', () {
       const card = Reward(
         id: 'card_test',
         name: 'Strike',
@@ -95,10 +119,10 @@ void main() {
         type: RewardType.attack,
         rarity: RewardRarity.common,
         icon: 'sword',
-        effects: {'damage': 5},
+        effects: {'damage': 15},
       );
-      final damage = 15 + ((card.effects['damage'] as num?)?.toInt() ?? 0);
-      expect(damage, 20);
+      final damage = ((card.effects['damage'] as num?)?.toInt() ?? 0).clamp(0, 2);
+      expect(damage, 2);
     });
   });
 

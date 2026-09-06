@@ -220,16 +220,27 @@ class PlayerProgress extends Equatable {
     'isSelected': reward.isSelected,
   };
 
-  static Reward _rewardFromJson(Map<String, dynamic> json) => Reward(
-    id: json['id'],
-    name: json['name'],
-    description: json['description'],
-    type: RewardType.values[json['type']],
-    rarity: RewardRarity.values[json['rarity']],
-    icon: json['icon'],
-    effects: Map<String, dynamic>.from(json['effects']),
-    isSelected: json['isSelected'],
-  );
+  static Reward _rewardFromJson(Map<String, dynamic> json) {
+    // Normalizzazione numeri boss fight: i save vecchi (pre-campagna)
+    // possono avere carte con damage/block/heal a doppia cifra
+    // (es. fireball damage 15); con boss HP 10 / player HP 3 gli effetti
+    // sono clampati a max 2 in lettura.
+    final effects = Map<String, dynamic>.from(json['effects']);
+    for (final key in ['damage', 'block', 'heal']) {
+      final value = effects[key];
+      if (value is num && value > 2) effects[key] = 2;
+    }
+    return Reward(
+      id: json['id'],
+      name: json['name'],
+      description: json['description'],
+      type: RewardType.values[json['type']],
+      rarity: RewardRarity.values[json['rarity']],
+      icon: json['icon'],
+      effects: effects,
+      isSelected: json['isSelected'],
+    );
+  }
 
   static Map<String, dynamic> _bossFightToJson(BossFight boss) => {
     'id': boss.id,

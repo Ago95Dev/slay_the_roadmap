@@ -3,7 +3,7 @@ import 'quiz.dart';
 import 'reward.dart';
 
 enum BossFightState { notStarted, playerTurn, bossTurn, victory, defeat }
-enum BossActionType { normalAttack, specialAttack, heal, statusEffect }
+enum BossActionType { normalAttack, specialAttack, heal }
 
 class BossFight extends Equatable {
   final String id;
@@ -28,8 +28,8 @@ class BossFight extends Equatable {
     required this.name,
     required this.maxHp,
     required this.currentHp,
-    this.maxPlayerHp = 100,
-    this.currentPlayerHp = 100,
+    this.maxPlayerHp = 3,
+    this.currentPlayerHp = 3,
     this.playerDeck = const [],
     this.availableRewards = const [],
     this.state = BossFightState.notStarted,
@@ -55,7 +55,7 @@ class BossFight extends Equatable {
 
   List<BossActionType> get availableBossActions {
     if (bossHpPercentage <= 0.25) {
-      return [BossActionType.specialAttack, BossActionType.statusEffect];
+      return [BossActionType.specialAttack];
     } else if (bossHpPercentage <= 0.5) {
       return [BossActionType.specialAttack, BossActionType.normalAttack];
     } else if (bossHpPercentage <= 0.75) {
@@ -69,6 +69,7 @@ class BossFight extends Equatable {
     int? currentPlayerHp,
     BossFightState? state,
     List<Reward>? playerDeck,
+    List<Quiz>? adaptiveQuizzes,
     int? currentTurn,
     String? lastAction,
     int? maxEnergy,
@@ -79,13 +80,14 @@ class BossFight extends Equatable {
       chapterId: chapterId,
       name: name,
       maxHp: maxHp,
-      currentHp: currentHp ?? this.currentHp,
+      currentHp: (currentHp ?? this.currentHp).clamp(0, maxHp),
       maxPlayerHp: maxPlayerHp,
-      currentPlayerHp: currentPlayerHp ?? this.currentPlayerHp,
+      currentPlayerHp:
+          (currentPlayerHp ?? this.currentPlayerHp).clamp(0, maxPlayerHp),
       playerDeck: playerDeck ?? this.playerDeck,
       availableRewards: availableRewards,
       state: state ?? this.state,
-      adaptiveQuizzes: adaptiveQuizzes,
+      adaptiveQuizzes: adaptiveQuizzes ?? this.adaptiveQuizzes,
       currentTurn: currentTurn ?? this.currentTurn,
       lastAction: lastAction ?? this.lastAction,
       maxEnergy: maxEnergy ?? this.maxEnergy,

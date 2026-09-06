@@ -170,8 +170,8 @@ void main() {
           id: 'man_in_the_middle',
           chapterId: 'c1',
           name: 'Man-in-the-Middle',
-          maxHp: 150,
-          currentHp: 150,
+          maxHp: 10,
+          currentHp: 10,
         );
 
     test('quiz passato → quiz_completed {xp_amount:100, badge:topicId}',

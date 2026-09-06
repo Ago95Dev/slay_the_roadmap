@@ -25,7 +25,7 @@ Reward _testReward(String id) => Reward(
       type: RewardType.attack,
       rarity: RewardRarity.common,
       icon: 'sword',
-      effects: const {'damage': 10},
+      effects: const {'damage': 2},
     );
 
 Topic? _findTopic(List<Topic> topics, String id) {
@@ -79,8 +79,8 @@ void main() {
         id: 'boss1',
         chapterId: 'ch1',
         name: 'Bug King',
-        maxHp: 150,
-        currentHp: 120,
+        maxHp: 10,
+        currentHp: 8,
         adaptiveQuizzes: [
           const Quiz(
             id: 'q1',
@@ -112,6 +112,32 @@ void main() {
         restoredBoss.adaptiveQuizzes.single.questions.single.text,
         'Q?',
       );
+    });
+
+    test('fromJson clampa le vecchie carte a max 2', () async {
+      final persistence = await _persistence();
+      final progress = PlayerProgress.initial().copyWith(
+        inventory: PlayerInventory(rewards: [
+          Reward(
+            id: 'fireball',
+            name: 'Fireball',
+            description: 'vecchia carta pre-campagna',
+            type: RewardType.attack,
+            rarity: RewardRarity.common,
+            icon: '🔥',
+            effects: const {'damage': 15, 'block': 10, 'heal': 25},
+          ),
+        ]),
+      );
+
+      await persistence.savePlayerProgress(progress);
+      final restored = await persistence.loadPlayerProgress();
+
+      expect(restored, isNotNull);
+      final effects = restored!.inventory.rewards.single.effects;
+      expect(effects['damage'], 2);
+      expect(effects['block'], 2);
+      expect(effects['heal'], 2);
     });
   });
 
