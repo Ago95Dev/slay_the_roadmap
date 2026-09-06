@@ -15,6 +15,16 @@ class Topic extends Equatable {
   final String? quizId;
   final TopicDetail? detail;
 
+  /// Boss finale di capitolo (campagna US-04): solo sui capitoli root.
+  /// `bossId` referenzia il boss in [BossRepository], `bossName` è il
+  /// nome mostrato nel nodo boss a fine capitolo.
+  final String? bossId;
+  final String? bossName;
+
+  /// Boss che deve essere sconfitto prima di sbloccare questo topic
+  /// (gate di campagna: il capitolo dopo si apre solo dopo la vittoria).
+  final String? requiredBossId;
+
   const Topic({
     required this.id,
     required this.title,
@@ -26,6 +36,9 @@ class Topic extends Equatable {
     this.prerequisites = const [],
     this.quizId,
     this.detail,
+    this.bossId,
+    this.bossName,
+    this.requiredBossId,
   });
 
   Topic copyWith({
@@ -39,6 +52,9 @@ class Topic extends Equatable {
     List<String>? prerequisites,
     String? quizId,
     TopicDetail? detail,
+    String? bossId,
+    String? bossName,
+    String? requiredBossId,
   }) {
     return Topic(
       id: id ?? this.id,
@@ -51,6 +67,9 @@ class Topic extends Equatable {
       prerequisites: prerequisites ?? this.prerequisites,
       quizId: quizId ?? this.quizId,
       detail: detail ?? this.detail,
+      bossId: bossId ?? this.bossId,
+      bossName: bossName ?? this.bossName,
+      requiredBossId: requiredBossId ?? this.requiredBossId,
     );
   }
 
@@ -58,6 +77,23 @@ class Topic extends Equatable {
   bool get isCompleted => status == TopicStatus.completed;
   bool get isLocked => status == TopicStatus.locked;
   bool get hasDetail => detail != null;
+
+  /// True se il capitolo (root + sotto-topic non opzionali) è interamente
+  /// completato: il boss finale diventa sfidabile.
+  bool get isChapterComplete {
+    if (!isCompleted) return false;
+    return _allRequiredSubtopicsCompleted(subtopics);
+  }
+
+  static bool _allRequiredSubtopicsCompleted(List<Topic> topics) {
+    for (final t in topics) {
+      // I topic opzionali (e i loro sotto-alberi) non bloccano il boss.
+      if (t.isOptional) continue;
+      if (!t.isCompleted) return false;
+      if (!_allRequiredSubtopicsCompleted(t.subtopics)) return false;
+    }
+    return true;
+  }
 
   @override
   List<Object?> get props => [
@@ -71,5 +107,8 @@ class Topic extends Equatable {
     prerequisites,
     quizId,
     detail,
+    bossId,
+    bossName,
+    requiredBossId,
   ];
 }

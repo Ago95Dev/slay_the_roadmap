@@ -5,7 +5,6 @@ import '../view_models/roadmap_view_model.dart';
 import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
-import 'boss_fight_screen.dart';
 import 'settings_screen.dart';
 
 /// Home (F5, US-05): CONTINUA solo se esiste un save con progressi,
@@ -124,23 +123,6 @@ class HomeScreen extends StatelessWidget {
           Icons.map,
           [Colors.blue, Colors.lightBlue],
           () => _startNewRun(context, hasProgress),
-          cardWidth,
-        ),
-        const SizedBox(height: 16),
-        _buildMenuCard(
-          context,
-          '⚔️ BOSS FIGHT',
-          'Test your skills in epic coding battles against bosses',
-          Icons.sports_martial_arts,
-          [Colors.red, Colors.orange],
-          () {
-            Navigator.push(
-              context,
-              DungeonPageRoute(
-                builder: (context) => const BossFightScreen(),
-              ),
-            );
-          },
           cardWidth,
         ),
         const SizedBox(height: 16),

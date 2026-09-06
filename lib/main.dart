@@ -53,7 +53,11 @@ Future<void> main() async {
     engine: engine,
     hubPlayerId: hubPlayerId,
   );
-  final roadmapViewModel = RoadmapViewModel(LocalRoadmapRepository());
+  final roadmapViewModel = RoadmapViewModel(
+    LocalRoadmapRepository(),
+    // Campagna US-04: il gate `requiredBossId` legge le vittorie reali.
+    isBossDefeated: playerViewModel.isBossDefeated,
+  );
   await roadmapViewModel.loadRoadmap();
   if (savedProgress != null) {
     roadmapViewModel.applyCompletedTopics(savedProgress.completedTopicIds);

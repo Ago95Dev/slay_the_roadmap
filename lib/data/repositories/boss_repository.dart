@@ -30,7 +30,7 @@ class BossRepository {
   // Mock data
   static final List<BossFight> _mockBosses = [
     BossFight(
-      id: 'boss_dart_basics',
+      id: 'syntax_guardian',
       chapterId: 'dart_basics',
       name: 'The Syntax Guardian',
       maxHp: 150,
@@ -98,8 +98,8 @@ class BossRepository {
       ],
     ),
     BossFight(
-      id: 'boss_flutter_widgets',
-      chapterId: 'flutter_widgets',
+      id: 'widget_overlord',
+      chapterId: 'oop_dart',
       name: 'Widget Overlord',
       maxHp: 200,
       currentHp: 200,
@@ -135,7 +135,7 @@ class BossRepository {
       adaptiveQuizzes: [
         Quiz(
           id: 'quiz_boss_flutter_1',
-          topicId: 'flutter_widgets',
+          topicId: 'oop_dart',
           questions: [
             const Question(
               text: 'Which widget is stateful?',
@@ -160,8 +160,8 @@ class BossRepository {
       ],
     ),
     BossFight(
-      id: 'boss_async_dart',
-      chapterId: 'async_programming',
+      id: 'async_demon',
+      chapterId: 'advanced_dart',
       name: 'Async Demon',
       maxHp: 250,
       currentHp: 250,

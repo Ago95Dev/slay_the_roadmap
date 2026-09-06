@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../data/repositories/boss_repository.dart';
 import '../../domain/models/topic.dart';
+import '../view_models/boss_fight_view_model.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 import '../animations/dungeon_motion.dart';
 import '../widgets/player_hud.dart';
 import '../widgets/roadmap/roadmap_tree.dart';
+import 'boss_fight_active_screen.dart';
 import 'topic_detail_screen.dart';
 
 class RoadmapScreen extends StatefulWidget {
@@ -63,6 +66,67 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         ),
       ),
     );
+  }
+
+  /// Tap sul nodo boss a fine capitolo (campagna US-04): locked finché
+  /// il capitolo non è interamente completato, altrimenti apre
+  /// `BossFightActiveScreen` diretto (stesso setup del push da lista).
+  /// Al rientro ricalcola gli unlock (la vittoria apre il capitolo dopo).
+  void _onBossTap(String bossId, String chapterId) {
+    final roadmapVm = context.read<RoadmapViewModel>();
+    final chapter = _findTopic(roadmapVm.topics, chapterId);
+    if (chapter?.bossId == null) return;
+
+    if (chapter != null && !chapter.isChapterComplete) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Completa tutti i topic del capitolo per sfidare il boss',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+    if (playerVm != null && !playerVm.canEnterBoss) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Supera un quiz per recuperare una vita'),
+        ),
+      );
+      return;
+    }
+
+    Navigator.push(
+      context,
+      DungeonPageRoute(
+        builder: (context) => ChangeNotifierProvider(
+          create: (context) => BossFightViewModel(BossRepository()),
+          child: BossFightActiveScreen(
+            bossId: bossId,
+            chapterCompleted: true,
+          ),
+        ),
+      ),
+    ).then((_) {
+      if (!mounted) return;
+      context.read<RoadmapViewModel>().reevaluateUnlocks();
+    });
+  }
+
+  /// `PlayerViewModel.isBossDefeated` se registrato (in app da `main.dart`),
+  /// null nei vecchi test con solo `RoadmapViewModel`.
+  bool Function(String)? _bossDefeatedLookup() {
+    try {
+      final playerVm =
+          Provider.of<PlayerViewModel?>(context, listen: false);
+      return playerVm?.isBossDefeated;
+    } catch (_) {
+      return null;
+    }
   }
 
   Topic? _findTopic(List<Topic> topics, String topicId) {
@@ -234,6 +298,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                       onTopicExpand: (topicId) {
                         viewModel.toggleTopicExpansion(topicId);
                       },
+                      isBossDefeated: _bossDefeatedLookup(),
+                      onBossTap: _onBossTap,
                     ),
                   ),
                 ),

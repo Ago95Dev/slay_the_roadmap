@@ -21,6 +21,8 @@ class LocalRoadmapRepository implements RoadmapRepository {
       status: TopicStatus.inProgress,
       isExpanded: true,
       quizId: 'quiz_dart_basics',
+      bossId: 'syntax_guardian',
+      bossName: 'The Syntax Guardian',
       subtopics: [
         Topic(
           id: 'variables',
@@ -58,6 +60,9 @@ class LocalRoadmapRepository implements RoadmapRepository {
       isOptional: false,
       status: TopicStatus.locked,
       prerequisites: ['dart_basics'],
+      requiredBossId: 'syntax_guardian',
+      bossId: 'widget_overlord',
+      bossName: 'Widget Overlord',
       quizId: 'quiz_oop',
       subtopics: [
         Topic(
@@ -96,6 +101,9 @@ class LocalRoadmapRepository implements RoadmapRepository {
       isOptional: false,
       status: TopicStatus.locked,
       prerequisites: ['oop_dart'],
+      requiredBossId: 'widget_overlord',
+      bossId: 'async_demon',
+      bossName: 'Async Demon',
       quizId: 'quiz_advanced_dart',
       subtopics: [
         Topic(

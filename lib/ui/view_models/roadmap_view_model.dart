@@ -4,11 +4,21 @@ import '../../data/repositories/roadmap_repository.dart';
 
 class RoadmapViewModel with ChangeNotifier {
   final RoadmapRepository _repository;
+
+  /// Campagna US-04: true se il boss [bossId] è stato sconfitto.
+  /// Opzionale (default: sempre false) così i vecchi test senza
+  /// PlayerViewModel restano invariati. Cablata in `main.dart` da
+  /// `PlayerViewModel.isBossDefeated`.
+  final bool Function(String bossId) isBossDefeated;
+
   List<Topic> _topics = [];
   bool _isLoading = false;
   String? _error;
 
-  RoadmapViewModel(this._repository);
+  RoadmapViewModel(
+    this._repository, {
+    bool Function(String bossId)? isBossDefeated,
+  }) : isBossDefeated = isBossDefeated ?? ((_) => false);
 
   List<Topic> get topics => _topics;
   bool get isLoading => _isLoading;
@@ -71,18 +81,40 @@ class RoadmapViewModel with ChangeNotifier {
   /// repository, i cui dati seed non vengono mai mutati dal ViewModel.
   Future<void> resetToInitial() => loadRoadmap();
 
+  /// Ricalcola gli unlock su tutti i topic locked (gate di campagna):
+  /// chiamato al rientro dalla vittoria contro un boss, quando i
+  /// `requiredBossId` possono essersi sbloccati senza nuove completion.
+  void reevaluateUnlocks() {
+    var changed = false;
+    _topics = _updateTopicsRecursive(_topics, (topic) {
+      if (topic.status == TopicStatus.locked && _unlockConditionsMet(topic)) {
+        changed = true;
+        return topic.copyWith(status: TopicStatus.inProgress);
+      }
+      return topic;
+    });
+    if (changed) notifyListeners();
+  }
+
+  /// True se il topic locked può aprirsi: prerequisiti completati +
+  /// eventuale boss richiesto sconfitto.
+  bool _unlockConditionsMet(Topic topic) {
+    final allPrerequisitesMet = topic.prerequisites.every((prereqId) {
+      final prereq = _findTopic(prereqId);
+      return prereq?.isCompleted ?? false;
+    });
+    if (!allPrerequisitesMet) return false;
+    final requiredBoss = topic.requiredBossId;
+    if (requiredBoss != null && !isBossDefeated(requiredBoss)) return false;
+    return true;
+  }
+
   void _unlockDependentTopics(String completedTopicId) {
     _topics = _updateTopicsRecursive(_topics, (topic) {
-      if (topic.prerequisites.contains(completedTopicId) && 
-          topic.status == TopicStatus.locked) {
-        final allPrerequisitesMet = topic.prerequisites.every((prereqId) {
-          final prereq = _findTopic(prereqId);
-          return prereq?.isCompleted ?? false;
-        });
-        
-        if (allPrerequisitesMet) {
-          return topic.copyWith(status: TopicStatus.inProgress);
-        }
+      if (topic.prerequisites.contains(completedTopicId) &&
+          topic.status == TopicStatus.locked &&
+          _unlockConditionsMet(topic)) {
+        return topic.copyWith(status: TopicStatus.inProgress);
       }
       return topic;
     });

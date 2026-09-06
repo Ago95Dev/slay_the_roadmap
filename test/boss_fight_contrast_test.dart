@@ -54,7 +54,7 @@ Future<void> _pumpBattle(WidgetTester tester, ThemeMode mode) async {
           useMaterial3: true,
         ),
         themeMode: mode,
-        home: const BossFightActiveScreen(bossId: 'boss_dart_basics'),
+        home: const BossFightActiveScreen(bossId: 'syntax_guardian'),
       ),
     ),
   );
