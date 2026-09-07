@@ -83,7 +83,7 @@ class _StatsScreenState extends State<StatsScreen>
           Expanded(
             child: TabBarView(
               controller: _tabController,
-              children: [
+              children: const [
                 RunHistoryWidget(),
                 RelicCollectionWidget(),
                 CardCompendiumWidget(),

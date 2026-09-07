@@ -74,7 +74,7 @@ class ProfileScreen extends StatelessWidget {
                       border: Border.all(color: Colors.amber.shade700, width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -258,7 +258,7 @@ class ProfileScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(4),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withOpacity(0.3),
+                    color: color.withValues(alpha: 0.3),
                     blurRadius: 4,
                   ),
                 ],
@@ -306,7 +306,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildEmptySlot() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.05),
+        color: Colors.black.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: Colors.black12),
       ),

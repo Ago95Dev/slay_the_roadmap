@@ -188,11 +188,11 @@ class _QuizScreenState extends State<QuizScreen> {
 
     if (_hasAnswered) {
       if (isCorrect) {
-        backgroundColor = Colors.green.withOpacity(0.1);
+        backgroundColor = Colors.green.withValues(alpha: 0.1);
         borderColor = Colors.green;
         icon = Icons.check_circle;
       } else if (isSelected) {
-        backgroundColor = Colors.red.withOpacity(0.1);
+        backgroundColor = Colors.red.withValues(alpha: 0.1);
         borderColor = Colors.red;
         icon = Icons.cancel;
       }
@@ -334,7 +334,7 @@ class _QuizScreenState extends State<QuizScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
+                  color: Colors.green.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.green),
                 ),
@@ -357,7 +357,7 @@ class _QuizScreenState extends State<QuizScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
+                  color: Colors.orange.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.orange),
                 ),
@@ -382,7 +382,7 @@ class _QuizScreenState extends State<QuizScreen> {
                       builder: (_) => RewardSelectionScreen(
                         topicId: widget.topicId,
                         topicTitle: widget.topicTitle,
-                        rewards: topicNode!.rewards,
+                        rewards: topicNode.rewards,
                       ),
                     ),
                   );

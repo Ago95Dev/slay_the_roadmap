@@ -71,7 +71,7 @@ class TopicDetailScreen extends StatelessWidget {
                       border: Border.all(color: Colors.black, width: 2),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 13, // Golden ratio: 13
                           offset: const Offset(0, 8),
                         ),
@@ -270,7 +270,7 @@ class TopicDetailScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: color, width: 2),
       ),
@@ -497,7 +497,7 @@ class TopicDetailScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8), // Golden ratio: 13, 8(approx 13/1.618)
         decoration: BoxDecoration(
-          color: statusColor.withOpacity(0.1),
+          color: statusColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(13), // Golden ratio: 13
           border: Border.all(color: statusColor, width: 2),
         ),

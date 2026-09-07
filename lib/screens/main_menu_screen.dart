@@ -38,7 +38,7 @@ class MainMenuScreen extends StatelessWidget {
                     radius: 1.0,
                     colors: [
                       Colors.transparent,
-                      Colors.black.withOpacity(0.6),
+                      Colors.black.withValues(alpha: 0.6),
                     ],
                     stops: const [0.3, 1.0],
                   ),
@@ -67,7 +67,7 @@ class MainMenuScreen extends StatelessWidget {
                                 color: const Color(0xFFd4af37), // Gold
                                 shadows: [
                                   Shadow(
-                                    color: Colors.black.withOpacity(0.8),
+                                    color: Colors.black.withValues(alpha: 0.8),
                                     offset: const Offset(2, 2),
                                     blurRadius: 4,
                                   ),
@@ -80,7 +80,7 @@ class MainMenuScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                           decoration: BoxDecoration(
                             border: Border.all(color: const Color(0xFF8b6f47), width: 2),
-                            color: const Color(0xFF1e1410).withOpacity(0.8),
+                            color: const Color(0xFF1e1410).withValues(alpha: 0.8),
                           ),
                           child: Column(
                             children: [
@@ -122,7 +122,7 @@ class MainMenuScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           // Main title
                           Text(
                             'SLAY THE',
@@ -166,7 +166,7 @@ class MainMenuScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                         ],
                       ),
                     ),
@@ -262,7 +262,7 @@ class MainMenuScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.9),
+                color: Colors.black.withValues(alpha: 0.9),
                 offset: const Offset(0, 8),
                 blurRadius: 32,
               ),
@@ -276,7 +276,7 @@ class MainMenuScreen extends StatelessWidget {
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: const Color(0xFF8b6f47).withOpacity(0.6),
+                      color: const Color(0xFF8b6f47).withValues(alpha: 0.6),
                       width: 2,
                     ),
                   ),
@@ -307,7 +307,7 @@ class MainMenuScreen extends StatelessWidget {
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            const Color(0xFFd4af37).withOpacity(0.6),
+                            const Color(0xFFd4af37).withValues(alpha: 0.6),
                             Colors.transparent,
                           ],
                         ),
@@ -317,13 +317,13 @@ class MainMenuScreen extends StatelessWidget {
                     const SizedBox(height: 24),
                     
                     // Options
-                    _SettingsOption(
+                    const _SettingsOption(
                       icon: Icons.volume_up,
                       label: 'Sound',
                       trailing: Icons.toggle_on,
                     ),
                     const SizedBox(height: 12),
-                    _SettingsOption(
+                    const _SettingsOption(
                       icon: Icons.dark_mode,
                       label: 'Dark Mode',
                       trailing: Icons.toggle_off,
@@ -402,7 +402,7 @@ class _MenuButtonState extends State<_MenuButton> {
           boxShadow: _isHovering
               ? [
                   BoxShadow(
-                    color: const Color(0xFFd4af37).withOpacity(0.5),
+                    color: const Color(0xFFd4af37).withValues(alpha: 0.5),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
@@ -456,7 +456,7 @@ class _MenuButtonState extends State<_MenuButton> {
                       margin: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
                         border: Border.all(
-                          color: const Color(0xFF8b6f47).withOpacity(0.5),
+                          color: const Color(0xFF8b6f47).withValues(alpha: 0.5),
                           width: 1,
                         ),
                       ),
@@ -475,7 +475,7 @@ class _MenuButtonState extends State<_MenuButton> {
                         letterSpacing: 3,
                         shadows: [
                           Shadow(
-                            color: Colors.black.withOpacity(0.8),
+                            color: Colors.black.withValues(alpha: 0.8),
                             offset: const Offset(2, 2),
                             blurRadius: 4,
                           ),
@@ -509,9 +509,9 @@ class _SettingsOption extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF0a0806).withOpacity(0.6),
+        color: const Color(0xFF0a0806).withValues(alpha: 0.6),
         border: Border.all(
-          color: const Color(0xFF8b6f47).withOpacity(0.4),
+          color: const Color(0xFF8b6f47).withValues(alpha: 0.4),
           width: 1,
         ),
       ),

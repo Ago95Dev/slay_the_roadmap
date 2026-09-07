@@ -26,13 +26,13 @@ class DungeonMapWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       children: [
         // Legend
-        Card(
+        const Card(
           child: Padding(
-            padding: const EdgeInsets.all(12),
+            padding: EdgeInsets.all(12),
             child: Wrap(
               spacing: 16,
               runSpacing: 8,
-              children: const [
+              children: [
                 _LegendItem(icon: Icons.help_outline, label: 'Quiz', color: Colors.blue),
                 _LegendItem(icon: Icons.local_fire_department, label: 'Combat', color: Colors.red),
                 _LegendItem(icon: Icons.card_giftcard, label: 'Treasure', color: Colors.amber),
@@ -213,7 +213,7 @@ class _RoomNode extends StatelessWidget {
               boxShadow: isCurrent
                   ? [
                       BoxShadow(
-                        color: color.withOpacity(0.5),
+                        color: color.withValues(alpha: 0.5),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),

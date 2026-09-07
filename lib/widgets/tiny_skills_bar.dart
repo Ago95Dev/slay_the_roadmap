@@ -93,8 +93,9 @@ class TinySkillsBar extends StatelessWidget {
 
     // Map Tier to Rarity
     CardRarity rarity;
-    if (skill.tier == 1) rarity = CardRarity.common;
-    else if (skill.tier == 2) rarity = CardRarity.rare;
+    if (skill.tier == 1) {
+      rarity = CardRarity.common;
+    } else if (skill.tier == 2) rarity = CardRarity.rare;
     else if (skill.tier == 3) rarity = CardRarity.epic;
     else rarity = CardRarity.legendary;
 

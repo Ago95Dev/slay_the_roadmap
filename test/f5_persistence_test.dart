@@ -75,7 +75,7 @@ void main() {
 
     test('fromJson preserva adaptiveQuizzes del boss', () async {
       final persistence = await _persistence();
-      final boss = BossFight(
+      const boss = BossFight(
         id: 'boss1',
         chapterId: 'ch1',
         name: 'Bug King',
@@ -117,7 +117,7 @@ void main() {
     test('fromJson clampa le vecchie carte a max 2', () async {
       final persistence = await _persistence();
       final progress = PlayerProgress.initial().copyWith(
-        inventory: PlayerInventory(rewards: [
+        inventory: const PlayerInventory(rewards: [
           Reward(
             id: 'fireball',
             name: 'Fireball',
@@ -125,7 +125,7 @@ void main() {
             type: RewardType.attack,
             rarity: RewardRarity.common,
             icon: '🔥',
-            effects: const {'damage': 15, 'block': 10, 'heal': 25},
+            effects: {'damage': 15, 'block': 10, 'heal': 25},
           ),
         ]),
       );

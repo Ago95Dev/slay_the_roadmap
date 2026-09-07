@@ -33,7 +33,7 @@ class SkillTreePainter extends CustomPainter {
             if (skill.unlocked) {
               paint.color = _getBranchColor(skill.branch); // Fully active path
             } else {
-              paint.color = _getBranchColor(skill.branch).withOpacity(0.5); // Available path
+              paint.color = _getBranchColor(skill.branch).withValues(alpha: 0.5); // Available path
             }
           } else {
             paint.color = Colors.grey[800]!; // Locked path

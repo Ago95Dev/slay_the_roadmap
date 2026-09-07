@@ -8,12 +8,12 @@ class TopicNode extends StatelessWidget {
   final Function(String) onToggleExpansion;
 
   const TopicNode({
-    Key? key,
+    super.key,
     required this.topic,
     required this.depth,
     required this.onTopicTap,
     required this.onToggleExpansion,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

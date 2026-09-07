@@ -32,7 +32,7 @@ class SkillNodeWidget extends StatelessWidget {
         : (canUnlock ? Colors.white70 : Colors.grey[700]!);
     final Color backgroundColor = isUnlocked 
         ? baseColor 
-        : (canUnlock ? baseColor.withOpacity(0.3) : const Color(0xFF1E1E1E));
+        : (canUnlock ? baseColor.withValues(alpha: 0.3) : const Color(0xFF1E1E1E));
 
     return GestureDetector(
       onTap: onTap,
@@ -54,7 +54,7 @@ class SkillNodeWidget extends StatelessWidget {
               boxShadow: isUnlocked || canUnlock
                   ? [
                       BoxShadow(
-                        color: baseColor.withOpacity(0.5),
+                        color: baseColor.withValues(alpha: 0.5),
                         blurRadius: 10,
                         spreadRadius: 2,
                       )

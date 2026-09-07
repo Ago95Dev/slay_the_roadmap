@@ -74,7 +74,7 @@ class TinyCardWidget extends StatelessWidget {
             totalHeight = 120.0; // Default height if unconstrained
         }
         final double imageHeight = totalHeight * 0.5; // 50% image height
-        final double bannerHeight = 22.0; // Slightly taller for larger text
+        const double bannerHeight = 22.0; // Slightly taller for larger text
 
         return GestureDetector(
           onTap: onTap,
@@ -91,7 +91,7 @@ class TinyCardWidget extends StatelessWidget {
                   boxShadow: isInDeck
                       ? [
                           BoxShadow(
-                            color: rarityColor.withOpacity(0.6),
+                            color: rarityColor.withValues(alpha: 0.6),
                             blurRadius: 8,
                             spreadRadius: 2,
                           )
@@ -111,7 +111,7 @@ class TinyCardWidget extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    color: classColor.withOpacity(0.3), // Subtle tint
+                    color: classColor.withValues(alpha: 0.3), // Subtle tint
                     borderRadius: BorderRadius.circular(4),
                     border: Border.all(color: Colors.grey[800]!, width: 1),
                   ),
@@ -227,7 +227,7 @@ class TinyCardWidget extends StatelessWidget {
                           )
                         : null,
                     color: card.type != CardType.knowledge
-                        ? const Color(0xFF2A2A2A).withOpacity(0.9)
+                        ? const Color(0xFF2A2A2A).withValues(alpha: 0.9)
                         : null,
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(3),

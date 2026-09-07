@@ -123,7 +123,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
             border: Border.all(color: const Color(0xFFd4af37), width: 4),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFd4af37).withOpacity(0.3),
+                color: const Color(0xFFd4af37).withValues(alpha: 0.3),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),
@@ -162,7 +162,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
                 end: Alignment.bottomCenter,
                 colors: [
                   const Color(0xFF8b6f47),
-                  const Color(0xFF8b6f47).withOpacity(0.3),
+                  const Color(0xFF8b6f47).withValues(alpha: 0.3),
                 ],
               ),
             ),
@@ -202,7 +202,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         Container(
           width: 3,
           height: 16,
-          color: Colors.black.withOpacity(0.2),
+          color: Colors.black.withValues(alpha: 0.2),
         ),
       ],
     );
@@ -226,17 +226,17 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               width: 320,
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [
-                    const Color(0xFF7f1d1d),
-                    const Color(0xFF991b1b),
+                    Color(0xFF7f1d1d),
+                    Color(0xFF991b1b),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: const Color(0xFFef4444), width: 4),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFFef4444).withOpacity(0.5),
+                    color: const Color(0xFFef4444).withValues(alpha: 0.5),
                     blurRadius: 24,
                     spreadRadius: 2,
                   ),
@@ -331,9 +331,9 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
             colors: [
-              const Color(0xFF8b6f47).withOpacity(0.3),
+              const Color(0xFF8b6f47).withValues(alpha: 0.3),
               const Color(0xFF8b6f47),
-              const Color(0xFF8b6f47).withOpacity(0.3),
+              const Color(0xFF8b6f47).withValues(alpha: 0.3),
             ],
           ),
         ),

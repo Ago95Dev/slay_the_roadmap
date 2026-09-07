@@ -28,10 +28,10 @@ class SkillDetailDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: const Color(0xFF1E1E1E),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: branchColor.withOpacity(0.5), width: 2),
+          border: Border.all(color: branchColor.withValues(alpha: 0.5), width: 2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.8),
+              color: Colors.black.withValues(alpha: 0.8),
               blurRadius: 20,
               spreadRadius: 5,
             ),
@@ -45,7 +45,7 @@ class SkillDetailDialog extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: branchColor.withOpacity(0.2),
+                color: branchColor.withValues(alpha: 0.2),
                 border: Border.all(color: branchColor, width: 2),
               ),
               child: Icon(
@@ -101,9 +101,9 @@ class SkillDetailDialog extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: branchColor.withOpacity(0.1),
+                color: branchColor.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: branchColor.withOpacity(0.3)),
+                border: Border.all(color: branchColor.withValues(alpha: 0.3)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,

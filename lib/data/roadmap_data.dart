@@ -14,9 +14,9 @@ final List<Boss> bossesData = [
     imageAsset: 'assets/images/bosses/syntax_sentinel.png',
     backgroundImage: 'assets/images/backgrounds/spire_bg.png',
     openingDialogue: [
-      "HALT.",
-      "COMPILE_ERROR: PLAYER_NOT_FOUND.",
-      "INITIATING_TERMINATION_PROTOCOL..."
+      'HALT.',
+      'COMPILE_ERROR: PLAYER_NOT_FOUND.',
+      'INITIATING_TERMINATION_PROTOCOL...'
     ],
     abilities: [
       BossAbility(
@@ -59,9 +59,9 @@ final List<Boss> bossesData = [
     imageAsset: 'assets/images/bosses/logic_lich.png',
     backgroundImage: 'assets/images/backgrounds/spire_bg.png',
     openingDialogue: [
-      "Your logic is flawed.",
-      "Let me correct it.",
-      "There is no escape from this loop."
+      'Your logic is flawed.',
+      'Let me correct it.',
+      'There is no escape from this loop.'
     ],
     abilities: [
       BossAbility(
@@ -110,9 +110,9 @@ final List<Boss> bossesData = [
     imageAsset: 'assets/images/bosses/bug_bear.png',
     backgroundImage: 'assets/images/backgrounds/spire_bg.png',
     openingDialogue: [
-      "N-n-ull P-p-ointer...",
-      "RRRRAAAH!",
-      "SEGMENTATION FAULT (CORE DUMPED)"
+      'N-n-ull P-p-ointer...',
+      'RRRRAAAH!',
+      'SEGMENTATION FAULT (CORE DUMPED)'
     ],
     abilities: [
       BossAbility(

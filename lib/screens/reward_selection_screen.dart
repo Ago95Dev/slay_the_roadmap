@@ -39,7 +39,7 @@ class _RewardSelectionScreenState extends State<RewardSelectionScreen> {
           children: [
             // Header
             Card(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.green.withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -222,7 +222,7 @@ class _RewardCard extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: isSelected
-              ? color.withOpacity(0.2)
+              ? color.withValues(alpha: 0.2)
               : theme.colorScheme.surfaceContainerHighest,
           border: Border.all(
             color: isSelected ? color : Colors.grey.shade300,
@@ -237,7 +237,7 @@ class _RewardCard extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(

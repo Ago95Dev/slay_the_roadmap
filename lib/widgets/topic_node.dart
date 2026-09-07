@@ -39,7 +39,7 @@ class TopicNode extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
+                    color: Colors.black.withValues(alpha: 0.1),
                     blurRadius: 5, // 5 is approx 8/1.618
                     offset: const Offset(0, 3),
                   ),
@@ -72,9 +72,9 @@ class TopicNode extends StatelessWidget {
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
-                                  color: Colors.red.withOpacity(0.1),
+                                  color: Colors.red.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(5),
-                                  border: Border.all(color: Colors.red.withOpacity(0.5)),
+                                  border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
                                 ),
                                 child: const Text(
                                   'CORE',
@@ -104,7 +104,7 @@ class TopicNode extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: Row(

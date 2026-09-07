@@ -9,7 +9,7 @@ class LocalRewardRepository implements RewardRepository {
   /// Libreria a tema fondamenta web. Effetti semplici, MAI oltre 2
   /// (damage 1-2, block 1, heal 1): boss HP 10 / player HP 3.
   final List<Reward> _allRewards = [
-    Reward(
+    const Reward(
       id: 'semantic_strike',
       name: 'Semantic Strike',
       description: 'Tag semantici precisi: 2 danni al boss',
@@ -18,7 +18,7 @@ class LocalRewardRepository implements RewardRepository {
       icon: '🏷️',
       effects: {'damage': 2},
     ),
-    Reward(
+    const Reward(
       id: 'dns_resolve',
       name: 'DNS Resolve',
       description: 'Risolvi il nome e colpisci: 1 danno al boss',
@@ -27,7 +27,7 @@ class LocalRewardRepository implements RewardRepository {
       icon: '🌐',
       effects: {'damage': 1},
     ),
-    Reward(
+    const Reward(
       id: 'json_parse',
       name: 'JSON Parse',
       description: 'Dati ben formati: 1 danno al boss',
@@ -36,7 +36,7 @@ class LocalRewardRepository implements RewardRepository {
       icon: '📦',
       effects: {'damage': 1},
     ),
-    Reward(
+    const Reward(
       id: 'cache_shield',
       name: 'Cache Shield',
       description: 'Copia fresca a portata di mano: blocca 1 danno',
@@ -45,7 +45,7 @@ class LocalRewardRepository implements RewardRepository {
       icon: '🛡️',
       effects: {'block': 1},
     ),
-    Reward(
+    const Reward(
       id: 'flexbox_guard',
       name: 'Flexbox Guard',
       description: 'Layout che assorbe i colpi: blocca 1 danno',
@@ -54,7 +54,7 @@ class LocalRewardRepository implements RewardRepository {
       icon: '🧱',
       effects: {'block': 1},
     ),
-    Reward(
+    const Reward(
       id: 'tls_tunnel',
       name: 'TLS Tunnel',
       description: 'Canale cifrato e sicuro: recupera 1 HP',

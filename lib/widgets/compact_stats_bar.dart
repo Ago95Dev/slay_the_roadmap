@@ -12,7 +12,7 @@ class CompactStatsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
     final completedCount = gameProvider.completedTopics.length;
-    final totalTopics = 15; // Could be dynamic based on selected path
+    const totalTopics = 15; // Could be dynamic based on selected path
     final playerStats = gameProvider.playerStats;
     
     // Calculate XP percentage

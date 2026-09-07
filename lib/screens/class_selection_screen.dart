@@ -151,7 +151,7 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
                                   children: [
                                     Text(
                                       classData['name'],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.black87,
@@ -207,8 +207,8 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7),
-                  border: Border(top: BorderSide(color: Colors.black, width: 2)),
+                  color: Colors.white.withValues(alpha: 0.7),
+                  border: const Border(top: const BorderSide(color: Colors.black, width: 2)),
                 ),
                 child: SizedBox(
                   width: double.infinity,

@@ -13,7 +13,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
   final TopicDetailRepository _detailRepository = LocalTopicDetailRepository();
 
   final List<Topic> _dartRoadmap = [
-    Topic(
+    const Topic(
       id: 'web_network',
       title: 'La Rete',
       description: 'Come i computer si trovano, si parlano e si scambiano contenuti',
@@ -24,7 +24,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
       bossId: 'man_in_the_middle',
       bossName: 'Man-in-the-Middle',
       subtopics: [
-        Topic(
+        const Topic(
           id: 'net_client_server',
           title: 'Client e server',
           description: 'Chi chiede e chi risponde nella conversazione web',
@@ -33,7 +33,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['web_network'],
           quizId: 'quiz_net_client_server',
         ),
-        Topic(
+        const Topic(
           id: 'net_dns_url',
           title: 'Indirizzi e nomi',
           description: 'Come i nomi diventano indirizzi e le risorse si localizzano',
@@ -42,7 +42,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['net_client_server'],
           quizId: 'quiz_net_dns_url',
         ),
-        Topic(
+        const Topic(
           id: 'net_http_https',
           title: 'HTTP e HTTPS',
           description: 'Il linguaggio della conversazione web, in chiaro e cifrato',
@@ -53,7 +53,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
         ),
       ],
     ),
-    Topic(
+    const Topic(
       id: 'web_data',
       title: 'Dati e Stato',
       description: 'Rappresentare, custodire e ricordare i dati sul web',
@@ -65,7 +65,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
       bossName: 'The Amnesiac',
       quizId: 'quiz_web_data',
       subtopics: [
-        Topic(
+        const Topic(
           id: 'data_represent',
           title: 'Rappresentare i dati',
           description: 'Forme e formati: come le informazioni viaggiano e si leggono',
@@ -74,7 +74,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['web_data'],
           quizId: 'quiz_data_represent',
         ),
-        Topic(
+        const Topic(
           id: 'data_where',
           title: 'Dove vivono i dati',
           description: 'Frontend, backend e database: tre case per tre mestieri',
@@ -83,7 +83,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['data_represent'],
           quizId: 'quiz_data_where',
         ),
-        Topic(
+        const Topic(
           id: 'data_state',
           title: 'Ricordare (stato, sessioni, cache)',
           description: 'Le memorie aggiuntive di un web smemorato (Opzionale)',
@@ -94,7 +94,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
         ),
       ],
     ),
-    Topic(
+    const Topic(
       id: 'web_building',
       title: 'Costruire sul Web',
       description: 'Dal browser alle app: mostrare, organizzare e spedire',
@@ -106,7 +106,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
       bossName: 'Spaghetti Colossus',
       quizId: 'quiz_web_building',
       subtopics: [
-        Topic(
+        const Topic(
           id: 'build_browser',
           title: 'Come ragiona il browser',
           description: 'Interpretare, comporre e dipingere le pagine',
@@ -115,7 +115,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['web_building'],
           quizId: 'quiz_build_browser',
         ),
-        Topic(
+        const Topic(
           id: 'build_framework',
           title: 'Domare la complessità',
           description: 'Componenti e stato quando le pagine diventano app',
@@ -124,7 +124,7 @@ class LocalRoadmapRepository implements RoadmapRepository {
           prerequisites: ['web_building'],
           quizId: 'quiz_build_framework',
         ),
-        Topic(
+        const Topic(
           id: 'build_ship',
           title: 'Versionare e spedire',
           description: 'Tappe, rami e consegna: sbagliare a basso costo',

@@ -63,10 +63,10 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'SKILL CONSTELLATION',
                       style: TextStyle(
                         fontSize: 20,
@@ -82,12 +82,12 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'Ascend the tree of knowledge',
                       style: TextStyle(
                         fontSize: 12,
-                        color: const Color(0xFF8b6f47),
+                        color: Color(0xFF8b6f47),
                         letterSpacing: 1,
                       ),
                     ),
@@ -109,7 +109,7 @@ class _SkillTreeScreenState extends State<SkillTreeScreen> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFFd4af37).withOpacity(0.3),
+                        color: const Color(0xFFd4af37).withValues(alpha: 0.3),
                         blurRadius: 12,
                         spreadRadius: 2,
                       ),
@@ -242,7 +242,7 @@ class _GothicBranchTab extends StatelessWidget {
               gradient: isSelected
                   ? LinearGradient(
                       colors: [
-                        _branchColor.withOpacity(0.3),
+                        _branchColor.withValues(alpha: 0.3),
                         const Color(0xFF1a1410),
                       ],
                     )
@@ -259,7 +259,7 @@ class _GothicBranchTab extends StatelessWidget {
               boxShadow: isSelected
                   ? [
                       BoxShadow(
-                        color: _branchColor.withOpacity(0.5),
+                        color: _branchColor.withValues(alpha: 0.5),
                         blurRadius: 12,
                         spreadRadius: 1,
                       ),
@@ -290,8 +290,8 @@ class _GothicBranchTab extends StatelessWidget {
                     fontSize: 11,
                     fontWeight: FontWeight.bold,
                     color: isSelected
-                        ? _branchColor.withOpacity(0.8)
-                        : const Color(0xFF8b6f47).withOpacity(0.6),
+                        ? _branchColor.withValues(alpha: 0.8)
+                        : const Color(0xFF8b6f47).withValues(alpha: 0.6),
                   ),
                 ),
               ],

@@ -513,9 +513,9 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                ElevatedButton(
+                const ElevatedButton(
                   onPressed: null, // Back disabled for boss fights
-                  child: const Text('Back'),
+                  child: Text('Back'),
                 ),
                 ElevatedButton(
                   onPressed: viewModel.selectedAnswers[

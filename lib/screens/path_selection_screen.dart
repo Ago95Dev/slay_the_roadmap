@@ -127,7 +127,7 @@ class _PathSelectionScreenState extends State<PathSelectionScreen> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 2),
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
                 child: Center(
                   child: _selectedPath != null

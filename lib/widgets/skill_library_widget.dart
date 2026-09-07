@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
-import '../models/types.dart';
 import 'skill_node_widget.dart';
 import 'skill_detail_dialog.dart';
 

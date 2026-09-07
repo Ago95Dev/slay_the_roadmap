@@ -26,11 +26,11 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   
   // Player State in Fight
   int _currentEnergy = 3;
-  int _maxEnergy = 3;
+  final int _maxEnergy = 3;
   int _playerBlock = 0;
-  List<CardModel> _hand = [];
+  final List<CardModel> _hand = [];
   List<CardModel> _drawPile = [];
-  List<CardModel> _discardPile = [];
+  final List<CardModel> _discardPile = [];
   
   // Boss State in Fight
   int _bossBlock = 0;
@@ -49,7 +49,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   // Dialogue State
   bool _showDialogue = false;
   int _dialogueIndex = 0;
-  String _currentDialogueText = "";
+  String _currentDialogueText = '';
   Timer? _typewriterTimer;
 
   // Animations
@@ -459,14 +459,14 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
     setState(() {
       _showDialogue = true;
       _dialogueIndex = 0;
-      _currentDialogueText = "";
+      _currentDialogueText = '';
     });
     _typewriteDialogue(_boss.openingDialogue![0]);
   }
 
   void _typewriteDialogue(String text) {
     _typewriterTimer?.cancel();
-    _currentDialogueText = "";
+    _currentDialogueText = '';
     int charIndex = 0;
     
     _typewriterTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
@@ -494,7 +494,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
     if (_dialogueIndex < _boss.openingDialogue!.length - 1) {
       setState(() {
         _dialogueIndex++;
-        _currentDialogueText = "";
+        _currentDialogueText = '';
       });
       _typewriteDialogue(_boss.openingDialogue![_dialogueIndex]);
     } else {
@@ -530,7 +530,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(color: Colors.black, width: 4),
                         boxShadow: [
-                          BoxShadow(color: Colors.black.withOpacity(0.5), offset: const Offset(4, 4), blurRadius: 0),
+                          BoxShadow(color: Colors.black.withValues(alpha: 0.5), offset: const Offset(4, 4), blurRadius: 0),
                         ],
                       ),
                       child: Column(
@@ -615,13 +615,13 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                 Expanded(
                   flex: 8, // Golden Ratio approx (8:5)
                   child: DragTarget<CardModel>(
-                    onWillAccept: (data) => _phase == TurnPhase.player,
-                    onAccept: (card) => _playCard(card),
+                    onWillAcceptWithDetails: (data) => _phase == TurnPhase.player,
+                    onAcceptWithDetails: (card) => _playCard(card),
                     builder: (context, candidateData, rejectedData) {
                       return Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: candidateData.isNotEmpty ? Colors.red.withOpacity(0.1) : null,
+                          color: candidateData.isNotEmpty ? Colors.red.withValues(alpha: 0.1) : null,
                         ),
                         child: SingleChildScrollView(
                           child: Column(
@@ -669,7 +669,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   margin: const EdgeInsets.only(top: 8),
                                   decoration: BoxDecoration(
-                                    color: Colors.blue.withOpacity(0.5),
+                                    color: Colors.blue.withValues(alpha: 0.5),
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
@@ -754,7 +754,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                             margin: const EdgeInsets.symmetric(horizontal: 20),
                                             decoration: BoxDecoration(
                                               color: card.type == CardType.knowledge
-                                                  ? const Color(0xFF1A0B2E).withOpacity(0.95)
+                                                  ? const Color(0xFF1A0B2E).withValues(alpha: 0.95)
                                                   : Colors.black87,
                                               borderRadius: BorderRadius.circular(8),
                                               border: Border.all(
@@ -864,13 +864,13 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                       constraints: const BoxConstraints(maxWidth: 700),
                       decoration: BoxDecoration(
                         // Dark parchment background with gradient
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                           colors: [
-                            const Color(0xFF1a1410),
-                            const Color(0xFF2d1f1a),
-                            const Color(0xFF1a1410),
+                            Color(0xFF1a1410),
+                            Color(0xFF2d1f1a),
+                            Color(0xFF1a1410),
                           ],
                         ),
                         // Ornate thick border (Slay the Spire style)
@@ -880,14 +880,14 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.9),
+                            color: Colors.black.withValues(alpha: 0.9),
                             offset: const Offset(0, 8),
                             blurRadius: 32,
                             spreadRadius: 4,
                           ),
                           // Inner glow
                           BoxShadow(
-                            color: const Color(0xFFd4af37).withOpacity(0.3),
+                            color: const Color(0xFFd4af37).withValues(alpha: 0.3),
                             offset: const Offset(0, 0),
                             blurRadius: 12,
                             spreadRadius: -4,
@@ -902,7 +902,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                               margin: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: const Color(0xFF8b6f47).withOpacity(0.6),
+                                  color: const Color(0xFF8b6f47).withValues(alpha: 0.6),
                                   width: 2,
                                 ),
                               ),
@@ -940,7 +940,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                                 color: _isThresholdQuiz ? const Color(0xFFa855f7) : const Color(0xFFef4444),
                                                 shadows: [
                                                   Shadow(
-                                                    color: Colors.black.withOpacity(0.8),
+                                                    color: Colors.black.withValues(alpha: 0.8),
                                                     offset: const Offset(2, 2),
                                                     blurRadius: 4,
                                                   ),
@@ -966,7 +966,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                         ),
                                         boxShadow: _quizTimeLeft <= 5 ? [
                                           BoxShadow(
-                                            color: const Color(0xFFef4444).withOpacity(0.5),
+                                            color: const Color(0xFFef4444).withValues(alpha: 0.5),
                                             blurRadius: 8,
                                             spreadRadius: 2,
                                           ),
@@ -996,7 +996,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                     gradient: LinearGradient(
                                       colors: [
                                         Colors.transparent,
-                                        const Color(0xFFd4af37).withOpacity(0.6),
+                                        const Color(0xFFd4af37).withValues(alpha: 0.6),
                                         Colors.transparent,
                                       ],
                                     ),
@@ -1009,9 +1009,9 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                 Container(
                                   padding: const EdgeInsets.all(20),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF0a0806).withOpacity(0.6),
+                                    color: const Color(0xFF0a0806).withValues(alpha: 0.6),
                                     border: Border.all(
-                                      color: const Color(0xFF8b6f47).withOpacity(0.4),
+                                      color: const Color(0xFF8b6f47).withValues(alpha: 0.4),
                                       width: 1,
                                     ),
                                   ),
@@ -1069,7 +1069,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                       decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withOpacity(0.6),
+                                            color: Colors.black.withValues(alpha: 0.6),
                                             offset: const Offset(0, 4),
                                             blurRadius: 8,
                                           ),
@@ -1094,7 +1094,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                                   width: 32,
                                                   height: 32,
                                                   decoration: BoxDecoration(
-                                                    color: borderColor.withOpacity(0.2),
+                                                    color: borderColor.withValues(alpha: 0.2),
                                                     border: Border.all(color: borderColor, width: 2),
                                                   ),
                                                   child: Center(
@@ -1144,8 +1144,8 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          const Color(0xFF7f1d1d).withOpacity(0.3),
-                                          const Color(0xFF991b1b).withOpacity(0.3),
+                                          const Color(0xFF7f1d1d).withValues(alpha: 0.3),
+                                          const Color(0xFF991b1b).withValues(alpha: 0.3),
                                         ],
                                       ),
                                       border: Border.all(

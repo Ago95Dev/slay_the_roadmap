@@ -121,7 +121,7 @@ class _RaritySection extends StatelessWidget {
             Chip(
               label: Text('${relics.length}'),
               visualDensity: VisualDensity.compact,
-              backgroundColor: color.withOpacity(0.2),
+              backgroundColor: color.withValues(alpha: 0.2),
             ),
           ],
         ),
@@ -178,7 +178,7 @@ class _RelicCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.2),
+                    color: color.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(icon, color: color, size: 20),

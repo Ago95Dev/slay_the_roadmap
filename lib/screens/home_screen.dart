@@ -55,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   end: Alignment.bottomCenter,
                   colors: [
                     const Color(0xFF1a1410),
-                    const Color(0xFF0a0806).withOpacity(0.0),
+                    const Color(0xFF0a0806).withValues(alpha: 0.0),
                   ],
                 ),
                 border: const Border(
@@ -204,7 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.9),
+                color: Colors.black.withValues(alpha: 0.9),
                 offset: const Offset(0, 8),
                 blurRadius: 32,
               ),
@@ -218,7 +218,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: const Color(0xFF8b6f47).withOpacity(0.6),
+                      color: const Color(0xFF8b6f47).withValues(alpha: 0.6),
                       width: 2,
                     ),
                   ),
@@ -249,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         gradient: LinearGradient(
                           colors: [
                             Colors.transparent,
-                            const Color(0xFFd4af37).withOpacity(0.6),
+                            const Color(0xFFd4af37).withValues(alpha: 0.6),
                             Colors.transparent,
                           ],
                         ),
@@ -338,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
             border: Border.all(color: const Color(0xFFef4444), width: 3),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.9),
+                color: Colors.black.withValues(alpha: 0.9),
                 blurRadius: 32,
               ),
             ],
@@ -545,7 +545,7 @@ class _GothicIconButton extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF1e1410).withOpacity(0.6),
+              color: const Color(0xFF1e1410).withValues(alpha: 0.6),
               border: Border.all(
                 color: const Color(0xFF8b6f47),
                 width: 2,
@@ -647,9 +647,9 @@ class _SettingsOption extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: const Color(0xFF0a0806).withOpacity(0.6),
+            color: const Color(0xFF0a0806).withValues(alpha: 0.6),
             border: Border.all(
-              color: const Color(0xFF8b6f47).withOpacity(0.4),
+              color: const Color(0xFF8b6f47).withValues(alpha: 0.4),
               width: 1,
             ),
           ),

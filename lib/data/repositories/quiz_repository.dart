@@ -7,12 +7,12 @@ abstract class QuizRepository {
 
 class LocalQuizRepository implements QuizRepository {
   final Map<String, Quiz> _quizzes = {
-    'quiz_web_network': Quiz(
+    'quiz_web_network': const Quiz(
       id: 'quiz_web_network',
       topicId: 'web_network',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché la rete è organizzata a strati invece che in un unico blocco?',
           options: [
             'Per consumare più energia',
@@ -23,7 +23,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Separare i problemi rende la rete riparabile ed evolvibile.',
         ),
-        Question(
+        const Question(
           text: 'Cosa significa che client, DNS e HTTP sono "fondamenta"?',
           options: [
             'Sono tecnologie vecchie e superate',
@@ -34,7 +34,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Le fondamenta non si vedono ma reggono i piani alti.',
         ),
-        Question(
+        const Question(
           text: 'Il sito non si apre: perché il modello a ruoli aiuta a capire il guasto?',
           options: [
             'Non aiuta, bisogna reinstallare tutto',
@@ -45,7 +45,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Ruoli separati = colpevoli separati.',
         ),
-        Question(
+        const Question(
           text: 'Perché ogni attore fa solo il suo mestiere (il DNS traduce, HTTP conversa, il browser mostra)?',
           options: [
             'Per pigrizia',
@@ -56,7 +56,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Interfacce stabili tra ruoli permettono innovazione indipendente.',
         ),
-        Question(
+        const Question(
           text: 'Perché studiare la rete prima dei dati e della costruzione?',
           options: [
             'Ordine alfabetico',
@@ -69,12 +69,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_net_client_server': Quiz(
+    'quiz_net_client_server': const Quiz(
       id: 'quiz_net_client_server',
       topicId: 'net_client_server',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Apri un sito: chi inizia la conversazione?',
           options: [
             'Il server invia la pagina da solo',
@@ -85,7 +85,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Tutto parte da una richiesta del client.',
         ),
-        Question(
+        const Question(
           text: 'Perché il codice dei pagamenti gira sul server e non nel browser?',
           options: [
             'È più veloce',
@@ -96,7 +96,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il client è ispezionabile, i segreti stanno sul server.',
         ),
-        Question(
+        const Question(
           text: 'Il server può aggiornare la tua pagina senza che tu chieda nulla?',
           options: [
             'Sì, quando vuole',
@@ -107,7 +107,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il modello base è pull, non push.',
         ),
-        Question(
+        const Question(
           text: 'Cosa distingue un client da un server?',
           options: [
             'La potenza del computer',
@@ -118,7 +118,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Sono ruoli, non macchine (una macchina può fare entrambi).',
         ),
-        Question(
+        const Question(
           text: 'Un sito lento a mostrare i vestiti filtrati: dove conviene filtrare, client o server, se il catalogo è enorme?',
           options: [
             'Client, è più moderno',
@@ -131,12 +131,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_net_dns_url': Quiz(
+    'quiz_net_dns_url': const Quiz(
       id: 'quiz_net_dns_url',
       topicId: 'net_dns_url',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'A cosa serve il DNS?',
           options: [
             'Cifrare i dati',
@@ -147,7 +147,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'È la rubrica di Internet.',
         ),
-        Question(
+        const Question(
           text: 'In `https://shop.it:443/scarpe?taglia=42`, cosa dice DOVE si trova la risorsa?',
           options: [
             'Solo `https`',
@@ -158,7 +158,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Nome e path localizzano, i parametri filtrano.',
         ),
-        Question(
+        const Question(
           text: 'Se il DNS non risponde, cosa succede?',
           options: [
             'Navigo più lento',
@@ -169,7 +169,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Senza traduzione nome→IP non si parte.',
         ),
-        Question(
+        const Question(
           text: 'Perché esistono le porte (es. :443)?',
           options: [
             'Decorazione',
@@ -180,7 +180,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Un IP, tanti servizi: la porta sceglie quale.',
         ),
-        Question(
+        const Question(
           text: 'HTTP vs HTTPS nell\u2019URL: cosa cambia per l\u2019utente?',
           options: [
             'Niente',
@@ -193,12 +193,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_net_http_https': Quiz(
+    'quiz_net_http_https': const Quiz(
       id: 'quiz_net_http_https',
       topicId: 'net_http_https',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Compili un form con la carta: perché serve HTTPS?',
           options: [
             'Il sito carica prima',
@@ -209,7 +209,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Cifratura del trasporto, non del sito.',
         ),
-        Question(
+        const Question(
           text: 'Il sito risponde 404: di chi è "colpa"?',
           options: [
             'Del server rotto',
@@ -220,7 +220,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: '4xx = errore del client/richiesta, 5xx = server.',
         ),
-        Question(
+        const Question(
           text: 'GET vs POST: differenza di idea?',
           options: [
             'Nessuna',
@@ -231,7 +231,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Semantica, non velocità.',
         ),
-        Question(
+        const Question(
           text: 'Il lucchetto del browser garantisce che il negozio è onesto?',
           options: [
             'Sì',
@@ -242,7 +242,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Cifratura ≠ affidabilità.',
         ),
-        Question(
+        const Question(
           text: 'Un Wi-Fi pubblico con Man-in-the-Middle: cosa rischia chi usa HTTP?',
           options: [
             'Nulla',
@@ -255,12 +255,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_web_data': Quiz(
+    'quiz_web_data': const Quiz(
       id: 'quiz_web_data',
       topicId: 'web_data',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché si dice che "il web è dati in viaggio"?',
           options: [
             'Perché i cavi si muovono',
@@ -271,7 +271,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La pagina è solo l\u2019ultima tappa di dati in movimento.',
         ),
-        Question(
+        const Question(
           text: 'Perché la rappresentazione dei dati conta più di quanto sembri?',
           options: [
             'Non conta nulla',
@@ -282,7 +282,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La forma decide costo di viaggio e facilità d\u2019uso.',
         ),
-        Question(
+        const Question(
           text: 'Perché non tenere tutti i dati nel browser dell\u2019utente?',
           options: [
             'Perché è vietato',
@@ -293,7 +293,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Ciò che deve durare e valere per tutti vive altrove.',
         ),
-        Question(
+        const Question(
           text: 'Perché il problema "ricordarsi di me" esiste sul web?',
           options: [
             'Perché gli utenti sono smemorati',
@@ -304,7 +304,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Senza memoria aggiuntiva, il server non riconosce nessuno.',
         ),
-        Question(
+        const Question(
           text: 'Cosa accomuna un negozio, un social e un gioco online dal punto di vista dei dati?',
           options: [
             'I colori usati',
@@ -317,12 +317,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_data_represent': Quiz(
+    'quiz_data_represent': const Quiz(
       id: 'quiz_data_represent',
       topicId: 'data_represent',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché i computer usano il binario ma sul web viaggia tanto testo?',
           options: [
             'Il testo è più moderno',
@@ -333,7 +333,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Interoperabilità batte compattezza nello scambio.',
         ),
-        Question(
+        const Question(
           text: 'Un catalogo deve scambiare prodotti tra negozio e fornitori con sistemi diversi: perché un formato testuale standard aiuta?',
           options: [
             'È più colorato',
@@ -344,7 +344,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Lo standard elimina il bisogno di parlare la stessa lingua madre.',
         ),
-        Question(
+        const Question(
           text: 'Quando conviene pensare a "lista" e quando a "mappa"?',
           options: [
             'Sono uguali',
@@ -355,7 +355,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La domanda è "come lo ritroverò?".',
         ),
-        Question(
+        const Question(
           text: 'Perché dire che una pagina è "un albero" (DOM)?',
           options: [
             'È verde',
@@ -366,7 +366,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La gerarchia permette di toccare un ramo senza abbattere il bosco.',
         ),
-        Question(
+        const Question(
           text: 'Spedisci una foto in un formato che il destinatario non apre: dov\u2019è il problema?',
           options: [
             'Nella foto',
@@ -379,12 +379,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_data_where': Quiz(
+    'quiz_data_where': const Quiz(
       id: 'quiz_data_where',
       topicId: 'data_where',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché dividere frontend, backend e database invece di fare tutto in un unico posto?',
           options: [
             'Per usare più computer',
@@ -395,7 +395,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Separare permette di riparare e far crescere pezzo per pezzo.',
         ),
-        Question(
+        const Question(
           text: 'Dove terresti il saldo del conto corrente: nel browser o nel backend col database?',
           options: [
             'Nel browser, è più comodo',
@@ -406,7 +406,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Ciò che deve essere vero per tutti vive sotto custodia.',
         ),
-        Question(
+        const Question(
           text: 'Perché il frontend chiede i dati invece di possederli?',
           options: [
             'Pigrizia',
@@ -417,7 +417,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Chiedere all\u2019occorrenza evita copie vecchie e pesanti.',
         ),
-        Question(
+        const Question(
           text: 'Il sito mostra prezzi vecchi dopo un cambio: quale confine sospetti?',
           options: [
             'I colori',
@@ -428,7 +428,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Più case = più copie: bisogna capire quale è rimasta indietro.',
         ),
-        Question(
+        const Question(
           text: 'Cosa succede se il database cade ma frontend e backend sono accesi?',
           options: [
             'Nulla',
@@ -441,12 +441,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_data_state': Quiz(
+    'quiz_data_state': const Quiz(
       id: 'quiz_data_state',
       topicId: 'data_state',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché HTTP è "smemorato" e perché è un problema?',
           options: [
             'È rotto',
@@ -457,7 +457,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La semplicità del protocollo scarica la memoria su altri meccanismi.',
         ),
-        Question(
+        const Question(
           text: 'Come fa un sito a ricordarti il login da una pagina all\u2019altra?',
           options: [
             'Indovina',
@@ -468,7 +468,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Riconoscimento = gettone ripresentato + registro lato server.',
         ),
-        Question(
+        const Question(
           text: 'Perché il carrello sopravvive se ricarichi ma sparisce in un altro browser?',
           options: [
             'Magia',
@@ -479,7 +479,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Conta DOVE vive la memoria: dispositivo o account.',
         ),
-        Question(
+        const Question(
           text: 'A cosa serve la cache e qual è il suo rischio?',
           options: [
             'A nulla',
@@ -490,7 +490,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Velocità contro freschezza, sempre.',
         ),
-        Question(
+        const Question(
           text: 'Un sito bancario su PC condiviso: perché il logout conta?',
           options: [
             'Spegne il PC',
@@ -503,12 +503,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_web_building': Quiz(
+    'quiz_web_building': const Quiz(
       id: 'quiz_web_building',
       topicId: 'web_building',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché "costruire sul web" non significa solo "scrivere pagine"?',
           options: [
             'Perché le pagine non servono',
@@ -519,7 +519,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Mostrare, organizzare e spedire sono tre mestieri diversi.',
         ),
-        Question(
+        const Question(
           text: 'Perché il browser è il primo "giudice" del tuo lavoro?',
           options: [
             'Perché paga lo stipendio',
@@ -530,7 +530,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il traguardo è sempre ciò che il browser capisce.',
         ),
-        Question(
+        const Question(
           text: 'Perché un progetto piccolo resta semplice e uno grande diventa caos?',
           options: [
             'Per sfortuna',
@@ -541,7 +541,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La complessità cresce con le connessioni tra pezzi.',
         ),
-        Question(
+        const Question(
           text: 'Perché "spedire" (pubblicare) è parte del costruire?',
           options: [
             'Non lo è',
@@ -552,7 +552,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Costruire include mettere il lavoro nelle mani degli utenti.',
         ),
-        Question(
+        const Question(
           text: 'Perché serve tenere traccia delle versioni mentre costruisci?',
           options: [
             'Per occupare disco',
@@ -565,12 +565,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_build_browser': Quiz(
+    'quiz_build_browser': const Quiz(
       id: 'quiz_build_browser',
       topicId: 'build_browser',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Cosa fa il browser quando "apre" una pagina?',
           options: [
             'Mostra il file così com\u2019è',
@@ -581,7 +581,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Interpretare, non fotocopiare.',
         ),
-        Question(
+        const Question(
           text: 'Perché separare cosa c\u2019è, come appare e cosa fa?',
           options: [
             'Moda',
@@ -592,7 +592,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Separazione = modifiche indipendenti.',
         ),
-        Question(
+        const Question(
           text: 'Cambi i colori e sparisce un paragrafo: cosa sospetti?',
           options: [
             'Il server',
@@ -603,7 +603,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'L\u2019intreccio trasforma ogni ritocco in rischio.',
         ),
-        Question(
+        const Question(
           text: 'Perché un errore in un punto può lasciare mezza pagina visibile?',
           options: [
             'Fortuna',
@@ -614,7 +614,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il render è progressivo, non tutto-o-niente.',
         ),
-        Question(
+        const Question(
           text: 'Due siti con stessi contenuti ma aspetto ed extra diversi: cosa condividono?',
           options: [
             'Niente',
@@ -627,12 +627,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_build_framework': Quiz(
+    'quiz_build_framework': const Quiz(
       id: 'quiz_build_framework',
       topicId: 'build_framework',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Quando una pagina diventa "app" e perché tutto si complica?',
           options: [
             'Quando è lunga',
@@ -643,7 +643,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La complessità è nelle connessioni tra pezzi.',
         ),
-        Question(
+        const Question(
           text: 'A cosa serve l\u2019idea di componente (pulsante, scheda, carrello)?',
           options: [
             'A scrivere di più',
@@ -654,7 +654,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Un pezzo, un mestiere, riuso invece di copia-incolla.',
         ),
-        Question(
+        const Question(
           text: 'Cos\u2019è lo "stato dell\u2019interfaccia" in una riga?',
           options: [
             'La nazione dell\u2019utente',
@@ -665,7 +665,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Prima i fatti, poi ciò che si vede li riflette.',
         ),
-        Question(
+        const Question(
           text: 'Il contatore del carrello dice 3 ma dentro ci sono 2 oggetti: dov\u2019è il problema?',
           options: [
             'Nei colori',
@@ -676,7 +676,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il bug classico è la doppia verità.',
         ),
-        Question(
+        const Question(
           text: 'Perché "copiare e adattare" lo stesso pezzo in 10 punti diventa un incubo?',
           options: [
             'Occupa disco',
@@ -689,12 +689,12 @@ class LocalQuizRepository implements QuizRepository {
         ),
       ],
     ),
-    'quiz_build_ship': Quiz(
+    'quiz_build_ship': const Quiz(
       id: 'quiz_build_ship',
       topicId: 'build_ship',
       passingThreshold: 80,
       questions: [
-        Question(
+        const Question(
           text: 'Perché salvare tappe (versioni) invece del solo file finale?',
           options: [
             'Per nostalgia',
@@ -705,7 +705,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'La storia rende gli errori economici.',
         ),
-        Question(
+        const Question(
           text: 'A cosa serve un ramo (branch) come idea, senza tecnicismi?',
           options: [
             'A decorare',
@@ -716,7 +716,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Sperimentare al sicuro.',
         ),
-        Question(
+        const Question(
           text: 'Due persone cambiano la stessa parte e poi fondono (merge): cosa può succedere?',
           options: [
             'Nulla mai',
@@ -727,7 +727,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Il merge unisce, ma le contraddizioni si risolvono a mano.',
         ),
-        Question(
+        const Question(
           text: 'Perché "sul mio computer funziona" non basta?',
           options: [
             'Perché mente',
@@ -738,7 +738,7 @@ class LocalQuizRepository implements QuizRepository {
           correctAnswerIndex: 1,
           explanation: 'Finché non è impacchettato e consegnato, non esiste per gli altri.',
         ),
-        Question(
+        const Question(
           text: 'Perché spedire spesso piccoli passi è più sicuro di un unico grande lancio?',
           options: [
             'Non lo è',

@@ -74,7 +74,7 @@ class PlayerProgress extends Equatable {
     if (level == 1) {
       return (experience / level2Threshold).clamp(0.0, 1.0);
     }
-    final span = level3Threshold - level2Threshold;
+    const span = level3Threshold - level2Threshold;
     return ((experience - level2Threshold) / span).clamp(0.0, 1.0);
   }
 
