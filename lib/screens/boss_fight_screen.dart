@@ -616,7 +616,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                   flex: 8, // Golden Ratio approx (8:5)
                   child: DragTarget<CardModel>(
                     onWillAcceptWithDetails: (data) => _phase == TurnPhase.player,
-                    onAcceptWithDetails: (card) => _playCard(card),
+                    onAcceptWithDetails: (details) => _playCard(details.data),
                     builder: (context, candidateData, rejectedData) {
                       return Container(
                         padding: const EdgeInsets.all(20),
