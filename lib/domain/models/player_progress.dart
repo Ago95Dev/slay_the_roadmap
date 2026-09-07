@@ -52,6 +52,11 @@ class PlayerProgress extends Equatable {
   /// di capitolo vinto (niente scelta multipla). '' = nessun titolo.
   final String activeTitle;
 
+  /// Ultimo claim della ricompensa giornaliera (Fase 1B-E, default '',
+  /// persistito): data `yyyy-MM-dd` dell'ultimo claim, '' = mai riscattata.
+  /// I save vecchi senza questo campo ripartono da '' (claim disponibile).
+  final String lastDailyClaim;
+
   /// Icone avatar tra cui scegliere (emoji semplici, tema fantasy).
   static const List<String> avatarIcons = ['🧙', '🦊', '🤖'];
 
@@ -129,6 +134,7 @@ class PlayerProgress extends Equatable {
     this.avatarIconIndex = 0,
     this.avatarFrameIndex = 0,
     this.activeTitle = '',
+    this.lastDailyClaim = '',
   });
 
   factory PlayerProgress.initial() {
@@ -190,6 +196,7 @@ class PlayerProgress extends Equatable {
     int? avatarIconIndex,
     int? avatarFrameIndex,
     String? activeTitle,
+    String? lastDailyClaim,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -209,6 +216,7 @@ class PlayerProgress extends Equatable {
       avatarIconIndex: avatarIconIndex ?? this.avatarIconIndex,
       avatarFrameIndex: avatarFrameIndex ?? this.avatarFrameIndex,
       activeTitle: activeTitle ?? this.activeTitle,
+      lastDailyClaim: lastDailyClaim ?? this.lastDailyClaim,
     );
   }
 
@@ -234,6 +242,7 @@ class PlayerProgress extends Equatable {
       'avatarIconIndex': avatarIconIndex,
       'avatarFrameIndex': avatarFrameIndex,
       'activeTitle': activeTitle,
+      'lastDailyClaim': lastDailyClaim,
     };
   }
 
@@ -266,6 +275,8 @@ class PlayerProgress extends Equatable {
       avatarIconIndex: (json['avatarIconIndex'] as num?)?.toInt() ?? 0,
       avatarFrameIndex: (json['avatarFrameIndex'] as num?)?.toInt() ?? 0,
       activeTitle: (json['activeTitle'] as String?) ?? '',
+      // Fase 1B-E: default '' per i save vecchi (claim disponibile).
+      lastDailyClaim: (json['lastDailyClaim'] as String?) ?? '',
     );
   }
 
@@ -407,5 +418,6 @@ class PlayerProgress extends Equatable {
     avatarIconIndex,
     avatarFrameIndex,
     activeTitle,
+    lastDailyClaim,
   ];
 }

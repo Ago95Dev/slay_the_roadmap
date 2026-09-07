@@ -18,6 +18,16 @@ import '../../domain/models/reward.dart';
 /// Se [persistence] è fornita, ogni mutazione viene salvata in automatico
 /// (fire-and-forget); [load]/[wipe] gestiscono restore e reset manuale.
 class PlayerViewModel with ChangeNotifier {
+  /// XP del bonus giornaliero (Fase 1B-E, locale, una-tantum al giorno).
+  static const int dailyRewardXp = 25;
+
+  /// Data odierna in formato `yyyy-MM-dd` (zero-padded, ora locale).
+  static String dailyDateString(DateTime date) {
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$m-$d';
+  }
+
   final PersistenceRepository? _persistence;
   PlayerProgress _progress;
   final Set<String> _claimedRewardTopics = {};
@@ -277,6 +287,26 @@ class PlayerViewModel with ChangeNotifier {
     );
     _autosave();
     notifyListeners();
+  }
+
+  /// True se la ricompensa giornaliera è ancora da riscattare oggi
+  /// (Fase 1B-E, locale): oggi != [PlayerProgress.lastDailyClaim].
+  bool get isDailyRewardAvailable =>
+      _progress.lastDailyClaim != dailyDateString(DateTime.now());
+
+  /// Riscatta il bonus giornaliero (+[dailyRewardXp] XP, una sola volta
+  /// al giorno). Ritorna true al primo claim del giorno, false se già
+  /// riscattata oggi (nessun XP). Il [now] opzionale serve solo ai test.
+  bool claimDailyReward({DateTime? now}) {
+    final today = dailyDateString(now ?? DateTime.now());
+    if (_progress.lastDailyClaim == today) return false;
+    _progress = _progress.copyWith(
+      experience: _progress.experience + dailyRewardXp,
+      lastDailyClaim: today,
+    );
+    _autosave();
+    notifyListeners();
+    return true;
   }
 
   /// Ripristina il save da [persistence]; ritorna false se assente.
