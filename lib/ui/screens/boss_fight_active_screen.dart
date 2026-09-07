@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../domain/models/boss_fight.dart';
+import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
 import '../view_models/boss_fight_view_model.dart';
@@ -256,6 +257,19 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 16),
             ),
+            if (bossTrait(boss.id).isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                bossTrait(boss.id),
+                key: const Key('boss_trait'),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
             const SizedBox(height: 32),
             ElevatedButton(
               onPressed: () {

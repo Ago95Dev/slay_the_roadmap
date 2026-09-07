@@ -22,6 +22,13 @@ class BossFightViewModel extends ChangeNotifier {
   List<Reward> _initialDeck = const [];
   int _shield = 0;
 
+  /// Corazza dello Spaghetti Colossus (Voce C): assorbe 1 punto danno
+  /// da carte, una sola volta per fight. I quiz la aggirano.
+  bool _colossusArmorUsed = false;
+
+  /// Solo per i test: true dopo che la corazza ha parato.
+  bool get colossusArmorUsed => _colossusArmorUsed;
+
   BossFightViewModel(
     this._repository, {
     this.bossTurnDelay = const Duration(milliseconds: 1500),
@@ -85,6 +92,7 @@ class BossFightViewModel extends ChangeNotifier {
         .toList();
     _initialDeck = List.unmodifiable(deck);
     _shield = 0;
+    _colossusArmorUsed = false;
 
     _currentBoss = _currentBoss!.copyWith(
       state: BossFightState.playerTurn,
@@ -125,8 +133,19 @@ class BossFightViewModel extends ChangeNotifier {
     final heal = _clampedEffect(card, 'heal');
     final parts = <String>[];
     if (damage > 0) {
-      _dealDamageToBoss(damage);
-      parts.add('dealt $damage damage');
+      // Corazza del Colossus (Voce C): il primo punto danno da carte
+      // del fight viene parato (una tantum, i quiz la aggirano).
+      var cardDamage = damage;
+      if (_currentBoss!.id == 'spaghetti_colossus' && !_colossusArmorUsed) {
+        _colossusArmorUsed = true;
+        cardDamage = damage - 1;
+        _addToCombatLog(
+            '🪨 La corazza dello Spaghetti Colossus assorbe il colpo! (1 danno parato)');
+      }
+      if (cardDamage > 0) {
+        _dealDamageToBoss(cardDamage);
+        parts.add('dealt $cardDamage damage');
+      }
     }
     if (block > 0) {
       _shield += block;
@@ -213,7 +232,9 @@ class BossFightViewModel extends ChangeNotifier {
 
   /// Risolve la domanda singola del turno boss: giusta -> boss -1 HP,
   /// errata -> SEMPRE danno al player (-1 normale, -2 se il boss è
-  /// enraged a HP ≤50%). Mai heal come risposta a un errore.
+  /// enraged: HP ≤ soglia enrage, 75% per il Man-in-the-Middle). Mai
+  /// heal come risposta a un errore. Contro The Amnesiac l'errore
+  /// costa anche -1 ⚡ (Voce C: Oblio).
   void _resolveBossQuiz() {
     final question = _currentQuiz!.questions.first;
     final selected =
@@ -252,7 +273,8 @@ class BossFightViewModel extends ChangeNotifier {
       currentTurn: _currentBoss!.currentTurn + 1,
       currentEnergy: _currentBoss!.maxEnergy,
     );
-    _addToCombatLog('⚔️ Your turn again! (⚡${_currentBoss!.maxEnergy}/${_currentBoss!.maxEnergy})');
+    if (!correct) _applyAmnesiacDrain();
+    _addToCombatLog('⚔️ Your turn again! (⚡${_currentBoss!.currentEnergy}/${_currentBoss!.maxEnergy})');
     notifyListeners();
   }
 
@@ -353,14 +375,26 @@ class BossFightViewModel extends ChangeNotifier {
   }
 
   /// Colpo del boss su errore: SEMPRE danno al player — -1 normale,
-  /// -2 special se enraged (boss HP ≤50%). Mai heal qui.
+  /// -2 special se enraged (HP ≤ soglia enrage: 75% per il
+  /// Man-in-the-Middle, 50% gli altri). Mai heal qui.
   void _strikePlayer() {
-    final enraged = _currentBoss!.bossHpPercentage <= 0.5;
+    final enraged = _currentBoss!.isEnraged;
     final damage = enraged ? 2 : 1;
     final moveName = enraged ? 'Special Attack' : 'Normal Attack';
     _dealDamageToPlayer(damage);
     _addToCombatLog(
         '👹 ${_currentBoss!.name} used $moveName! You took $damage damage.');
+  }
+
+  /// Oblio di The Amnesiac (Voce C): a ogni risposta errata, oltre al
+  /// danno, -1 ⚡ (min 0). Chiamato dopo il ripristino dell'energia di
+  /// inizio turno player: il turno riparte da max-1.
+  void _applyAmnesiacDrain() {
+    if (_currentBoss?.id != 'the_amnesiac') return;
+    _currentBoss = _currentBoss!.copyWith(
+      currentEnergy: max(0, _currentBoss!.currentEnergy - 1),
+    );
+    _addToCombatLog('🌫️ The Amnesiac ti fa dimenticare... (-1 ⚡)');
   }
 
   /// Effetto carta clampato a max 2 (sicurezza numeri: i save vecchi
@@ -412,6 +446,7 @@ class BossFightViewModel extends ChangeNotifier {
 
     // Reset battle state: full HP + energia + scudo, deck ripristinato
     _shield = 0;
+    _colossusArmorUsed = false;
     _currentBoss = _currentBoss!.copyWith(
       currentHp: _currentBoss!.maxHp,
       currentPlayerHp: _currentBoss!.maxPlayerHp,

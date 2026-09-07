@@ -200,19 +200,33 @@ void main() {
       expect(vm.currentBoss!.currentPlayerHp, playerBefore - 2);
     });
 
-    test('soglie con HP 10, niente veleno', () async {
+    test('soglie con HP 10, niente veleno (+ MITM enraged a 75%)', () async {
       final vm = await _loadedVm();
       BossFight at(int hp) => vm.currentBoss!.copyWith(currentHp: hp);
       expect(at(10).availableBossActions, [BossActionType.normalAttack]);
+      // Voce C: il MITM intercetta presto — già a 7/10 (70%) è enraged.
       expect(
         at(7).availableBossActions,
-        [BossActionType.normalAttack, BossActionType.heal],
+        [BossActionType.specialAttack, BossActionType.normalAttack],
       );
       expect(
         at(5).availableBossActions,
         [BossActionType.specialAttack, BossActionType.normalAttack],
       );
       expect(at(2).availableBossActions, [BossActionType.specialAttack]);
+      // Gli altri boss restano a soglia 50%: 7/10 = normal+heal.
+      const amnesiac = BossFight(
+        id: 'the_amnesiac',
+        chapterId: 'web_data',
+        name: 'The Amnesiac',
+        maxHp: 10,
+        currentHp: 7,
+      );
+      expect(amnesiac.enrageThreshold, 0.5);
+      expect(
+        amnesiac.availableBossActions,
+        [BossActionType.normalAttack, BossActionType.heal],
+      );
     });
 
     test('block assorbe il prossimo attacco, heal recupera (max 3)', () async {

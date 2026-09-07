@@ -136,16 +136,31 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     }
 
     // Lore pre-fight (Fase 1B-A): dialog con Combatti/Indietro prima di
-    // ogni boss fight.
+    // ogni boss fight. Voce C: riga "Tratto: ..." con la passiva del boss.
     if (!mounted) return;
     final bossName = bossNames[bossId] ?? chapter?.bossName ?? 'Boss';
+    final trait = bossTrait(bossId);
     final proceed = await showPopDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         key: const Key('boss_lore_dialog'),
         title: Text('👹 $bossName'),
-        content: Text(
-          bossLores[bossId] ?? 'Un guardiano del web ti sbarra la strada.',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              bossLores[bossId] ?? 'Un guardiano del web ti sbarra la strada.',
+            ),
+            if (trait.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Text(
+                trait,
+                key: const Key('boss_lore_trait'),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ],
         ),
         actions: [
           TextButton(

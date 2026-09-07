@@ -56,6 +56,23 @@ const Map<String, String> bossLores = {
       'davanti a chi costruisce con ordine e spedisce con cura.',
 };
 
+/// Tratti passivi dei boss (Voce C, 1 per boss): mostrati come riga
+/// "Tratto: ..." nel dialog lore pre-fight. Solo flavor + promemoria
+/// della meccanica, nessun numero nascosto.
+const Map<String, String> bossTraits = {
+  'man_in_the_middle':
+      'Tratto: Intercettazione — sotto il 75% di HP i suoi colpi '
+      'diventano speciali (-2).',
+  'the_amnesiac':
+      'Tratto: Oblio — ogni risposta errata ti fa dimenticare (-1 ⚡).',
+  'spaghetti_colossus':
+      'Tratto: Corazza — ignora il primo punto danno da carte '
+      '(i quiz la aggirano).',
+};
+
+/// Tratto passivo del boss (stringa vuota se boss sconosciuto).
+String bossTrait(String bossId) => bossTraits[bossId] ?? '';
+
 /// Finale narrativo con stats (chiude il bug endgame aperto).
 const String campaignCompleteTitle = 'Campagna completata! 🎉';
 
