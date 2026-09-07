@@ -31,23 +31,35 @@ sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture}[
-  every node/.style={font=\scriptsize},
-  forte/.style={draw, rounded corners=2pt, fill=green!15, align=center, inner sep=2pt},
-  medio/.style={draw, rounded corners=2pt, fill=yellow!15, align=center, inner sep=2pt},
-  debole/.style={draw, dashed, rounded corners=2pt, fill=gray!10, text=black!60, align=center, inner sep=2pt}
+  every node/.style={font=\footnotesize},
+  forte/.style={draw, rounded corners=2pt, fill=green!15, align=center, inner sep=3pt},
+  medio/.style={draw, rounded corners=2pt, fill=yellow!15, align=center, inner sep=3pt},
+  debole/.style={draw, dashed, rounded corners=2pt, fill=gray!10, text=black!70, align=center, inner sep=3pt},
+  lead/.style={thin, gray}
 ]
-\node[regular polygon, regular polygon sides=8, minimum size=3.4cm, draw, thick, rotate=22.5] (oct) {};
-\node[forte] at (90:2.9cm) {CD2\\Sviluppo};
-\node[forte] at (45:2.9cm) {CD3\\Creativit\`a};
-\node[forte] at (0:3.1cm) {CD4\\Possesso};
-\node[debole] at (315:2.9cm) {CD5\\Sociale};
-\node[debole] at (270:2.9cm) {CD6\\Scarsit\`a};
-\node[forte] at (225:3.1cm) {CD7\\Imprevedibilit\`a};
-\node[forte] at (180:3.1cm) {CD8\\Perdita};
-\node[medio] at (135:2.9cm) {CD1\\Significato};
-\node[font=\scriptsize\itshape, below=4mm of oct] {forti: CD2, CD3, CD4, CD7, CD8 \quad|\quad medio: CD1 \quad|\quad deboli: CD5, CD6};
+\node[regular polygon, regular polygon sides=8, minimum size=3.2cm, draw, thick, rotate=22.5] (oct) {};
+% pallini peso sui vertici: verde = forte, giallo = medio, grigio = debole
+\foreach \a/\c in {90/green!70!black,45/green!70!black,0/green!70!black,315/gray,270/gray,225/green!70!black,180/green!70!black,135/yellow!80!black}
+  \fill[\c] (\a:1.73cm) circle (2.2pt);
+% etichette esterne con leader-line corte
+\node[forte, above=8mm of oct] (cd2) {CD2 $\cdot$ forte\\Sviluppo};
+\node[forte, above right=6mm and 12mm of oct] (cd3) {CD3 $\cdot$ forte\\Creativit\`a};
+\node[forte, right=10mm of oct] (cd4) {CD4 $\cdot$ forte\\Possesso};
+\node[debole, below right=6mm and 12mm of oct] (cd5) {CD5 $\cdot$ debole\\Sociale};
+\node[debole, below=8mm of oct] (cd6) {CD6 $\cdot$ debole\\Scarsit\`a};
+\node[forte, below left=6mm and 12mm of oct] (cd7) {CD7 $\cdot$ forte\\Imprevedibilit\`a};
+\node[forte, left=10mm of oct] (cd8) {CD8 $\cdot$ forte\\Perdita};
+\node[medio, above left=6mm and 12mm of oct] (cd1) {CD1 $\cdot$ medio\\Significato};
+\draw[lead] (oct.north) -- (cd2.south);
+\draw[lead] (45:1.73cm) -- (cd3.south west);
+\draw[lead] (0:1.73cm) -- (cd4.west);
+\draw[lead] (315:1.73cm) -- (cd5.north west);
+\draw[lead] (oct.south) -- (cd6.north);
+\draw[lead] (225:1.73cm) -- (cd7.north east);
+\draw[lead] (180:1.73cm) -- (cd8.east);
+\draw[lead] (135:1.73cm) -- (cd1.south east);
 \end{tikzpicture}
-\caption{Ottagono Octalysis con i pesi dei Core Drive nel progetto: nucleo forte su Sviluppo, Creativit\`a, Possesso, Imprevedibilit\`a e Perdita; deboli Sociale e Scarsit\`a per scelta di scope.}
+\caption{Ottagono Octalysis: pesi dei Core Drive nel progetto (dettagli nel testo).}
 \label{fig:octalysis}
 \end{figure}
 
