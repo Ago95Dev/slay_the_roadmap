@@ -1,0 +1,15 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Flutter: Slay The Roadmap",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define=HUB_USER=slay",
+                "--dart-define=HUB_PASS=c256NQ%mn2@tKR"
+            ]
+        }
+    ]
+}

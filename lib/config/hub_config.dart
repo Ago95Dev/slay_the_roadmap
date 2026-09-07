@@ -20,4 +20,5 @@ abstract final class HubConfig {
   /// XP assegnati dall'Hub per ogni quiz passato (soglie livello locali
   /// in `PlayerProgress`: L1 0 / L2 100 / L3 500, uguali all'Hub).
   static const int quizXpAmount = 100;
+  static const String overallXpClassification = 'overall_xp';
 }

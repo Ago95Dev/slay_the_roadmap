@@ -35,4 +35,36 @@ class StorageService {
       print('Failed to reset progress: $e');
     }
   }
+
+  // --- Auth & Profile ---
+  Future<bool> checkUserExists(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.containsKey('user_pwd_$username');
+  }
+
+  Future<void> saveLocalUser(String username, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_pwd_$username', password);
+  }
+
+  Future<bool> checkLocalUser(String username, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedPwd = prefs.getString('user_pwd_$username');
+    return savedPwd == password;
+  }
+
+  Future<void> saveCurrentUser(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('current_user', username);
+  }
+
+  Future<String?> loadCurrentUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('current_user');
+  }
+
+  Future<void> logoutUser() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('current_user');
+  }
 }

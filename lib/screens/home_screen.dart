@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../domain/models/player_progress.dart';
+import '../widgets/gothic_profile_dialog.dart';
 import 'roadmap_screen.dart';
 import 'deck_builder_screen.dart';
 import 'skill_tree_screen.dart';
@@ -68,19 +70,65 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // Title
-                  const Text(
-                    'SLAY THE ROADMAP',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 2,
-                      color: Color(0xFFd4af37),
-                      shadows: [
-                        Shadow(
-                          color: Colors.black,
-                          offset: Offset(2, 2),
-                          blurRadius: 4,
+                  // Player HUD (Avatar, Name, Title)
+                  GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        barrierColor: Colors.black87,
+                        builder: (_) => const GothicProfileDialog(),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: Colors.black54,
+                            border: Border.all(
+                              color: Color(gameProvider.avatarFrameColorValue),
+                              width: 2,
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Text(
+                              gameProvider.avatarIcon,
+                              style: const TextStyle(fontSize: 20),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              gameProvider.playerStats.playerName.toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
+                                letterSpacing: 1,
+                                color: Color(0xFFd4af37),
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black,
+                                    offset: Offset(1, 1),
+                                    blurRadius: 2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (gameProvider.hasTitle)
+                              Text(
+                                gameProvider.activeTitle,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontStyle: FontStyle.italic,
+                                  color: Color(0xFFfbbf24),
+                                ),
+                              ),
+                          ],
                         ),
                       ],
                     ),
@@ -88,6 +136,23 @@ class _HomeScreenState extends State<HomeScreen> {
                   // Actions
                   Row(
                     children: [
+                      if (gameProvider.isDailyRewardAvailable)
+                        _GothicIconButton(
+                          icon: Icons.card_giftcard,
+                          tooltip: 'Daily Reward',
+                          color: const Color(0xFFfbbf24),
+                          onPressed: () {
+                            if (gameProvider.claimDailyReward()) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('✨ Hai ricevuto ${GameProvider.dailyRewardXp} XP!'),
+                                  backgroundColor: const Color(0xFF2d1f1a),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      const SizedBox(width: 8),
                       if (hasActiveDungeon)
                         _GothicIconButton(
                           icon: Icons.play_arrow,
@@ -521,41 +586,54 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 // Gothic Icon Button Widget
-class _GothicIconButton extends StatelessWidget {
+class _GothicIconButton extends StatefulWidget {
   final IconData icon;
   final String tooltip;
   final VoidCallback onPressed;
+  final Color? color;
 
   const _GothicIconButton({
     required this.icon,
     required this.tooltip,
     required this.onPressed,
+    this.color,
   });
+
+  @override
+  State<_GothicIconButton> createState() => _GothicIconButtonState();
+}
+
+class _GothicIconButtonState extends State<_GothicIconButton> {
+  bool _isHovering = false;
 
   @override
   Widget build(BuildContext context) {
     return Tooltip(
-      message: tooltip,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(4),
-          child: Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: const Color(0xFF1e1410).withValues(alpha: 0.6),
-              border: Border.all(
-                color: const Color(0xFF8b6f47),
-                width: 2,
+      message: widget.tooltip,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovering = true),
+        onExit: (_) => setState(() => _isHovering = false),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onPressed,
+            borderRadius: BorderRadius.circular(4),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1e1410).withValues(alpha: 0.6),
+                border: Border.all(
+                  color: _isHovering ? const Color(0xFFfbbf24) : const Color(0xFF8b6f47),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(4),
               ),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Icon(
-              icon,
-              color: const Color(0xFFd4af37),
-              size: 20,
+              child: Icon(
+                widget.icon,
+                color: widget.color ?? (_isHovering ? const Color(0xFFfbbf24) : const Color(0xFFd4af37)),
+                size: 20,
+              ),
             ),
           ),
         ),

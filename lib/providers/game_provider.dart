@@ -21,6 +21,7 @@ class GameProvider with ChangeNotifier {
 
   // --- Hub Gamification (F7) ---
   late final EngineClient _engine;
+  EngineClient get engine => _engine;
   String _hubPlayerId = '';
 
   // Player State
@@ -134,6 +135,12 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  static const Map<String, String> _chapterTitles = {
+    'foundation': 'Il Novizio',
+    'core': 'Lo Studioso',
+    'advanced': 'Il Maestro',
+  };
+
   /// Titolo capitolo (Fase 1B-B): assegnato al completamento.
   bool checkAndAwardChapterTitle(
     String chapterId, {
@@ -141,7 +148,7 @@ class GameProvider with ChangeNotifier {
     required bool bossDefeated,
   }) {
     if (!chapterComplete || !bossDefeated) return false;
-    final title = chapterTitles[chapterId];
+    final title = _chapterTitles[chapterId];
     if (title == null || title.isEmpty) return false;
     if (_activeTitle == title) return false;
     _activeTitle = title;
@@ -206,12 +213,12 @@ class GameProvider with ChangeNotifier {
 
 
   Future<void> _loadProgress() async {
-    // Load or create stable Hub player ID
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      _hubPlayerId = await HubIdentity.loadOrCreate(prefs);
-    } catch (_) {
-      _hubPlayerId = HubIdentity.newId();
+    // Load local player profile
+    final currentUser = await _storage.loadCurrentUser();
+    if (currentUser != null && currentUser.isNotEmpty) {
+      _hubPlayerId = currentUser;
+    } else {
+      _hubPlayerId = '';
     }
 
     final progress = await _storage.loadProgress();
@@ -952,6 +959,31 @@ class GameProvider with ChangeNotifier {
     _analytics = const AnalyticsLog();
     _initializeRoadmap();
     await _storage.resetProgress();
+    notifyListeners();
+  }
+
+  // --- Auth & Profile ---
+  Future<bool> registerLocal(String username, String password) async {
+    final exists = await _storage.checkUserExists(username);
+    if (exists) return false;
+    await _storage.saveLocalUser(username, password);
+    return loginLocal(username, password);
+  }
+
+  Future<bool> loginLocal(String username, String password) async {
+    final isValid = await _storage.checkLocalUser(username, password);
+    if (isValid) {
+      _hubPlayerId = username;
+      await _storage.saveCurrentUser(username);
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+  Future<void> logout() async {
+    _hubPlayerId = '';
+    await _storage.logoutUser();
     notifyListeners();
   }
 

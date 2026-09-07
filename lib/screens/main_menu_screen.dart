@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import 'home_screen.dart';
 import 'path_selection_screen.dart';
+import '../widgets/auth_dialogs.dart';
 
 class MainMenuScreen extends StatelessWidget {
   const MainMenuScreen({super.key});
@@ -11,7 +12,7 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
     final hasActiveDungeon = gameProvider.dungeonRun?.active ?? false;
-    
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -45,7 +46,7 @@ class MainMenuScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             // Main content
             SafeArea(
               child: Column(
@@ -76,45 +77,102 @@ class MainMenuScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0xFF8b6f47), width: 2),
-                            color: const Color(0xFF1e1410).withValues(alpha: 0.8),
-                          ),
-                          child: Column(
-                            children: [
-                              const Text(
-                                'SIGN IN',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFf5f5dc),
-                                  letterSpacing: 1,
+                        if (gameProvider.hubPlayerId.isEmpty)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: const Color(0xFF8b6f47), width: 2),
+                              color:
+                                  const Color(0xFF1e1410).withValues(alpha: 0.8),
+                            ),
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => const SignInDialog(),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'SIGN IN',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFf5f5dc),
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                height: 1,
-                                width: 50,
-                                color: const Color(0xFF8b6f47),
-                                margin: const EdgeInsets.symmetric(vertical: 2),
-                              ),
-                              const Text(
-                                'SIGN UP',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFf5f5dc),
-                                  letterSpacing: 1,
+                                Container(
+                                  height: 1,
+                                  width: 50,
+                                  color: const Color(0xFF8b6f47),
+                                  margin: const EdgeInsets.symmetric(vertical: 4),
                                 ),
-                              ),
-                            ],
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => const SignUpDialog(),
+                                    );
+                                  },
+                                  child: const Text(
+                                    'SIGN UP',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFFf5f5dc),
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                  color: const Color(0xFFd4af37), width: 2),
+                              color:
+                                  const Color(0xFF1e1410).withValues(alpha: 0.8),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  gameProvider.hubPlayerId,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFd4af37),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                GestureDetector(
+                                  onTap: () => gameProvider.logout(),
+                                  child: const Text(
+                                    'LOGOUT',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.redAccent,
+                                      letterSpacing: 1,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
-                  
+
                   // Spacer and Title
                   const Expanded(
                     flex: 2,
@@ -184,7 +242,8 @@ class MainMenuScreen extends StatelessWidget {
                             onPressed: () {
                               Navigator.pushReplacement(
                                 context,
-                                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const HomeScreen()),
                               );
                             },
                           ),
@@ -194,7 +253,9 @@ class MainMenuScreen extends StatelessWidget {
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const PathSelectionScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) =>
+                                        const PathSelectionScreen()),
                               );
                             },
                           ),
@@ -209,17 +270,17 @@ class MainMenuScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  
+
                   // Bottom decorative elements
                   const Expanded(
                     flex: 1,
                     child: Center(
                       child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Conquer the Knowledge',
-                          style: TextStyle(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Conquer the Knowledge',
+                            style: TextStyle(
                               fontSize: 12,
                               color: Color(0xFF8b6f47),
                               letterSpacing: 2,
@@ -242,133 +303,223 @@ class MainMenuScreen extends StatelessWidget {
     showDialog(
       context: context,
       barrierColor: Colors.black87,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 500),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Color(0xFF1a1410),
-                Color(0xFF2d1f1a),
-                Color(0xFF1a1410),
+      builder: (context) {
+        final gameProvider = context.watch<GameProvider>();
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 500),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF1a1410),
+                  Color(0xFF2d1f1a),
+                  Color(0xFF1a1410),
+                ],
+              ),
+              border: Border.all(
+                color: const Color(0xFFd4af37),
+                width: 4,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.9),
+                  offset: const Offset(0, 8),
+                  blurRadius: 32,
+                ),
               ],
             ),
-            border: Border.all(
-              color: const Color(0xFFd4af37),
-              width: 4,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.9),
-                offset: const Offset(0, 8),
-                blurRadius: 32,
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              // Inner border
-              Positioned.fill(
-                child: Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: const Color(0xFF8b6f47).withValues(alpha: 0.6),
-                      width: 2,
+            child: Stack(
+              children: [
+                // Inner border
+                Positioned.fill(
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF8b6f47).withValues(alpha: 0.6),
+                        width: 2,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // Content
-              Padding(
-                padding: const EdgeInsets.all(32),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                     // Title
-                    const Text(
-                      'SETTINGS',
-                      style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 3,
-                            color: Color(0xFFd4af37),
+                // Content
+                Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      const Text(
+                        'SETTINGS',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 3,
+                          color: Color(0xFFd4af37),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Divider
+                      Container(
+                        height: 2,
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              const Color(0xFFd4af37).withValues(alpha: 0.6),
+                              Colors.transparent,
+                            ],
                           ),
-                    ),
-                    const SizedBox(height: 24),
-                    
-                    // Divider
-                    Container(
-                      height: 2,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            Colors.transparent,
-                            const Color(0xFFd4af37).withValues(alpha: 0.6),
-                            Colors.transparent,
+                        ),
+                      ),
+
+                      // Hub Connection Status
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0a0806).withValues(alpha: 0.6),
+                          border: Border.all(
+                            color:
+                                const Color(0xFF8b6f47).withValues(alpha: 0.4),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(Icons.cloud_done,
+                                color: gameProvider.hubPlayerId.isNotEmpty
+                                    ? Colors.green
+                                    : Colors.grey,
+                                size: 24),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Gamification Hub',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFFf5f5dc),
+                                    ),
+                                  ),
+                                  Text(
+                                    gameProvider.hubPlayerId.isNotEmpty
+                                        ? 'GamerTag: ${gameProvider.hubPlayerId}'
+                                        : 'Non sei autenticato. Fai il Sign In.',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: gameProvider.hubPlayerId.isNotEmpty
+                                          ? const Color(0xFFd4af37)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Options
-                    const _SettingsOption(
-                      icon: Icons.volume_up,
-                      label: 'Sound',
-                      trailing: Icons.toggle_on,
-                    ),
-                    const SizedBox(height: 12),
-                    const _SettingsOption(
-                      icon: Icons.dark_mode,
-                      label: 'Dark Mode',
-                      trailing: Icons.toggle_off,
-                    ),
-                    
-                    const SizedBox(height: 24),
-                    
-                    // Close button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: Material(
+                      const SizedBox(height: 12),
+
+                      // Options
+                      const _SettingsOption(
+                        icon: Icons.volume_up,
+                        label: 'Sound',
+                        trailing: Icons.toggle_on,
+                      ),
+                      const SizedBox(height: 12),
+                      const _SettingsOption(
+                        icon: Icons.dark_mode,
+                        label: 'Dark Mode',
+                        trailing: Icons.toggle_off,
+                      ),
+                      const SizedBox(height: 12),
+                      // Reset Button
+                      Material(
                         color: Colors.transparent,
                         child: InkWell(
-                          onTap: () => Navigator.pop(context),
+                          onTap: () {
+                            gameProvider.resetProgress();
+                            Navigator.pop(context);
+                          },
                           child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF1e1410),
+                              color: Colors.red.shade900.withValues(alpha: 0.2),
                               border: Border.all(
-                                color: const Color(0xFF8b6f47),
-                                width: 2,
+                                color:
+                                    Colors.red.shade700.withValues(alpha: 0.4),
+                                width: 1,
                               ),
                             ),
-                            child: const Center(
-                              child: Text(
-                                'CLOSE',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color(0xFFf5f5dc),
-                                  letterSpacing: 2,
+                            child: const Row(
+                              children: [
+                                Icon(Icons.delete_forever,
+                                    color: Colors.red, size: 24),
+                                SizedBox(width: 16),
+                                Text(
+                                  'Wipe Save',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Close button
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => Navigator.pop(context),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1e1410),
+                                border: Border.all(
+                                  color: const Color(0xFF8b6f47),
+                                  width: 2,
+                                ),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  'CLOSE',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFFf5f5dc),
+                                    letterSpacing: 2,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

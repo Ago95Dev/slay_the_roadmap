@@ -5,6 +5,8 @@ import '../data/relics_data.dart';
 import '../widgets/run_history_widget.dart';
 import '../widgets/relic_collection_widget.dart';
 import '../widgets/card_compendium_widget.dart';
+import '../widgets/gothic_leaderboard_widget.dart';
+import '../widgets/gothic_analytics_widget.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -20,7 +22,7 @@ class _StatsScreenState extends State<StatsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
@@ -70,6 +72,14 @@ class _StatsScreenState extends State<StatsScreen>
                   icon: Icon(Icons.history),
                 ),
                 Tab(
+                  text: 'RANKINGS',
+                  icon: Icon(Icons.emoji_events),
+                ),
+                Tab(
+                  text: 'ANALYTICS',
+                  icon: Icon(Icons.query_stats),
+                ),
+                Tab(
                   text: 'RELICS',
                   icon: Icon(Icons.auto_awesome),
                 ),
@@ -85,6 +95,8 @@ class _StatsScreenState extends State<StatsScreen>
               controller: _tabController,
               children: const [
                 RunHistoryWidget(),
+                GothicLeaderboardWidget(),
+                GothicAnalyticsWidget(),
                 RelicCollectionWidget(),
                 CardCompendiumWidget(),
               ],

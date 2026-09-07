@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
-import '../config/hub_config.dart';
+import '../../config/hub.dart';
 
 /// Client minimo del Gamification Hub (F7, offline-first).
 ///
