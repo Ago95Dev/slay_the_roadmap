@@ -2,6 +2,7 @@
 \label{g:behavior}
 
 \section{Core loop}
+Il loop (riassunto in Fig.~\ref{fig:coreloop}) procede cos\`i:
 \begin{enumerate}
 \item \textbf{Studio}: pagina di dettaglio del topic (testo breve + link
 opzionali). Nessun timer.
@@ -13,6 +14,28 @@ XP in caso di sconfitta/ripetizione fallita, perdita di vite nel boss).
 \item \textbf{Avanzamento}: lo sblocco del nodo successivo lungo la roadmap;
 a fine capitolo, \textbf{boss fight}.
 \end{enumerate}
+
+\begin{figure}[ht]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  node distance=8mm,
+  every node/.style={font=\scriptsize},
+  cstep/.style={draw, rounded corners=3pt, fill=blue!8, minimum width=2.4cm, minimum height=9mm, align=center},
+  >=Stealth
+]
+\node[cstep] (s) {Studio\\topic};
+\node[cstep, right=of s] (q) {Quiz 5Q\\soglia 80\%};
+\node[cstep, right=of q] (r) {Ricompensa\\1-di-3};
+\node[cstep, right=of r] (a) {Avanzamento\\sblocco nodo};
+\node[cstep, right=of a] (b) {Boss fight\\10 HP vs 3 HP};
+\draw[->] (s) -- (q); \draw[->] (q) -- (r); \draw[->] (r) -- (a); \draw[->] (a) -- (b);
+\draw[->, dashed] (b.south) -- ++(0,-10mm) -| (s.south);
+\node[anchor=north, font=\scriptsize\itshape] at ([yshift=-11mm]q.south) {vittoria boss: capitolo successivo, si ritorna a Studio};
+\end{tikzpicture}}
+\caption{Core loop: Studio $\rightarrow$ Quiz $\rightarrow$ Ricompensa $\rightarrow$ Avanzamento $\rightarrow$ Boss fight, con ritorno al capitolo successivo.}
+\label{fig:coreloop}
+\end{figure}
 
 \section{Boss fight}
 Combattimento a turni con numeri reali (stato vero implementato):

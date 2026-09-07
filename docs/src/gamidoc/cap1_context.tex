@@ -8,7 +8,7 @@ i \textbf{topic sono i mostri/stanze}, le \textbf{carte-ricompensa sono il
 bottino}. Il giocatore studia un topic, supera un quiz e avanza lungo la
 roadmap fino al boss di capitolo. La campagna implementata \`e quella
 \textbf{Web -- fondamenta} (file
-\texttt{docs/assignment/campagna\_web.md}): zero sintassi, solo modelli
+\path{docs/assignment/campagna_web.md}): zero sintassi, solo modelli
 mentali (perch\'e/come/cosa-succede-se), quiz in italiano.
 
 \section{Obiettivi didattici}
@@ -19,7 +19,7 @@ trasformano in pagine e si spediscono agli utenti (costruire).
 \item Dare feedback immediato e motivante: ogni quiz superato sblocca il nodo
 successivo e assegna una ricompensa; ogni capitolo si chiude con un boss.
 \item Rendere misurabile il progresso sia in locale (XP, livelli, vite,
-streak, save) sia sul Gamification Hub (XP, badge, livelli remoti).
+streak, save) sia sull'Hub (XP, badge, livelli remoti).
 \end{itemize}
 
 \section{Target users}
@@ -33,27 +33,64 @@ essere rigiocabile da zero (New Run).
 \section{Struttura della campagna}
 Tre capitoli, ciascuno con un inquadramento (root) + 3 topic + 1 boss
 finale, per un totale di 12 nodi quiz. Tutti gli ID sono stabili in
-snake\_case (Tab.~\ref{tab:mappa}).
+snake\_case (Tab.~\ref{tab:mappa}, schema in Fig.~\ref{fig:roadmap}).
 
-\begin{table}[h]
+\begin{table}[ht]
 \centering
-\begin{tabular}{lll}
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}lX>{\raggedright\arraybackslash}p{3.2cm}@{}}
 \toprule
 Capitolo & Nodi (root + 3 topic) & Boss \\
 \midrule
-1 -- La Rete & \texttt{web\_network}, \texttt{net\_client\_server},
-\texttt{net\_dns\_url}, \texttt{net\_http\_https} & \texttt{man\_in\_the\_middle} \\
-2 -- Dati e Stato & \texttt{web\_data}, \texttt{data\_represent},
-\texttt{data\_where}, \texttt{data\_state} & \texttt{the\_amnesiac} \\
-3 -- Costruire sul Web & \texttt{web\_building}, \texttt{build\_browser},
-\texttt{build\_framework}, \texttt{build\_ship} & \texttt{spaghetti\_colossus} \\
+1 -- La Rete & \path{web_network}, \path{net_client_server}, \path{net_dns_url}, \path{net_http_https} & \path{man_in_the_middle} \\
+2 -- Dati e Stato & \path{web_data}, \path{data_represent}, \path{data_where}, \path{data_state} & \path{the_amnesiac} \\
+3 -- Costruire sul Web & \path{web_building}, \path{build_browser}, \path{build_framework}, \path{build_ship} & \path{spaghetti_colossus} \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \caption{Mappa stabile della campagna Web.}
 \label{tab:mappa}
 \end{table}
 
-\noindent Prerequisiti a catena: il capitolo 2 richiede la sconfitta di
-\texttt{man\_in\_the\_middle}, il capitolo 3 quella di
-\texttt{the\_amnesiac}. Ogni quiz (inclusi i root) ha ID
-\texttt{quiz\_\textless topic\textgreater} e contiene 5 domande.
+\begin{figure}[ht]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  node distance=4mm,
+  every node/.style={font=\scriptsize},
+  mod/.style={draw, rounded corners=2pt, fill=blue!8, minimum width=2.7cm, minimum height=6mm, align=center},
+  root/.style={mod, fill=blue!18, font=\scriptsize\bfseries},
+  boss/.style={draw, diamond, aspect=2.2, fill=red!12, align=center, font=\scriptsize\bfseries, inner sep=1pt},
+  >=Stealth
+]
+\node[root] (r1) {web\_network};
+\node[mod, below=of r1] (a1) {net\_client\_server};
+\node[mod, below=of a1] (b1) {net\_dns\_url};
+\node[mod, below=of b1] (c1) {net\_http\_https};
+\node[boss, below=of c1] (boss1) {MITM};
+\node[root, right=14mm of r1] (r2) {web\_data};
+\node[mod, below=of r2] (a2) {data\_represent};
+\node[mod, below=of a2] (b2) {data\_where};
+\node[mod, below=of b2] (c2) {data\_state};
+\node[boss, below=of c2] (boss2) {Amnesiac};
+\node[root, right=14mm of r2] (r3) {web\_building};
+\node[mod, below=of r3] (a3) {build\_browser};
+\node[mod, below=of a3] (b3) {build\_framework};
+\node[mod, below=of b3] (c3) {build\_ship};
+\node[boss, below=of c3] (boss3) {Spaghetti};
+\draw[->] (r1) -- (a1); \draw[->] (a1) -- (b1); \draw[->] (b1) -- (c1); \draw[->] (c1) -- (boss1);
+\draw[->] (r2) -- (a2); \draw[->] (a2) -- (b2); \draw[->] (b2) -- (c2); \draw[->] (c2) -- (boss2);
+\draw[->] (r3) -- (a3); \draw[->] (a3) -- (b3); \draw[->] (b3) -- (c3); \draw[->] (c3) -- (boss3);
+\draw[->, dashed] (boss1.east) -- (r2.west) node[midway, above, font=\tiny\itshape] {sblocca};
+\draw[->, dashed] (boss2.east) -- (r3.west) node[midway, above, font=\tiny\itshape] {sblocca};
+\node[font=\scriptsize\bfseries, above=of r1] {Cap.~1 -- La Rete};
+\node[font=\scriptsize\bfseries, above=of r2] {Cap.~2 -- Dati e Stato};
+\node[font=\scriptsize\bfseries, above=of r3] {Cap.~3 -- Costruire};
+\end{tikzpicture}}
+\caption{Albero della roadmap: 3 capitoli $\times$ (root + 3 topic) + boss di capitolo. La sconfitta del boss (MITM = \texttt{man\_in\_the\_middle}, Amnesiac = \texttt{the\_amnesiac}, Spaghetti = \texttt{spaghetti\_colossus}) sblocca il capitolo successivo.}
+\label{fig:roadmap}
+\end{figure}
+
+\noindent Prerequisiti a catena: il capitolo 2 richiede la sconfitta del
+boss del cap.~1 (MITM), il capitolo 3 quella del boss del cap.~2
+(Amnesiac); gli ID completi sono in Tab.~\ref{tab:mappa}. Ogni quiz
+(inclusi i root) ha ID \path{quiz_<topic>} e contiene 5 domande.

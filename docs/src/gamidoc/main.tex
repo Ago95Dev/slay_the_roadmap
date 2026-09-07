@@ -1,8 +1,18 @@
 % GamiDOC — Slay the Roadmap / Slay the Code
 \documentclass[a4paper,11pt]{report}
 \usepackage[italian]{babel}
+\usepackage{cmap}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage{charter}
+% Mono vettoriale: le metriche T1 di cmtt mancano (resterebbe bitmap EC),
+% si riusa il cmtt OT1 Type1 di AMS (solo ASCII, sufficiente per gli ID).
+\renewcommand{\ttdefault}{cmtt}
+\DeclareFontFamily{T1}{cmtt}{\hyphenchar\font=-1}
+\DeclareFontShape{T1}{cmtt}{m}{n}{<->cmtt10}{}
+\DeclareFontShape{T1}{cmtt}{m}{sl}{<->cmtt10}{}
+\DeclareFontShape{T1}{cmtt}{m}{it}{<->ssub*cmtt/m/sl}{}
+\DeclareFontShape{T1}{cmtt}{bx}{n}{<->ssub*cmtt/m/n}{}
 \usepackage{geometry}
 \geometry{a4paper,margin=2.5cm}
 \usepackage{xcolor}
@@ -12,6 +22,13 @@
 \usepackage{amsmath}
 \usepackage{enumitem}
 \usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{xurl}
+\usepackage{listings}
+\lstset{basicstyle=\ttfamily\small,breaklines=true,breakatwhitespace=false,columns=fullflexible,keepspaces=true}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning}
+\counterwithout{figure}{chapter}
 \graphicspath{{../../assets/}{./}}
 
 \title{Slay the Roadmap / Slay the Code\\GamiDOC di Progetto}
@@ -21,6 +38,7 @@
 
 \begin{document}
 \maketitle
+\begin{center}\small\textit{Nota sui nomi: progetto \textbf{Slay the Roadmap}, game Hub \textbf{Slay The Code} (game su console Hub).}\end{center}
 \tableofcontents
 
 \input{cap1_context}
@@ -32,7 +50,7 @@
 \input{cap7_valutazione}
 
 \begin{thebibliography}{9}
-\bibitem{hub} Gamification Hub Univaq, console \url{https://gamification-webapp.createlab-univaq.it} e API \url{https://gamification-api.createlab-univaq.it/api/v1} (contratto eventi in \texttt{docs/assignment/hub\_setup.md}).
+\bibitem{hub} Gamification Hub Univaq, console \url{https://gamification-webapp.createlab-univaq.it} e API \url{https://gamification-api.createlab-univaq.it/api/v1} (contratto eventi in \path{docs/assignment/hub_setup.md}).
 \bibitem{molina} A.\ Molina et al., materiali GamiDOC e user research (think-aloud + questionari), corso EGS.
 \bibitem{chou} Y.-K.\ Chou, \textit{Actionable Gamification}, Octalysis Media, 2015.
 \bibitem{toda} A.\ M.\ Toda et al., ``A taxonomy of game elements for gamified applications'', \textit{SIGCSE}, 2019.

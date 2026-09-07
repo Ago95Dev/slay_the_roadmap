@@ -11,7 +11,7 @@ errori ripetuti.
 \item \textbf{Ecological}: vite (3), energia boss (3/turno), economia chiusa
 senza valuta acquistabile.
 \item \textbf{Personal}: collezione carte (deck da ricompense 1-di-3),
-badge di topic e di boss, progressione a capitoli con prerequisiti.
+badge di topic e di boss, capitoli in sequenza con prerequisiti.
 \item \textbf{Fictional}: narrativa dei tre boss e del dungeon-roadmap.
 \item \textbf{Social}: tagliato (vedi Cap.~\ref{g:stato}); nessuna
 leaderboard locale, nessuna condivisione.
@@ -25,7 +25,31 @@ Lettura secondo Chou~\cite{chou}: il nucleo \`e
 \textbf{Imprevedibilit\`a (CD7)} nella pesca boss dai topic del capitolo,
 \textbf{Perdita (CD8)} nel rischio boss (retry senza XP).
 Significato/Narrativa (CD1) \`e coperto dalla lore dei boss; Influenza
-sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope.
+sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
+(visualizzazione dei pesi in Fig.~\ref{fig:octalysis}).
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+  every node/.style={font=\scriptsize},
+  forte/.style={draw, rounded corners=2pt, fill=green!15, align=center, inner sep=2pt},
+  medio/.style={draw, rounded corners=2pt, fill=yellow!15, align=center, inner sep=2pt},
+  debole/.style={draw, dashed, rounded corners=2pt, fill=gray!10, text=black!60, align=center, inner sep=2pt}
+]
+\node[regular polygon, regular polygon sides=8, minimum size=3.4cm, draw, thick, rotate=22.5] (oct) {};
+\node[forte] at (90:2.9cm) {CD2\\Sviluppo};
+\node[forte] at (45:2.9cm) {CD3\\Creativit\`a};
+\node[forte] at (0:3.1cm) {CD4\\Possesso};
+\node[debole] at (315:2.9cm) {CD5\\Sociale};
+\node[debole] at (270:2.9cm) {CD6\\Scarsit\`a};
+\node[forte] at (225:3.1cm) {CD7\\Imprevedibilit\`a};
+\node[forte] at (180:3.1cm) {CD8\\Perdita};
+\node[medio] at (135:2.9cm) {CD1\\Significato};
+\node[font=\scriptsize\itshape, below=4mm of oct] {forti: CD2, CD3, CD4, CD7, CD8 \quad|\quad medio: CD1 \quad|\quad deboli: CD5, CD6};
+\end{tikzpicture}
+\caption{Ottagono Octalysis con i pesi dei Core Drive nel progetto: nucleo forte su Sviluppo, Creativit\`a, Possesso, Imprevedibilit\`a e Perdita; deboli Sociale e Scarsit\`a per scelta di scope.}
+\label{fig:octalysis}
+\end{figure}
 
 \medskip
 \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
