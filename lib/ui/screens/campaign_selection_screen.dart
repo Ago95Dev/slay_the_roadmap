@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../domain/models/campaign.dart';
+import '../animations/dungeon_motion.dart';
 import '../view_models/session_controller.dart';
+import 'home_screen.dart';
 
-/// Selezione campagna (F11, DOPO il login e PRIMA della Home).
+/// Selezione campagna (raggiungibile dall'Hub personale, DOPO il login).
 ///
 /// Lista le campagne di [SessionController.availableCampaigns]: quelle
 /// attive con bottone "Gioca", quelle coming soon disabilitate con badge
 /// "Prossimamente" (niente contenuti, mai selezionabili). A scelta riuscita
-/// la [SessionController] notifica e la root monta la Home della campagna.
+/// la [SessionController] notifica e si entra direttamente nella Home di
+/// gioco della campagna (quando la selezione è pushata sopra l'Hub);
+/// come root (nessuna route sotto, es. test) resta ferma sulla lista.
 class CampaignSelectionScreen extends StatelessWidget {
   final SessionController session;
 
@@ -22,7 +27,30 @@ class CampaignSelectionScreen extends StatelessWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message)),
       );
+      return;
     }
+    if (!context.mounted) return;
+    // Flusso Hub: pushata sopra l'Hub, dopo la scelta si entra nella Home
+    // della campagna con i ViewModel aggiornati. Come root (test) resta
+    // ferma: niente route sotto a cui tornare.
+    if (!Navigator.canPop(context)) return;
+    final player = session.player;
+    final roadmap = session.roadmap;
+    if (player == null || roadmap == null) return;
+    final profileId = session.activeProfile?.userId;
+    final campaignId = session.activeCampaignId;
+    Navigator.push(
+      context,
+      DungeonPageRoute(
+        builder: (_) => MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: player),
+            ChangeNotifierProvider.value(value: roadmap),
+          ],
+          child: HomeScreen(key: ValueKey('${profileId}_$campaignId')),
+        ),
+      ),
+    );
   }
 
   @override

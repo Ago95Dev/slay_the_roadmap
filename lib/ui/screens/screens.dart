@@ -9,3 +9,5 @@ export 'topic_detail_screen.dart';
 export 'reward_choice_screen.dart';
 export 'profile_screen.dart';
 export 'campaign_selection_screen.dart';
+export 'hub_screen.dart';
+export 'my_numbers_screen.dart';

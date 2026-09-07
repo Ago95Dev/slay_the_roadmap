@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../animations/dungeon_motion.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../widgets/my_numbers_card.dart';
 
 /// Impostazioni minime (F5, US-05): Reset progressi + About.
 /// F10: "Cambia utente" (logout, torna alla scelta profilo senza
@@ -69,10 +70,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  /// "I miei numeri" (F12, Evaluation): solo conteggi locali
-  /// (quiz passati/falliti, boss vinti/persi, reward, serie max,
-  /// sessioni), niente tracking invasivo. Nascosta se PlayerViewModel
-  /// non è registrato (es. vecchi test).
+  /// "I miei numeri" (F12, Evaluation): card condivisa con la schermata
+  /// "I miei numeri" dell'Hub ([MyNumbersCard], stessi conteggi locali,
+  /// nessuna logica duplicata).
   Widget _buildStatsCard(BuildContext context) {
     PlayerViewModel? playerVm;
     try {
@@ -81,24 +81,7 @@ class SettingsScreen extends StatelessWidget {
       playerVm = null;
     }
     if (playerVm == null) return const SizedBox.shrink();
-    final progress = playerVm.progress;
-    final rows = [
-      'Quiz superati: ${progress.analytics.quizPassed}',
-      'Quiz falliti: ${progress.analytics.quizFailed}',
-      'Boss vinti: ${progress.analytics.bossWon}',
-      'Boss persi: ${progress.analytics.bossLost}',
-      'Reward riscattate: ${progress.analytics.rewardsClaimed}',
-      'Serie migliore: x${progress.maxStreak}',
-      'Sessioni: ${progress.analytics.sessions}',
-    ];
-    return Card(
-      key: const Key('settings_stats'),
-      child: ListTile(
-        leading: const Icon(Icons.query_stats),
-        title: const Text('📊 I miei numeri'),
-        subtitle: Text(rows.join('\n')),
-      ),
-    );
+    return const MyNumbersCard();
   }
 
   /// Reset totale della campagna attiva (BUG 3): wipe del

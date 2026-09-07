@@ -5,6 +5,7 @@ import '../view_models/roadmap_view_model.dart';
 import '../view_models/session_controller.dart';
 import '../animations/dungeon_motion.dart';
 import '../widgets/avatar_picker.dart';
+import '../widgets/daily_reward_banner.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
 import 'leaderboard_screen.dart';
@@ -55,8 +56,9 @@ class HomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Ricompensa giornaliera (Fase 1B-E): solo se disponibile.
-                _buildDailyRewardBanner(context),
+                // Ricompensa giornaliera (Fase 1B-E): solo se disponibile
+                // (widget condiviso con l'Hub: stesso claim, niente duplicati).
+                const DailyRewardBanner(),
                 const SizedBox(height: 20),
 
                 // Menu Cards Column
@@ -134,74 +136,6 @@ class HomeScreen extends StatelessWidget {
           child: const Text('Cambia'),
         ),
       ],
-    );
-  }
-
-  /// Banner ricompensa giornaliera (Fase 1B-E, locale): visibile solo se
-  /// il claim di oggi è disponibile. Tap = claim + SnackBar di conferma.
-  Widget _buildDailyRewardBanner(BuildContext context) {
-    final playerVm = context.watch<PlayerViewModel>();
-    if (!playerVm.isDailyRewardAvailable) return const SizedBox.shrink();
-    final screenWidth = MediaQuery.of(context).size.width;
-    final cardWidth = screenWidth > 600 ? 400.0 : screenWidth * 0.85;
-    return SizedBox(
-      width: cardWidth,
-      child: Card(
-        key: const Key('home_daily_reward'),
-        elevation: 6,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        child: InkWell(
-          key: const Key('home_daily_reward_tap'),
-          borderRadius: BorderRadius.circular(15),
-          onTap: () {
-            final claimed = context.read<PlayerViewModel>().claimDailyReward();
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  claimed
-                      ? '🎁 Ricompensa riscattata! +${PlayerViewModel.dailyRewardXp} XP'
-                      : 'Già riscattata oggi, torna domani!',
-                ),
-              ),
-            );
-          },
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Colors.deepPurple, Colors.purpleAccent],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: const Row(
-              children: [
-                Icon(Icons.card_giftcard, color: Colors.white, size: 28),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    '🎁 Ricompensa giornaliera +25 XP',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: Colors.white,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
     );
   }
 

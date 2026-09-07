@@ -51,10 +51,10 @@ Future<void> main() async {
 }
 
 /// Root con sessione (F10, F11): osserva [SessionController] e monta lo
-/// switch profili, poi la selezione campagna (dopo il login, prima della
-/// Home), poi la Home dell'utente per la campagna attiva (i ViewModel
+/// switch profili, poi l'Hub personale (dopo il login, centro di tutto),
+/// da cui si raggiungono selezione campagna e Home di gioco (i ViewModel
 /// per-utente e per-campagna sono forniti qui; il cambio utente o campagna
-/// ricostruisce il Navigator da zero).
+/// ricostruisce l'Hub da zero via [ValueKey]).
 class MyAppRoot extends StatelessWidget {
   final SessionController session;
 
@@ -77,19 +77,18 @@ class MyAppRoot extends StatelessWidget {
             );
           } else if (active == null || player == null || roadmap == null) {
             home = ProfileSwitchScreen(session: watched);
-          } else if (!watched.hasSelectedCampaign) {
-            home = CampaignSelectionScreen(
-              key: ValueKey('campaign_${active.userId}'),
-              session: watched,
-            );
           } else {
+            // Hub personale: la selezione campagna non è più forzata, è
+            // raggiungibile da qui; la prima campagna mai scelta mostra
+            // l'invito (CONTINUA nascosto).
             home = MultiProvider(
               providers: [
                 ChangeNotifierProvider.value(value: roadmap),
                 ChangeNotifierProvider.value(value: player),
               ],
-              child: HomeScreen(
-                key: ValueKey('${active.userId}_${watched.activeCampaignId}'),
+              child: HubScreen(
+                key: ValueKey(
+                    'hub_${active.userId}_${watched.activeCampaignId}'),
               ),
             );
           }

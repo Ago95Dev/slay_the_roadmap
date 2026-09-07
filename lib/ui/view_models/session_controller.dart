@@ -25,8 +25,8 @@ class SessionController with ChangeNotifier {
   bool ready = false;
 
   /// Campagna attiva (id, default spedita) + flag di selezione esplicita
-  /// (persistito): finché false la root mostra la selezione campagne
-  /// prima della Home.
+  /// (persistito): finché false l'Hub nasconde CONTINUA e invita a
+  /// scegliere la campagna.
   String activeCampaignId = CampaignRepository.webFoundationsId;
   bool campaignSelected = false;
 
@@ -112,8 +112,9 @@ class SessionController with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Torna alla selezione campagne (la Home resta dietro, i progress
-  /// salvati sono intatti). Usato da "Cambia campagna" in Home.
+  /// Torna alla selezione campagne (l'Hub nasconde CONTINUA e mostra
+  /// l'invito; i progress salvati sono intatti). Usato da "Cambia
+  /// campagna" in Home.
   Future<void> backToCampaignSelection() async {
     final profile = activeProfile;
     if (profile == null) return;
