@@ -1,9 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import '../config/hub_config.dart';
 import '../models/types.dart';
 import '../data/skill_tree_data.dart';
 import '../data/roadmap_data.dart' as data;
 import '../data/cards_data.dart' as cards_data;
+import '../services/engine_client.dart';
+import '../services/hub_identity.dart';
 import '../services/storage_service.dart';
 import '../services/dungeon_generator.dart';
 import '../data/topics_and_quizzes.dart';
@@ -11,6 +15,10 @@ import '../data/topics_and_quizzes.dart';
 class GameProvider with ChangeNotifier {
   final StorageService _storage = StorageService();
   final _uuid = const Uuid();
+
+  // --- Hub Gamification (F7) ---
+  late final EngineClient _engine;
+  String _hubPlayerId = '';
 
   // Player State
   List<String> _completedTopics = [];
@@ -62,6 +70,13 @@ class GameProvider with ChangeNotifier {
   }
 
   GameProvider() {
+    // Detect Hub credentials from --dart-define
+    const hubUser = String.fromEnvironment('HUB_USER', defaultValue: '');
+    const hubPass = String.fromEnvironment('HUB_PASS', defaultValue: '');
+    _engine = (hubUser.isNotEmpty && hubPass.isNotEmpty)
+        ? HttpEngineClient(username: hubUser, password: hubPass)
+        : FakeEngineClient();
+
     _initializeRoadmap();
     _loadProgress();
   }
@@ -73,6 +88,14 @@ class GameProvider with ChangeNotifier {
 
 
   Future<void> _loadProgress() async {
+    // Load or create stable Hub player ID
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      _hubPlayerId = await HubIdentity.loadOrCreate(prefs);
+    } catch (_) {
+      _hubPlayerId = HubIdentity.newId();
+    }
+
     final progress = await _storage.loadProgress();
     if (progress != null) {
       _completedTopics = List<String>.from(progress['completedTopics'] ?? []);
@@ -232,6 +255,12 @@ class GameProvider with ChangeNotifier {
       // Award experience based on score
       final experienceReward = 50 + (score * 10);
       _awardExperience(experienceReward);
+
+      // --- Hub: notify quiz passed (fire-and-forget) ---
+      _hubEvent(HubConfig.quizCompletedAction, {
+        'xp_amount': HubConfig.quizXpAmount,
+        'badge': topicId,
+      });
       
       // Find and complete the corresponding roadmap node
       final topicNode = _roadmapNodes.where((node) => 
@@ -516,11 +545,25 @@ class GameProvider with ChangeNotifier {
       completeTopic(node.topicId!);
     }
 
+    // --- Hub: notify boss defeated (fire-and-forget) ---
+    if (node.type == RoadmapNodeType.boss && node.bossId != null) {
+      _hubEvent(HubConfig.bossDefeatedAction, {
+        'badge': node.bossId!,
+      });
+    }
+
     _saveProgress();
     notifyListeners();
   }
 
   void _processReward(RoadmapReward reward) {
+    // --- Hub: notify reward claimed (fire-and-forget) ---
+    _hubEvent(HubConfig.claimRewardAction, {
+      'reward_type': reward.type,
+      'reward_id': reward.id ?? '',
+      'reward_amount': reward.amount ?? 0,
+    });
+
     switch (reward.type) {
       case 'card':
         // Award a random card based on rarity
@@ -752,5 +795,20 @@ class GameProvider with ChangeNotifier {
     _initializeRoadmap();
     await _storage.resetProgress();
     notifyListeners();
+  }
+
+  // --- Hub Gamification: fire-and-forget event dispatch ---
+  /// Invia un evento all'Hub senza mai bloccare o lanciare eccezioni.
+  /// Se l'Hub è offline o le credenziali mancano, non succede niente.
+  Future<void> _hubEvent(String actionId, Map<String, dynamic> data) async {
+    try {
+      await _engine.execute(
+        actionId: actionId,
+        playerId: _hubPlayerId,
+        data: data,
+      );
+    } catch (_) {
+      // fire-and-forget: mai bloccare il gioco per errori Hub
+    }
   }
 }
