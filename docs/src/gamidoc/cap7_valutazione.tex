@@ -1,10 +1,11 @@
 \chapter{Valutazione, KPI e Analytics}
 \label{g:valutazione}
 
-\section{Valutazione (protocollo da eseguire)}
-Think-aloud + questionari (SUS, IMI, nucleo GEQ) su 5--8 studenti,
-sessioni da circa 30\,min. Sezioni \textit{metodo / profilo partecipanti /
-risultati / riflessioni} da compilare dopo le sessioni.
+\section{Valutazione (protocollo pronto, sessioni da svolgere)}
+Protocollo definito (Molina et al.~\cite{molina}): think-aloud +
+questionari (SUS, IMI, nucleo GEQ) su 5--8 studenti, sessioni da circa
+30\,min. Sezioni \textit{metodo / profilo partecipanti / risultati /
+riflessioni} da compilare dopo le sessioni.
 
 \medskip
 \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
@@ -16,7 +17,11 @@ dopo le sessioni reali.}}
 \section{KPI e Analytics}
 KPI candidati: retention D1/D7, tasso di mastery al primo tentativo
 (soglia 80\,\%), tempo medio per boss, carte per vittoria, SUS $\geq 70$.
-Eventi tracciabili via Hub (\texttt{data} nelle executions):
-\path{quiz_completed}, \path{claim_reward},
-\path{boss_defeated}. Le soglie di successo saranno fissate dopo la
-prima tornata di dati reali.
+Analytics locali gi\`a implementati (isolati per utente$\times$campagna,
+cap 200 eventi, riepilogo ``I miei numeri'' in Settings): conteggi
+\path{quiz_pass}, \path{quiz_fail}, \path{boss_win},
+\path{boss_lose}, \path{reward_claim}, \path{session_start} +
+\path{failCount} per topic (soglia 2 per ``Da ripassare''). Specchio Hub
+(\texttt{data} nelle executions): \path{quiz_completed},
+\path{claim_reward}, \path{boss_defeated}. Le soglie di successo saranno
+fissate dopo la prima tornata di dati reali.

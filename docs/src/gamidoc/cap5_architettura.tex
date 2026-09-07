@@ -6,21 +6,41 @@ documento gemello \texttt{specifica.pdf}.
 
 \section{Layer}
 \begin{itemize}
-\item \textbf{UI + Provider}: schermate (home, roadmap, topic, quiz,
-ricompensa, boss) con view-model Provider; un'unica fonte di verit\`a
-locale per il progresso (\path{PlayerProgress}: XP, livello, vite,
-streak, deck, sblocchi).
+\item \textbf{UI + Provider}: schermate (profili/login, selezione
+campagna, home, roadmap, topic, quiz, ricompensa, boss, classifica,
+settings) con view-model Provider; un'unica fonte di verit\`a locale per
+il progresso (\path{PlayerProgress}: XP, livello, vite, streak, deck,
+sblocchi, titoli, avatar, intro viste, daily, fail e analytics) isolata
+per bucket utente$\times$campagna.
+\item \textbf{Sessione multi-profilo}: \path{UserStore} con indice
+\path{slay_users_index}, un record \path{slay_profile_<userId>} per
+utente e login/registrazione locale (hash FNV-1a con salt,
+prototype: niente recupero password, niente auth remota); il vecchio
+\path{slay_save_v1} viene migrato una-tantum in un utente ``Giocatore''
+senza password e poi ignorato.
 \item \textbf{Repository}: sei repository con responsabilit\`a singola ---
 roadmap (seed: 3 root + 9 sub, prerequisiti a catena tramite
 \path{bossId}/\path{requiredBossId}), testi dei topic (12),
-quiz (12 da 5 domande), boss (nomi, lore, quiz adattivi del capitolo),
-ricompense (scelta 1-di-3, limite 1/topic) e persistenza
-(save locale \path{Save v1} su SharedPreferences).
+quiz (12 da 5 domande), boss (nomi, lore, tratti passivi, quiz adattivi
+del capitolo), ricompense (scelta 1-di-3, limite 1/topic) e persistenza
+(save locale su SharedPreferences). \path{CampaignRepository} espone il
+catalogo: 1 attiva (\path{web_foundations}, ``Fondamenta Web'') + 2
+coming soon oneste (\path{backend_arcana}, \path{mobile_odyssey}); ogni
+repository richiede campagna attiva (\path{requireActive}), mai contenuti
+finti.
+\item \textbf{Save per utente$\times$campagna}:
+\path{SharedPreferencesPersistence.forUser} lega il save alla chiave
+\path{slay_data_<userId>} con envelope
+\path{{activeCampaign, campaignSelected, campaigns: {<id>: {progress, completedTopicIds, claimedRewardTopics}}}};
+ogni campagna ha progress, claim e wipe isolati; gli envelope vecchi
+vengono migrati in lettura.
 \item \textbf{Engine}: logica di combattimento (HP 10 vs 3, energia 3,
-quiz-danno) e regole di sblocco, XP, streak e livelli isolate dai widget.
-\item \textbf{Hub client con fallback}: \path{EngineClient} reale e
-\path{FakeEngineClient} offline. Senza credenziali a runtime non parte
-alcuna chiamata di rete e l'app \`e identica (offline-first).
+quiz-danno, passive dei boss) e regole di sblocco, XP, streak, livelli,
+titoli, daily e ``da ripassare'' isolate dai widget.
+\item \textbf{Hub client con fallback}: \path{HttpEngineClient} reale e
+\path{FakeEngineClient} offline (no-op con chiamate registrate per i
+test). Senza credenziali a runtime non parte alcuna chiamata di rete e
+l'app \`e identica (offline-first).
 \end{itemize}
 
 \begin{figure}[ht]
@@ -37,7 +57,7 @@ alcuna chiamata di rete e l'app \`e identica (offline-first).
 \node[box, minimum width=6.4cm, below=of repo] (eng) {Engine\\combattimento, XP/streak/livelli, sblocchi};
 \node[box, minimum width=4.6cm, right=12mm of eng, fill=orange!12] (hub) {Hub client\\{\ttfamily EngineClient} reale/\\{\ttfamily FakeEngineClient} offline};
 \draw[->] (ui) -- (repo); \draw[->] (repo) -- (eng);
-\draw[<->, dashed] (eng) -- (hub) node[midway, above, font=\scriptsize\itshape] {best-effort};
+\draw[<->, dashed] (eng.east) -- (hub.west) node[midway, below, font=\tiny\itshape, yshift=-1mm] {best-effort};
 \node[anchor=north, font=\scriptsize\itshape] at ([yshift=-2mm]hub.south) {senza credenziali: nessuna rete};
 \end{tikzpicture}}
 \caption{Schema a blocchi: UI/Provider e Repository appoggiano sull'Engine locale; l'Hub (reale o fake) \`e solo uno specchio best-effort di XP, badge e livelli, con fallback offline totale.}
@@ -51,13 +71,16 @@ Game \textbf{Slay The Code} su console Hub
 Risorse: action \path{quiz_completed}, \path{claim_reward},
 \path{boss_defeated}; Point \path{xp}; Level \path{experience} su
 \path{xp} (L1 0, L2 100, L3 500); collezione badge \path{slay_badges};
-rule \path{quiz_xp}, \path{topic_badge}, \path{boss_badge}.
+rule \path{quiz_xp}, \path{topic_badge}, \path{boss_badge};
+classification \path{overall_xp} (GENERAL su \path{xp}, cron lun 8:00)
+per la classifica.
 Eventi inviati best-effort dai view-model di quiz e boss, solo a quiz
 superato (soglia 80\,\% verificata in app), con \path{data} sempre
 presente in snake\_case (es.\ \path{xp_amount}, \path{badge}).
 Autenticazione a runtime via \path{--dart-define} (Bearer 24h),
-credenziali mai nel repo; \path{playerId} locale tipo
-\path{slay_<uuid>} salvato in SharedPreferences.
+credenziali mai nel repo; \path{playerId} Hub per coppia
+(utente, campagna): \path{slay_<userId>_<campaignId>} (il vecchio
+\path{slay_<timestamp>} resta solo per compatibilit\`a con i test F7).
 
 \section{Scelte tecniche}
 Flutter + Provider per semplicit\`a e testabilit\`a; persistenza locale su

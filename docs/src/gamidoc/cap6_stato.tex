@@ -4,23 +4,30 @@
 \section{Cosa gira davvero}
 App Flutter offline-first: roadmap 3 capitoli $\times$ 3 topic + boss
 finali (12 nodi quiz da 5 domande, soglia 80\,\%), reward 1-di-3 per tipo,
-boss 10 HP / giocatore 3 HP / energia 3 con quiz-danno, vite 3, streak
-+25/3, XP/livelli 0/100/500, save locale SharedPreferences, animazioni
-sobrie. Hub: eventi \path{quiz_completed}/\path{boss_defeated}
-best-effort con XP/badge/livelli remoti e fallback offline completo.
+boss 10 HP / giocatore 3 HP / energia 3 con quiz-danno, passive uniche
+(MITM enrage al 75\,\%, Amnesiac $-1$ energia per errore, Colossus
+corazza sul primo danno da carte), vite 3, streak +25/3, XP/livelli
+0/100/500, daily reward +25 XP una-tantum, titoli di capitolo + avatar
+(3 icone $\times$ 3 cornici), intro di capitolo + lore pre-fight +
+epilogo con statistiche, classifica XP Hub con stati vuota/offline.
+Profili locali multipli con login/registrazione (hash FNV-1a con salt,
+prototype: niente recupero password, niente auth remota; profilo migrato
+senza password) e save isolati per utente$\times$campagna
+(\path{slay_data_<userId>}, envelope con bucket per campagna).
+Campagne: 1 attiva (``Fondamenta Web'') + 2 coming soon oneste
+(``Backend Arcana'' e ``Mobile Odyssey'', non selezionabili).
+Personalizzazione: sezione ``Da ripassare'' (topic con almeno 2 quiz
+falliti, azzerati al passaggio) + analytics locali (6 tipi di evento,
+cap 200, ``I miei numeri'' in Settings). Hub: eventi
+\path{quiz_completed}/\path{claim_reward}/\path{boss_defeated}
+best-effort con XP/badge/livelli/classifica remoti e fallback offline
+completo.
 
 \section{Tagli dichiarati (future work)}
-Dichiarati nel piano (\S2) e NON implementati: social e leaderboard
-locale, shop/coins, classi, login e signup (playerId locale fisso),
-roadmap extra, profilo/achievement avanzati, eventi testuali random,
-branching di campagna, difficolt\`a adattiva oltre la pesca boss, monthly
-quest e login reward, animazioni extra. Voci mockup M1 Sign-in e M2
-Option2: rimosse o disattivate.
-
-\medskip
-\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
-\textbf{DA COMPLETARE (Fase 1B B--E, in corso).} A chiusura delle voci
-B (titoli + avatar), C (passive uniche boss), D (leaderboard Hub) ed E
-(daily reward) aggiornare l'elenco ``cosa gira'' con i numeri reali
-implementati e i test corrispondenti. Nessun comportamento futuro va
-descritto al presente.}}
+Dichiarati nel piano (\S2) e NON implementati: social, condivisione e
+classifiche locali; shop/coins e classi; auth remota e recupero
+password; roadmap extra oltre le 2 campagne annunciate; profilo e
+achievement avanzati, eventi testuali random, branching di campagna,
+difficolt\`a adattiva oltre pesca boss + soglie + passive, monthly quest,
+animazioni extra. Voci mockup M1 Sign-in e M2 Option2: rimosse o
+disattivate.

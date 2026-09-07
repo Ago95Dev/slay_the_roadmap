@@ -13,8 +13,9 @@ senza valuta acquistabile.
 \item \textbf{Personal}: collezione carte (deck da ricompense 1-di-3),
 badge di topic e di boss, capitoli in sequenza con prerequisiti.
 \item \textbf{Fictional}: narrativa dei tre boss e del dungeon-roadmap.
-\item \textbf{Social}: tagliato (vedi Cap.~\ref{g:stato}); nessuna
-leaderboard locale, nessuna condivisione.
+\item \textbf{Social}: classifica XP dell'Hub (classification
+\path{overall_xp} su \path{xp}, board remota con stati vuota/offline in
+app); nessuna leaderboard locale, nessuna condivisione (scelta di scope).
 \end{itemize}
 
 \section{Lente Octalysis}
@@ -24,8 +25,10 @@ Lettura secondo Chou~\cite{chou}: il nucleo \`e
 \textbf{Possesso (CD4)} nelle carte e nei badge,
 \textbf{Imprevedibilit\`a (CD7)} nella pesca boss dai topic del capitolo,
 \textbf{Perdita (CD8)} nel rischio boss (retry senza XP).
-Significato/Narrativa (CD1) \`e coperto dalla lore dei boss; Influenza
-sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
+Significato/Narrativa (CD1) \`e coperto da intro di capitolo, lore
+pre-fight ed epilogo con statistiche; Influenza sociale (CD5) vive solo
+nella classifica Hub (medio, remota e best-effort); Scarsit\`a (CD6) nel
+bonus giornaliero una-tantum (medio)
 (visualizzazione dei pesi in Fig.~\ref{fig:octalysis}).
 
 \begin{figure}[ht]
@@ -39,17 +42,17 @@ sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
 ]
 \node[regular polygon, regular polygon sides=8, minimum size=3.2cm, draw, thick, rotate=22.5] (oct) {};
 % pallini peso sui vertici: verde = forte, giallo = medio, grigio = debole
-\foreach \a/\c in {90/green!70!black,45/green!70!black,0/green!70!black,315/gray,270/gray,225/green!70!black,180/green!70!black,135/yellow!80!black}
+\foreach \a/\c in {90/green!70!black,45/green!70!black,0/green!70!black,315/yellow!80!black,270/yellow!80!black,225/green!70!black,180/green!70!black,135/green!70!black}
   \fill[\c] (\a:1.73cm) circle (2.2pt);
 % etichette esterne con leader-line corte
 \node[forte, above=8mm of oct] (cd2) {CD2 $\cdot$ forte\\Sviluppo};
 \node[forte, above right=6mm and 12mm of oct] (cd3) {CD3 $\cdot$ forte\\Creativit\`a};
 \node[forte, right=10mm of oct] (cd4) {CD4 $\cdot$ forte\\Possesso};
-\node[debole, below right=6mm and 12mm of oct] (cd5) {CD5 $\cdot$ debole\\Sociale};
-\node[debole, below=8mm of oct] (cd6) {CD6 $\cdot$ debole\\Scarsit\`a};
+\node[medio, below right=6mm and 12mm of oct] (cd5) {CD5 $\cdot$ medio\\Sociale};
+\node[medio, below=8mm of oct] (cd6) {CD6 $\cdot$ medio\\Scarsit\`a};
 \node[forte, below left=6mm and 12mm of oct] (cd7) {CD7 $\cdot$ forte\\Imprevedibilit\`a};
 \node[forte, left=10mm of oct] (cd8) {CD8 $\cdot$ forte\\Perdita};
-\node[medio, above left=6mm and 12mm of oct] (cd1) {CD1 $\cdot$ medio\\Significato};
+\node[forte, above left=6mm and 12mm of oct] (cd1) {CD1 $\cdot$ forte\\Significato};
 \draw[lead] (oct.north) -- (cd2.south);
 \draw[lead] (45:1.73cm) -- (cd3.south west);
 \draw[lead] (0:1.73cm) -- (cd4.west);
@@ -64,9 +67,33 @@ sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
 \end{figure}
 
 \medskip
-\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
-\textbf{DA COMPLETARE (Fase 1B, in corso).} Le voci A--E del piano
-(narrativa CD1 estesa con intro/finale per capitolo, titoli + avatar,
-passive uniche dei boss, leaderboard Hub CD5, daily reward CD6) sono in
-corso di implementazione e NON sono ancora riflesse in questo capitolo.
-Questo paragrafo sar\`a aggiornato a chiusura della Fase 1B.}}
+\section{Chiusura Fase 1B (voci A--E)}
+\begin{itemize}
+\item \textbf{A -- Narrativa (CD1)}: intro evocativa per capitolo,
+mostrata una sola volta per save (\path{seenChapterIntros}); lore estesa
+pre-fight per ogni boss (dialogo con riga ``Tratto'' della voce C);
+epilogo ``Campagna completata!'' con statistiche della run (XP, livello,
+streak massima, ricompense, boss vinti), mostrato una volta per
+completamento (\path{campaignCompletionSeen}).
+\item \textbf{B -- Titoli + avatar (CD4)}: un titolo per capitolo
+(\textit{Sentinella della Rete}, \textit{Custode dei Dati},
+\textit{Architetto del Web}), assegnato al completamento del capitolo
+(tutti i topic + boss sconfitto); l'ultimo vinto resta attivo
+(\path{activeTitle}). Avatar persistito: 3 icone (mago, volpe, robot)
+$\times$ 3 cornici (viola, teal, arancio); i save vecchi ripartono dai
+default con indici clampati.
+\item \textbf{C -- Passive dei boss (CD7)}, una per boss:
+Man-in-the-Middle \textit{Intercettazione} (soglia enrage al 75\,\% di HP
+invece del 50\,\%: i suoi colpi diventano speciali prima, $-2$);
+The Amnesiac \textit{Oblio} (ogni risposta errata costa anche $-1$
+energia); Spaghetti Colossus \textit{Corazza} (assorbe il primo punto
+danno da carte; i danni da quiz la aggirano).
+\item \textbf{D -- Leaderboard Hub (CD5)}: classification
+\path{overall_xp} (GENERAL su \path{xp}, cron lun 8:00);
+\path{EngineClient.getLeaderboard()} best-effort (mai throw, lista vuota
+su offline/errore) + schermata Classifica con stati di caricamento,
+lista vuota e offline.
+\item \textbf{E -- Daily reward (CD6)}: \textbf{+25 XP} una-tantum al
+giorno (data \path{yyyy-MM-dd} in \path{lastDailyClaim}, stringa vuota =
+mai riscattata; i save vecchi ripartono da claim disponibile).
+\end{itemize}
