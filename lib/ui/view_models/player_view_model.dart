@@ -5,6 +5,7 @@ import '../../config/hub.dart';
 import '../../data/repositories/persistence_repository.dart';
 import '../../data/services/engine_client.dart';
 import '../../domain/models/boss_fight.dart';
+import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/reward.dart';
 
@@ -68,7 +69,10 @@ class PlayerViewModel with ChangeNotifier {
       _progress.inventory.rewards.isNotEmpty ||
       _progress.bossFights.isNotEmpty ||
       _progress.seenChapterIntros.isNotEmpty ||
-      _progress.campaignCompletionSeen;
+      _progress.campaignCompletionSeen ||
+      _progress.activeTitle.isNotEmpty ||
+      _progress.avatarIconIndex != 0 ||
+      _progress.avatarFrameIndex != 0;
 
   bool canClaim(String topicId) =>
       !isTopicClaimed(topicId) && !isInventoryFull;
@@ -194,6 +198,60 @@ class PlayerViewModel with ChangeNotifier {
   void markCampaignCompletionSeen() {
     if (_progress.campaignCompletionSeen) return;
     _progress = _progress.copyWith(campaignCompletionSeen: true);
+    _autosave();
+    notifyListeners();
+  }
+
+  /// Titolo capitolo (Fase 1B-B): assegnato solo a capitolo interamente
+  /// completato ([chapterComplete]) E boss sconfitto ([bossDefeated]).
+  /// L'ultimo titolo vinto diventa attivo (sovrascrive il precedente).
+  /// Ritorna true solo se un nuovo titolo è stato assegnato.
+  bool checkAndAwardChapterTitle(
+    String chapterId, {
+    required bool chapterComplete,
+    required bool bossDefeated,
+  }) {
+    if (!chapterComplete || !bossDefeated) return false;
+    final title = chapterTitles[chapterId];
+    if (title == null || title.isEmpty) return false;
+    if (_progress.activeTitle == title) return false;
+    _progress = _progress.copyWith(activeTitle: title);
+    _autosave();
+    notifyListeners();
+    return true;
+  }
+
+  /// Scorta per boss: risolve il capitolo da [bossId] e assegna il
+  /// titolo se [chapterComplete] è true e il boss risulta sconfitto.
+  bool checkAndAwardTitleForBoss(
+    String bossId, {
+    required bool chapterComplete,
+  }) {
+    final chapterId = chapterIdForBossId(bossId);
+    if (chapterId == null) return false;
+    return checkAndAwardChapterTitle(
+      chapterId,
+      chapterComplete: chapterComplete,
+      bossDefeated: isBossDefeated(bossId),
+    );
+  }
+
+  /// Avatar (Fase 1B-B): indici clampati alle opzioni disponibili.
+  void setAvatar({int? iconIndex, int? frameIndex}) {
+    final icons = PlayerProgress.avatarIcons.length;
+    final frames = PlayerProgress.avatarFrameColorValues.length;
+    final nextIcon =
+        (iconIndex ?? _progress.avatarIconIndex).clamp(0, icons - 1);
+    final nextFrame =
+        (frameIndex ?? _progress.avatarFrameIndex).clamp(0, frames - 1);
+    if (nextIcon == _progress.avatarIconIndex &&
+        nextFrame == _progress.avatarFrameIndex) {
+      return;
+    }
+    _progress = _progress.copyWith(
+      avatarIconIndex: nextIcon,
+      avatarFrameIndex: nextFrame,
+    );
     _autosave();
     notifyListeners();
   }

@@ -42,6 +42,37 @@ class PlayerProgress extends Equatable {
   /// Miglior serie di quiz passati di fila (default 0, persistita).
   final int maxStreak;
 
+  /// Avatar scelto (Fase 1B-B, default 0, persistiti): indici in
+  /// [avatarIcons] / [avatarFrameColorValues]. I save vecchi senza
+  /// questi campi ripartono dal default (mago + cornice viola).
+  final int avatarIconIndex;
+  final int avatarFrameIndex;
+
+  /// Titolo attivo (Fase 1B-B, default '', persistito): ultimo titolo
+  /// di capitolo vinto (niente scelta multipla). '' = nessun titolo.
+  final String activeTitle;
+
+  /// Icone avatar tra cui scegliere (emoji semplici, tema fantasy).
+  static const List<String> avatarIcons = ['🧙', '🦊', '🤖'];
+
+  /// Cornici avatar tra cui scegliere (ARGB, mappate a Color in UI).
+  static const List<int> avatarFrameColorValues = [
+    0xFF7C4DFF, // viola
+    0xFF009688, // teal
+    0xFFF57C00, // arancio
+  ];
+
+  /// Icona avatar corrente (indice clampato per i save corrotti).
+  String get avatarIcon => avatarIcons[
+      avatarIconIndex.clamp(0, avatarIcons.length - 1)];
+
+  /// Valore ARGB della cornice avatar corrente (indice clampato).
+  int get avatarFrameColorValue => avatarFrameColorValues[
+      avatarFrameIndex.clamp(0, avatarFrameColorValues.length - 1)];
+
+  /// True se il giocatore ha già vinto almeno un titolo.
+  bool get hasTitle => activeTitle.isNotEmpty;
+
   /// Intro capitoli già mostrate (Fase 1B-A, default [], persistite):
   /// ogni intro appare una sola volta per save, fino a New Run.
   final List<String> seenChapterIntros;
@@ -95,6 +126,9 @@ class PlayerProgress extends Equatable {
     this.maxStreak = 0,
     this.seenChapterIntros = const [],
     this.campaignCompletionSeen = false,
+    this.avatarIconIndex = 0,
+    this.avatarFrameIndex = 0,
+    this.activeTitle = '',
   });
 
   factory PlayerProgress.initial() {
@@ -153,6 +187,9 @@ class PlayerProgress extends Equatable {
     int? maxStreak,
     List<String>? seenChapterIntros,
     bool? campaignCompletionSeen,
+    int? avatarIconIndex,
+    int? avatarFrameIndex,
+    String? activeTitle,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -169,6 +206,9 @@ class PlayerProgress extends Equatable {
       seenChapterIntros: seenChapterIntros ?? this.seenChapterIntros,
       campaignCompletionSeen:
           campaignCompletionSeen ?? this.campaignCompletionSeen,
+      avatarIconIndex: avatarIconIndex ?? this.avatarIconIndex,
+      avatarFrameIndex: avatarFrameIndex ?? this.avatarFrameIndex,
+      activeTitle: activeTitle ?? this.activeTitle,
     );
   }
 
@@ -191,6 +231,9 @@ class PlayerProgress extends Equatable {
       'maxStreak': maxStreak,
       'seenChapterIntros': seenChapterIntros,
       'campaignCompletionSeen': campaignCompletionSeen,
+      'avatarIconIndex': avatarIconIndex,
+      'avatarFrameIndex': avatarFrameIndex,
+      'activeTitle': activeTitle,
     };
   }
 
@@ -218,6 +261,11 @@ class PlayerProgress extends Equatable {
           (json['seenChapterIntros'] as List?)?.map((e) => e as String).toList() ??
               const [],
       campaignCompletionSeen: (json['campaignCompletionSeen'] as bool?) ?? false,
+      // Fase 1B-B: default sensati per i save vecchi (mago + viola,
+      // nessun titolo). Indici fuori range clampati dai getter.
+      avatarIconIndex: (json['avatarIconIndex'] as num?)?.toInt() ?? 0,
+      avatarFrameIndex: (json['avatarFrameIndex'] as num?)?.toInt() ?? 0,
+      activeTitle: (json['activeTitle'] as String?) ?? '',
     );
   }
 
@@ -356,5 +404,8 @@ class PlayerProgress extends Equatable {
     maxStreak,
     seenChapterIntros,
     campaignCompletionSeen,
+    avatarIconIndex,
+    avatarFrameIndex,
+    activeTitle,
   ];
 }

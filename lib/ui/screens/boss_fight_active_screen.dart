@@ -87,6 +87,26 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
         // Senza PlayerViewModel (es. test): nessun XP, ma la vittoria resta.
       }
       if (!context.mounted) return;
+      // Titolo capitolo (Fase 1B-B): il boss si sfida solo a capitolo
+      // intero, quindi `chapterCompleted` + vittoria = titolo vinto.
+      String? newTitle;
+      try {
+        final playerVm = context.read<PlayerViewModel>();
+        if (playerVm.checkAndAwardTitleForBoss(
+          boss.id,
+          chapterComplete: widget.chapterCompleted,
+        )) {
+          newTitle = playerVm.progress.activeTitle;
+        }
+      } catch (_) {
+        newTitle = null;
+      }
+      if (!context.mounted) return;
+      if (newTitle != null && newTitle.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('🏅 Nuovo titolo: $newTitle!')),
+        );
+      }
       int? levelAfter;
       try {
         levelAfter = context.read<PlayerViewModel>().progress.level;
@@ -589,6 +609,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
+              _buildVictoryTitle(context),
             ],
             const SizedBox(height: 32),
             if (_rewardClaimed) ...[
@@ -624,6 +645,31 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  /// Titolo vinto (Fase 1B-B): mostrato nella schermata di vittoria se
+  /// il giocatore ne ha uno attivo. Nascosto senza PlayerViewModel.
+  Widget _buildVictoryTitle(BuildContext context) {
+    String title = '';
+    try {
+      title = context.watch<PlayerViewModel>().progress.activeTitle;
+    } catch (_) {
+      return const SizedBox.shrink();
+    }
+    if (title.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Text(
+        '🏅 $title',
+        key: const Key('victory_title'),
+        style: const TextStyle(
+          fontSize: 16,
+          fontStyle: FontStyle.italic,
+          color: Colors.deepPurple,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

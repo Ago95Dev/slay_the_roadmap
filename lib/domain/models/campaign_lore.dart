@@ -75,6 +75,42 @@ const List<String> campaignBossIds = [
   'spaghetti_colossus',
 ];
 
+/// Titoli per capitolo (Fase 1B-B): assegnati al completamento del
+/// capitolo (tutti i topic + boss sconfitto). L'ultimo vinto è attivo.
+const Map<String, String> chapterTitles = {
+  'web_network': 'Sentinella della Rete',
+  'web_data': 'Custode dei Dati',
+  'web_building': 'Architetto del Web',
+};
+
+/// Capitolo di appartenenza di un boss finale.
+String? chapterIdForBossId(String bossId) {
+  switch (bossId) {
+    case 'man_in_the_middle':
+      return 'web_network';
+    case 'the_amnesiac':
+      return 'web_data';
+    case 'spaghetti_colossus':
+      return 'web_building';
+    default:
+      return null;
+  }
+}
+
+/// Boss finale di un capitolo root.
+String? bossIdForChapterId(String chapterId) {
+  switch (chapterId) {
+    case 'web_network':
+      return 'man_in_the_middle';
+    case 'web_data':
+      return 'the_amnesiac';
+    case 'web_building':
+      return 'spaghetti_colossus';
+    default:
+      return null;
+  }
+}
+
 /// Capitolo di appartenenza di un topic (root o subtopic).
 String? chapterIdForTopicId(String topicId) {
   switch (topicId) {

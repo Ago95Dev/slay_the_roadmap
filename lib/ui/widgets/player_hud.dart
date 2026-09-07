@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 
 import '../animations/dungeon_motion.dart';
 import '../../domain/models/player_progress.dart';
+import 'avatar_picker.dart';
 
 /// HUD globale del giocatore (F6): XP bar + "Livello N" + XP mancanti
 /// al prossimo livello. Unica fonte: [PlayerProgress] (stesse soglie
 /// dell'Hub futuro: L1 0 / L2 100 / L3 500).
+///
+/// Fase 1B-B: mostra anche l'avatar (badge con cornice) e il titolo
+/// attivo sotto il livello (se vinto).
 ///
 /// La barra XP si muove con Tween tra un valore e l'altro (300ms,
 /// one-shot); rispetta `MediaQuery.disableAnimations`.
@@ -52,12 +56,31 @@ class _PlayerHudState extends State<PlayerHud> {
         children: [
           Row(
             children: [
-              Text(
-                'Livello $level',
-                key: const Key('player_hud_level'),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+              AvatarBadge(progress: widget.progress, size: 40),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Livello $level',
+                      key: const Key('player_hud_level'),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
+                    if (widget.progress.activeTitle.isNotEmpty)
+                      Text(
+                        '🏅 ${widget.progress.activeTitle}',
+                        key: const Key('player_hud_title'),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontStyle: FontStyle.italic,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                  ],
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(

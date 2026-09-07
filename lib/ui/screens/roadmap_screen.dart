@@ -177,8 +177,31 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     ).then((_) async {
       if (!mounted) return;
       context.read<RoadmapViewModel>().reevaluateUnlocks();
+      // Rete di sicurezza titoli (Fase 1B-B): ricalcola su tutti i
+      // capitoli (copre i casi in cui la victory screen non aveva
+      // PlayerViewModel o il capitolo si è chiuso dopo).
+      _awardEarnedTitles();
       await _maybeShowCampaignComplete();
     });
+  }
+
+  /// Assegna ogni titolo di capitolo meritato (capitolo intero + boss
+  /// sconfitto) e ancora non attivo. Ultimo vinto = attivo.
+  void _awardEarnedTitles() {
+    final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+    if (playerVm == null) return;
+    final roadmapVm = context.read<RoadmapViewModel>();
+    if (roadmapVm.topics.isEmpty) return;
+    for (final chapterId in chapterIds) {
+      final chapter = _findTopic(roadmapVm.topics, chapterId);
+      final bossId = bossIdForChapterId(chapterId);
+      if (chapter == null || bossId == null) continue;
+      playerVm.checkAndAwardChapterTitle(
+        chapterId,
+        chapterComplete: chapter.isChapterComplete,
+        bossDefeated: playerVm.isBossDefeated(bossId),
+      );
+    }
   }
 
   /// Finale campagna (Fase 1B-A): tutti i capitoli completi + tutti i
@@ -202,8 +225,11 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     final progress = playerVm.progress;
     final defeated =
         campaignBossIds.where(playerVm.isBossDefeated).length;
+    final titleLine = progress.activeTitle.isNotEmpty
+        ? '🏅 ${progress.activeTitle}\n'
+        : '';
     final stats =
-        'XP: ${progress.experience} • Livello ${progress.level}\n'
+        '${titleLine}XP: ${progress.experience} • Livello ${progress.level}\n'
         'Serie migliore: x${progress.maxStreak}\n'
         'Boss sconfitti: $defeated/${campaignBossIds.length}';
     return showPopDialog<void>(

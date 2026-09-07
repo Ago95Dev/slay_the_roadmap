@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/quiz.dart';
 import '../../domain/models/reward.dart';
@@ -68,6 +69,34 @@ class TopicDetailScreen extends StatelessWidget {
                   );
                   if (playerVm != null) {
                     final leveledUp = playerVm.addCompletedTopic(topic.id);
+                    // Titolo capitolo (Fase 1B-B): se questo quiz chiudeva
+                    // il capitolo E il boss è già sconfitto, assegna ora
+                    // il titolo (altrimenti arriverà alla vittoria boss).
+                    final chapterId = chapterIdForTopicId(topic.id);
+                    if (chapterId != null) {
+                      final chapter = _findChapter(vm.topics, chapterId);
+                      final bossId = bossIdForChapterId(chapterId);
+                      if (chapter != null &&
+                          bossId != null &&
+                          chapter.isChapterComplete &&
+                          playerVm.isBossDefeated(bossId)) {
+                        if (playerVm.checkAndAwardChapterTitle(
+                          chapterId,
+                          chapterComplete: true,
+                          bossDefeated: true,
+                        )) {
+                          if (!context.mounted) return;
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '🏅 Nuovo titolo: '
+                                '${playerVm.progress.activeTitle}!',
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    }
                     if (leveledUp) {
                       if (!context.mounted) return;
                       // F6: level-up mostrato una sola volta (al crossing).
@@ -231,8 +260,15 @@ class TopicDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatusBadge() {
-    Color backgroundColor;
+  /// Cerca il capitolo root [chapterId] nei topic della roadmap.
+  Topic? _findChapter(List<Topic> topics, String chapterId) {
+    for (final topic in topics) {
+      if (topic.id == chapterId) return topic;
+    }
+    return null;
+  }
+
+  Widget _buildStatusBadge() {    Color backgroundColor;
     Color textColor;
     String statusText;
 

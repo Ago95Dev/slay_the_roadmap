@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 import '../animations/dungeon_motion.dart';
+import '../widgets/avatar_picker.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
 import 'settings_screen.dart';
@@ -40,6 +41,10 @@ class HomeScreen extends StatelessWidget {
               children: [
                 // Subtitle Section
                 _buildSubtitleSection(context),
+                const SizedBox(height: 12),
+
+                // Avatar (Fase 1B-B): badge + nome + titolo + cambia.
+                _buildAvatarSection(context),
                 const SizedBox(height: 12),
 
                 // HUD globale (F6): XP bar + livello sotto il titolo.
@@ -85,6 +90,44 @@ class HomeScreen extends StatelessWidget {
         ),
         textAlign: TextAlign.center,
       ),
+    );
+  }
+
+  Widget _buildAvatarSection(BuildContext context) {
+    final progress = context.watch<PlayerViewModel>().progress;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AvatarBadge(progress: progress, size: 56),
+        const SizedBox(width: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              progress.playerName,
+              key: const Key('home_player_name'),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            if (progress.activeTitle.isNotEmpty)
+              Text(
+                '🏅 ${progress.activeTitle}',
+                key: const Key('home_player_title'),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontStyle: FontStyle.italic,
+                    ),
+              ),
+          ],
+        ),
+        const SizedBox(width: 12),
+        OutlinedButton(
+          key: const Key('home_avatar_edit'),
+          onPressed: () => showAvatarPicker(context),
+          child: const Text('Cambia'),
+        ),
+      ],
     );
   }
 
