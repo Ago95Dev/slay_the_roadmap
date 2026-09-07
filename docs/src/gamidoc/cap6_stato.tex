@@ -1,13 +1,26 @@
 \chapter{Stato implementazione (onesto)}
 \label{g:stato}
-\textbf{Oggi gira in locale}: roadmap ad albero (US-01), quiz 12$\times$5 con
-soglia 80\% e feedback (US-02), scelta ricompensa e deck (US-03 parziale),
-boss fight locale con soglie/danni/veleno (US-04 prototipo), build Linux,
-analyze 0 error, test 7/7 (stato P0, commit \texttt{origin/main 24d8aa3}).
-\textbf{Va su Hub in futuro}: persistenza (US-05), economia chiusa
-(XP/level reali, energia/vite), leaderboard e badge come collezioni,
-regole Drools validate via Swagger. \textbf{Manca}: UI ricompense completa,
-HUD XP/level, \texttt{reward\_repository} collegato, pulizia stub
-(\texttt{\_startQuiz}, \texttt{onPressed} vuoto), TODO victory, dettagli
-topic 5/12, schermate \texttt{ComingSoon}. Nessun dato utente è inventato:
-le sezioni di valutazione restano placeholder (Cap.~\ref{g:valutazione}).
+
+\section{Cosa gira davvero}
+App Flutter offline-first: roadmap 3 capitoli $\times$ 3 topic + boss
+finali (12 nodi quiz da 5 domande, soglia 80\,\%), reward 1-di-3 per tipo,
+boss 10 HP / giocatore 3 HP / energia 3 con quiz-danno, vite 3, streak
++25/3, XP/livelli 0/100/500, save locale SharedPreferences, animazioni
+sobrie. Hub: eventi \texttt{quiz\_completed}/\texttt{boss\_defeated}
+best-effort con XP/badge/livelli remoti e fallback offline completo.
+
+\section{Tagli dichiarati (future work)}
+Dichiarati nel piano (\S2) e NON implementati: social/leaderboard locale,
+shop/coins, classi, login/signup (playerId locale fisso), roadmap extra,
+profilo/achievement avanzati, eventi testuali random, branching di
+campagna, difficolt\`a adattiva oltre la pesca boss, monthly quest/login
+reward, animazioni extra. Voci mockup M1 Sign-in e M2 Option2: rimosse o
+disattivate.
+
+\medskip
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+\textbf{DA COMPLETARE (Fase 1B B--E, in corso).} A chiusura delle voci
+B (titoli + avatar), C (passive uniche boss), D (leaderboard Hub) ed E
+(daily reward) aggiornare l'elenco ``cosa gira'' con i numeri reali
+implementati e i test corrispondenti. Nessun comportamento futuro va
+descritto al presente.}}

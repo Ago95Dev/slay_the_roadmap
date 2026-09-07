@@ -1,13 +1,36 @@
 \chapter{Gamification}
 \label{g:gamification}
-Elementi implementati o specificati: punti XP (+100/level), badge di topic,
-level (oggi fisso a 1, curva da definire), collezioni (deck max 6+2),
-vite/energia, streak (da tracciare). Octalysis (score 169: CD3 7, CD7 7,
-CD1 5, CD2 5, CD4 3, CD5 2, CD6 2, CD8 2) e Toda (6 righe: Performance
-Levels/Streaks; Social Leaderboards(?); Immersion Avatar; Economy
-Hearts/Energy/Cards/Skills/XP/Coins; Personalization Custom path/Many
-choices; Feedback Progress bar/XP notif/Correct answer feedback) sono
-documentati in \texttt{aspetti\_teorici.pdf} e qui applicati: CD3/CD7 nel
-deck e nei quiz adattivi, CD2 nella soglia 80\%, CD4 nel possesso carte,
-CD8 nel rischio boss. Restano mock (leaderboard, economia chiusa) e
-migreranno su Hub (Cap.~\ref{g:stato}).
+
+\section{Meccaniche e dinamiche (Molina/Toda)}
+Gli elementi implementati, classificati secondo la tassonomia di Toda et
+al.~\cite{toda}:
+\begin{itemize}
+\item \textbf{Performance}: punti XP, livelli (0/100/500), streak (+25/3),
+soglia quiz 80\,\%, feedback immediato con explanation come hint dopo
+errori ripetuti.
+\item \textbf{Ecological}: vite (3), energia boss (3/turno), economia chiusa
+senza valuta acquistabile.
+\item \textbf{Personal}: collezione carte (deck da ricompense 1-di-3),
+badge di topic e di boss, progressione a capitoli con prerequisiti.
+\item \textbf{Fictional}: narrativa dei tre boss e del dungeon-roadmap.
+\item \textbf{Social}: tagliato (vedi Cap.~\ref{g:stato}); nessuna
+leaderboard locale, nessuna condivisione.
+\end{itemize}
+
+\section{Lente Octalysis}
+Lettura secondo Chou~\cite{chou}: il nucleo \`e
+\textbf{Sviluppo/Realizzazione (CD2)} nella soglia 80\,\% e nei livelli,
+\textbf{Creativit\`a/Feedback (CD3)} nella scelta 1-di-3 e nel deck,
+\textbf{Possesso (CD4)} nelle carte e nei badge,
+\textbf{Imprevedibilit\`a (CD7)} nella pesca boss dai topic del capitolo,
+\textbf{Perdita (CD8)} nel rischio boss (retry senza XP).
+Significato/Narrativa (CD1) \`e coperto dalla lore dei boss; Influenza
+sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope.
+
+\medskip
+\noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
+\textbf{DA COMPLETARE (Fase 1B, in corso).} Le voci A--E del piano
+(narrativa CD1 estesa con intro/finale per capitolo, titoli + avatar,
+passive uniche dei boss, leaderboard Hub CD5, daily reward CD6) sono in
+corso di implementazione e NON sono ancora riflesse in questo capitolo.
+Questo paragrafo sar\`a aggiornato a chiusura della Fase 1B.}}

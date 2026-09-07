@@ -1,19 +1,49 @@
 \chapter{Game behavior}
 \label{g:behavior}
-Il core loop, con durate dal GamiDOC di riferimento
-(\textit{gamidoc\_5}):
 
+\section{Core loop}
 \begin{enumerate}
-\item \textbf{Studio} (6--8\,min): pagina topic con link opzionali.
-\item \textbf{Quiz} (3--5 domande, soglia 80\%, tentativi illimitati ma
-penalizzati): superarlo sblocca il topic successivo + 1 carta.
-\item \textbf{Deck} (2--3 carte per sessione): scelta e combinazione carte.
-\item \textbf{Boss} (10--15\,min): turni alterni carte/quiz contro Gargoyle
-(150\,HP), StackOverflow (200\,HP), Async, WidgetTitan (250\,HP).
+\item \textbf{Studio}: pagina di dettaglio del topic (testo breve + link
+opzionali). Nessun timer.
+\item \textbf{Quiz}: 5 domande a risposta multipla, soglia di superamento
+\textbf{80\,\% (4/5)}. I tentativi sono illimitati ma penalizzati (nessuna
+XP in caso di sconfitta/ripetizione fallita, perdita di vite nel boss).
+\item \textbf{Ricompensa}: a quiz superato, scelta \textbf{1-di-3} carte
+(per tipo di ricompensa). Una sola ricompensa per topic; inventario visibile.
+\item \textbf{Avanzamento}: lo sblocco del nodo successivo lungo la roadmap;
+a fine capitolo, \textbf{boss fight}.
 \end{enumerate}
 
-Regole numeriche: energia minima 3 per giocare, 3 vite; carte Common 6,
-Rare 10, Epic 16 + Perf 5, Legendary 25 + Crit 25\%; soglie boss 25/50/75\%
-con cambio pattern. Mockup M1--M7 (\texttt{docs/legacy/3\_Mockups.pdf}) fissano le
-schermate: Home, Pick a PATH, Roadmap (99\,XP, vite 3/5, energia 5/5),
-Topic, Boss carte/quiz, Deck (Level 12 Rogue, Energy 4, 6+2 carte, 2+2 skill).
+\section{Boss fight}
+Combattimento a turni con numeri reali (stato vero implementato):
+\begin{itemize}
+\item Boss: \textbf{10 HP}; giocatore: \textbf{3 HP}; \textbf{vite totali 3}.
+\item \textbf{Energia 3 per turno} (1 per carta giocata).
+\item A fine turno quiz obbligatorio: risposta giusta = danno al boss
+(quiz-danno), risposta errata = danno al giocatore.
+\item Vittoria: 1 ricompensa a scelta, sblocco del capitolo successivo,
+badge del boss. Sconfitta: retry a HP pieni, senza XP.
+\end{itemize}
+I tre boss (con lore di una riga dalla campagna Web):
+\begin{itemize}
+\item \textbf{Man-in-the-Middle} (cap.~1): ``vive nei Wi-Fi aperti e legge
+ci\`o che non \`e cifrato'';
+\item \textbf{The Amnesiac} (cap.~2): ``ha cancellato la memoria del web: ti
+costringe a ricordare tutto da solo, tra bigliettini, sessioni e copie
+stantie'';
+\item \textbf{Spaghetti Colossus} (cap.~3): ``un ammasso di pagine copiate e
+mai versionate: ogni modifica spezza qualcos'altro''.
+\end{itemize}
+I quiz del boss sono adattivi: pescati dai 3 topic del capitolo.
+
+\section{Economie numeriche locali}
+\begin{itemize}
+\item \textbf{XP/livelli}: soglie \textbf{L1 0 / L2 100 / L3 500}, identiche
+a quelle dell'Hub cos\`i che locale e remoto coincidano.
+\item \textbf{Streak}: bonus \textbf{+25 XP ogni 3 successi consecutivi}.
+\item \textbf{Vite}: 3. \textbf{Save locale}: SharedPreferences
+(\texttt{Save v1}: nodi completati, deck, XP, livello, boss sbloccati;
+\texttt{Continue} ripristina, \texttt{New Run} azzera con conferma).
+\item \textbf{Animazioni}: sobrie (transizioni essenziali, niente effetti
+extra).
+\end{itemize}

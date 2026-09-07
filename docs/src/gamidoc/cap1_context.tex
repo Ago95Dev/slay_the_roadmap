@@ -1,11 +1,59 @@
 \chapter{Context}
 \label{g:context}
-Slay the Roadmap / Slay the Code è un dungeon crawler didattico per
-l'apprendimento di Dart/Flutter (team D'Agostino 303226 + Di Giacomo 303377,
-corso EGS 2025/2026). Pubblico: studenti di programmazione con basi deboli
-di Dart; bisogno: trasformare una roadmap piatta in un percorso motivante
-con feedback immediato. Framing (slide \textit{Slay\_The\_Roadmap\_EGS2025}):
-il \textbf{Dungeon è la Roadmap}, i \textbf{Monsters sono i Topics}, le
-\textbf{Cards sono i Concepts}. Visione: \textbf{Dual Progression} (crescono
-insieme il giocatore e il suo deck) con futura \textbf{Boss Creator} per
-docenti e community.
+
+\section{Concept}
+Slay the Roadmap / Slay the Code \`e un dungeon crawler didattico
+offline-first realizzato in Flutter. La \textbf{roadmap \`e il dungeon},
+i \textbf{topic sono i mostri/stanze}, le \textbf{carte-ricompensa sono il
+bottino}. Il giocatore studia un topic, supera un quiz e avanza lungo la
+roadmap fino al boss di capitolo. La campagna implementata \`e quella
+\textbf{Web -- fondamenta} (file
+\texttt{docs/assignment/campagna\_web.md}): zero sintassi, solo modelli
+mentali (perch\'e/come/cosa-succede-se), quiz in italiano.
+
+\section{Obiettivi didattici}
+\begin{itemize}
+\item Costruire i modelli mentali del Web prima della sintassi: come viaggiano
+le informazioni (rete), cosa sono e dove vivono (dati e stato), come si
+trasformano in pagine e si spediscono agli utenti (costruire).
+\item Dare feedback immediato e motivante: ogni quiz superato sblocca il nodo
+successivo e assegna una ricompensa; ogni capitolo si chiude con un boss.
+\item Rendere misurabile il progresso sia in locale (XP, livelli, vite,
+streak, save) sia sul Gamification Hub (XP, badge, livelli remoti).
+\end{itemize}
+
+\section{Target users}
+Studenti di programmazione con basi deboli o nulle di tecnologie Web, che
+devono orientarsi prima di scrivere codice. Non si assume conoscenza di
+HTTP, DNS, JSON, DOM o git: i testi dei topic partono dalle idee e i link
+di approfondimento (MDN, Cloudflare, web.dev, roadmap.sh) sono opzionali.
+Il gioco \`e pensato per sessioni brevi (pochi minuti per topic) e per
+essere rigiocabile da zero (New Run).
+
+\section{Struttura della campagna}
+Tre capitoli, ciascuno con un inquadramento (root) + 3 topic + 1 boss
+finale, per un totale di 12 nodi quiz. Tutti gli ID sono stabili in
+snake\_case (Tab.~\ref{tab:mappa}).
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lll}
+\toprule
+Capitolo & Nodi (root + 3 topic) & Boss \\
+\midrule
+1 -- La Rete & \texttt{web\_network}, \texttt{net\_client\_server},
+\texttt{net\_dns\_url}, \texttt{net\_http\_https} & \texttt{man\_in\_the\_middle} \\
+2 -- Dati e Stato & \texttt{web\_data}, \texttt{data\_represent},
+\texttt{data\_where}, \texttt{data\_state} & \texttt{the\_amnesiac} \\
+3 -- Costruire sul Web & \texttt{web\_building}, \texttt{build\_browser},
+\texttt{build\_framework}, \texttt{build\_ship} & \texttt{spaghetti\_colossus} \\
+\bottomrule
+\end{tabular}
+\caption{Mappa stabile della campagna Web.}
+\label{tab:mappa}
+\end{table}
+
+\noindent Prerequisiti a catena: il capitolo 2 richiede la sconfitta di
+\texttt{man\_in\_the\_middle}, il capitolo 3 quella di
+\texttt{the\_amnesiac}. Ogni quiz (inclusi i root) ha ID
+\texttt{quiz\_\textless topic\textgreater} e contiene 5 domande.

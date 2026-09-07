@@ -1,10 +1,48 @@
-\chapter{Architettura (rimando)}
+\chapter{Architettura e scelte tecniche}
 \label{g:arch}
-Per l'architettura software completa (3-layer Provider, tabelle
-file $\rightarrow$ responsabilità, modello di dominio, repository, flussi UI,
-integrazione Hub, verifica P0, debiti) si veda il documento gemello
-\texttt{specifica.pdf}. Qui si fissa solo il vincolo di design: ogni regola
-di gamification deve corrispondere a una \textit{action} Hub
-(\texttt{complete\_quiz}, \texttt{unlock\_topic}, \texttt{boss\_hit},
-\texttt{earn\_card}) così che il GamiDOC resti la fonte di verità dei
-parametri (soglie, danni, HP, costi).
+App Flutter offline-first. L'architettura \`e descritta qui solo a testo
+(nessun diagramma complesso); per i dettagli implementativi si rimanda al
+documento gemello \texttt{specifica.pdf}.
+
+\section{Layer}
+\begin{itemize}
+\item \textbf{UI + Provider}: schermate (home, roadmap, topic, quiz,
+ricompensa, boss) con view-model Provider; un'unica fonte di verit\`a
+locale per il progresso (\texttt{PlayerProgress}: XP, livello, vite,
+streak, deck, sblocchi).
+\item \textbf{Repository}: \texttt{roadmap\_repository} (seed: 3 root + 9
+sub, prerequisiti a catena, \texttt{bossId}/\texttt{requiredBossId}),
+\texttt{topic\_detail\_repository} (12 testi),
+\texttt{quiz\_repository} (12 quiz da 5 domande),
+\texttt{boss\_repository} (nomi, lore, quiz adattivi del capitolo),
+\texttt{reward\_repository} (scelta 1-di-3, limite 1/topic),
+\texttt{persistence\_repository} (save locale \texttt{Save v1} su
+SharedPreferences).
+\item \textbf{Engine}: logica di combattimento (HP 10 vs 3, energia 3,
+quiz-danno) e regole di sblocco/XP/streak/livelli isolate dai widget.
+\item \textbf{Hub client con fallback}: \texttt{EngineClient} reale e
+\texttt{FakeEngineClient} offline. Senza credenziali a runtime non parte
+alcuna chiamata di rete e l'app \`e identica (offline-first).
+\end{itemize}
+
+\section{Integrazione Hub (contratto)}
+Game \textbf{Slay The Code} su console Hub
+(\texttt{gameId = 6a9dbf66cc89679981fe7893}, owner \texttt{slay}), API
+\texttt{gamification-api.createlab-univaq.it/api/v1}~\cite{hub}.
+Risorse: action \texttt{quiz\_completed}, \texttt{claim\_reward},
+\texttt{boss\_defeated}; Point \texttt{xp}; Level \texttt{experience} su
+\texttt{xp} (L1 0, L2 100, L3 500); collezione badge \texttt{slay\_badges};
+rule \texttt{quiz\_xp}, \texttt{topic\_badge}, \texttt{boss\_badge}.
+Eventi inviati best-effort dai view-model di quiz e boss, solo a quiz
+superato (soglia 80\,\% verificata in app), con \texttt{data} sempre
+presente in snake\_case (es.\ \texttt{xp\_amount}, \texttt{badge}).
+Autenticazione a runtime via \texttt{--dart-define} (Bearer 24h),
+credenziali mai nel repo; \texttt{playerId} locale tipo
+\texttt{slay\_\textless uuid\textgreater} salvato in SharedPreferences.
+
+\section{Scelte tecniche}
+Flutter + Provider per semplicit\`a e testabilit\`a; persistenza locale su
+SharedPreferences (nessun backend proprio); Hub come unico servizio
+remoto, usato solo come specchio di XP/badge/livelli con fallback totale.
+Ogni regola di gamification corrisponde a una action Hub, cos\`i che il
+GamiDOC resti fonte di verit\`a dei parametri (soglie, danni, HP, costi).
