@@ -39,6 +39,18 @@ class PlayerProgress extends Equatable {
   /// Serie di quiz topic passati di fila (default 0, persistita).
   final int streak;
 
+  /// Miglior serie di quiz passati di fila (default 0, persistita).
+  final int maxStreak;
+
+  /// Intro capitoli già mostrate (Fase 1B-A, default [], persistite):
+  /// ogni intro appare una sola volta per save, fino a New Run.
+  final List<String> seenChapterIntros;
+
+  /// Finale campagna già mostrato (Fase 1B-A, default false, persistito):
+  /// la schermata "Campagna completata!" appare una volta per
+  /// completamento, non a ogni apertura della roadmap.
+  final bool campaignCompletionSeen;
+
   /// Livello derivato da [experience] (F6: niente più level salvato).
   int get level => levelForXp(experience);
 
@@ -80,6 +92,9 @@ class PlayerProgress extends Equatable {
     required this.lastSaved,
     this.lives = maxLives,
     this.streak = 0,
+    this.maxStreak = 0,
+    this.seenChapterIntros = const [],
+    this.campaignCompletionSeen = false,
   });
 
   factory PlayerProgress.initial() {
@@ -135,6 +150,9 @@ class PlayerProgress extends Equatable {
     DateTime? lastSaved,
     int? lives,
     int? streak,
+    int? maxStreak,
+    List<String>? seenChapterIntros,
+    bool? campaignCompletionSeen,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -147,6 +165,10 @@ class PlayerProgress extends Equatable {
       lastSaved: lastSaved ?? this.lastSaved,
       lives: lives ?? this.lives,
       streak: streak ?? this.streak,
+      maxStreak: maxStreak ?? this.maxStreak,
+      seenChapterIntros: seenChapterIntros ?? this.seenChapterIntros,
+      campaignCompletionSeen:
+          campaignCompletionSeen ?? this.campaignCompletionSeen,
     );
   }
 
@@ -166,6 +188,9 @@ class PlayerProgress extends Equatable {
       'lastSaved': lastSaved.toIso8601String(),
       'lives': lives,
       'streak': streak,
+      'maxStreak': maxStreak,
+      'seenChapterIntros': seenChapterIntros,
+      'campaignCompletionSeen': campaignCompletionSeen,
     };
   }
 
@@ -188,6 +213,11 @@ class PlayerProgress extends Equatable {
       // Campi aggiunti dopo il save v1: default per i save vecchi.
       lives: (json['lives'] as num?)?.toInt() ?? maxLives,
       streak: (json['streak'] as num?)?.toInt() ?? 0,
+      maxStreak: (json['maxStreak'] as num?)?.toInt() ?? 0,
+      seenChapterIntros:
+          (json['seenChapterIntros'] as List?)?.map((e) => e as String).toList() ??
+              const [],
+      campaignCompletionSeen: (json['campaignCompletionSeen'] as bool?) ?? false,
     );
   }
 
@@ -323,5 +353,8 @@ class PlayerProgress extends Equatable {
     lastSaved,
     lives,
     streak,
+    maxStreak,
+    seenChapterIntros,
+    campaignCompletionSeen,
   ];
 }

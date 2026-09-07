@@ -4,3 +4,4 @@ export 'reward.dart';
 export 'boss_fight.dart';
 export 'player_progress.dart';
 export 'topic_detail.dart';
+export 'campaign_lore.dart';

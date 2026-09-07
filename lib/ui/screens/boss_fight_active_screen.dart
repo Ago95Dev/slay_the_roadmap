@@ -33,6 +33,12 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
   bool _rewardClaimed = false;
   bool _defeatRecorded = false;
 
+  /// La vittoria è registrata all'arrivo sulla schermata (una sola volta),
+  /// NON al claim: chiudere senza riscattare non perde più la vittoria
+  /// (root cause del bug endgame: il Colossus restava sfidabile).
+  /// Il claim resta separato (solo reward via RewardChoiceScreen).
+  bool _victoryRecorded = false;
+
   List<Reward> _inventoryRewards(BuildContext context) {
     try {
       return context.read<PlayerViewModel>().inventory.rewards;
@@ -59,6 +65,40 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       textAlign: TextAlign.center,
     );
+  }
+
+  /// Registra la vittoria UNA sola volta all'arrivo (post-frame per
+  /// non mutare lo stato durante il build). +100 XP solo alla prima
+  /// vittoria per boss (logica in `recordBossVictory`); il level-up si
+  /// mostra qui confrontando il level prima/dopo.
+  void _recordVictoryOnce(BuildContext context, BossFight boss) {
+    if (_victoryRecorded) return;
+    _victoryRecorded = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      int? levelBefore;
+      try {
+        levelBefore = context.read<PlayerViewModel>().progress.level;
+      } catch (_) {
+        levelBefore = null;
+      }
+      try {
+        context.read<PlayerViewModel>().recordBossVictory(boss);
+      } catch (_) {
+        // Senza PlayerViewModel (es. test): nessun XP, ma la vittoria resta.
+      }
+      if (!context.mounted) return;
+      int? levelAfter;
+      try {
+        levelAfter = context.read<PlayerViewModel>().progress.level;
+      } catch (_) {
+        levelAfter = null;
+      }
+      if (levelBefore != null &&
+          levelAfter != null &&
+          levelAfter > levelBefore) {
+        await showLevelUpDialog(context, levelAfter);
+      }
+    });
   }
 
   /// Addebita -1 vita UNA sola volta per sconfitta (post-frame per
@@ -508,6 +548,7 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
     BossFightViewModel viewModel,
     BossFight boss,
   ) {
+    _recordVictoryOnce(context, viewModel.currentBoss ?? boss);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -588,8 +629,11 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
   }
 
   /// Vittoria: riusa RewardChoiceScreen con le availableRewards del boss.
-  /// Il tap su una carta chiama claimReward(bossId) dentro la schermata;
-  /// al ritorno si registra la vittoria (+100 XP solo la prima volta).
+  /// La vittoria è già registrata all'arrivo (`_recordVictoryOnce`): qui
+  /// solo il claim della reward (il tap chiama claimReward dentro la
+  /// schermata). Rete di sicurezza: se la registrazione fosse mancata
+  /// (es. PlayerViewModel assente all'arrivo), la si ripete qui —
+  /// idempotente, senza doppio XP.
   /// Sconfitta: nessuna reward/XP (solo retry con retryBattle).
   Future<void> _claimVictoryReward(
     BuildContext context,
@@ -606,14 +650,6 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
       ),
     );
     if (!context.mounted || reward == null) return;
-    // F6: level-up (solo alla prima vittoria, unica a dare +100 XP)
-    // mostrato una sola volta confrontando il level prima/dopo.
-    int? levelBefore;
-    try {
-      levelBefore = context.read<PlayerViewModel>().progress.level;
-    } catch (_) {
-      levelBefore = null;
-    }
     try {
       context.read<PlayerViewModel>().recordBossVictory(
             viewModel.currentBoss ?? boss,
@@ -622,16 +658,6 @@ class _BossFightActiveScreenState extends State<BossFightActiveScreen> {
       // Senza PlayerViewModel (es. test): nessun XP, ma la vittoria resta.
     }
     if (!context.mounted) return;
-    int? levelAfter;
-    try {
-      levelAfter = context.read<PlayerViewModel>().progress.level;
-    } catch (_) {
-      levelAfter = null;
-    }
-    if (levelBefore != null && levelAfter != null && levelAfter > levelBefore) {
-      await showLevelUpDialog(context, levelAfter);
-      if (!context.mounted) return;
-    }
     setState(() {
       _rewardClaimed = true;
     });

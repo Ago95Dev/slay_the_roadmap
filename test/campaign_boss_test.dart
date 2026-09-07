@@ -225,6 +225,11 @@ void main() {
       await tester.tap(find.byKey(const Key('boss_tile_man_in_the_middle')));
       await tester.pumpAndSettle();
 
+      // Lore pre-fight (Fase 1B-A): dialog con Combatti/Indietro.
+      expect(find.byKey(const Key('boss_lore_dialog')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('boss_lore_fight')));
+      await tester.pumpAndSettle();
+
       expect(find.byType(BossFightActiveScreen), findsOneWidget);
       expect(find.text('Man-in-the-Middle'), findsWidgets);
     });

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/topic.dart';
 import '../../data/repositories/roadmap_repository.dart';
 
@@ -80,6 +81,21 @@ class RoadmapViewModel with ChangeNotifier {
   /// Torna allo stato iniziale (Nuovo percorso / Reset): ricarica dal
   /// repository, i cui dati seed non vengono mai mutati dal ViewModel.
   Future<void> resetToInitial() => loadRoadmap();
+
+  /// Finale campagna (Fase 1B-A): true se tutti i capitoli sono
+  /// interamente completati E tutti i boss sono sconfitti. Di default
+  /// usa il lookup [isBossDefeated] del ViewModel (le vittorie reali).
+  bool isCampaignComplete([bool Function(String bossId)? defeated]) {
+    final isDefeated = defeated ?? isBossDefeated;
+    for (final chapterId in chapterIds) {
+      final chapter = _findTopic(chapterId);
+      if (chapter == null || !chapter.isChapterComplete) return false;
+    }
+    for (final bossId in campaignBossIds) {
+      if (!isDefeated(bossId)) return false;
+    }
+    return true;
+  }
 
   /// Ricalcola gli unlock su tutti i topic locked (gate di campagna):
   /// chiamato al rientro dalla vittoria contro un boss, quando i

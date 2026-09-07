@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../data/repositories/boss_repository.dart';
+import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/topic.dart';
 import '../view_models/boss_fight_view_model.dart';
 import '../view_models/player_view_model.dart';
@@ -19,11 +20,16 @@ class RoadmapScreen extends StatefulWidget {
 }
 
 class _RoadmapScreenState extends State<RoadmapScreen> {
+  /// Guardia anti-doppio dialog del finale (rebuild durante l'apertura).
+  bool _campaignDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<RoadmapViewModel>().loadRoadmap();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<RoadmapViewModel>().loadRoadmap();
+      if (!mounted) return;
+      await _maybeShowCampaignComplete();
     });
   }
 
@@ -42,6 +48,33 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
         ),
       );
       return;
+    }
+
+    // Intro capitolo (Fase 1B-A): alla prima apertura del capitolo per
+    // save, prima del dettaglio; poi mai più fino a New Run.
+    final chapterId = chapterIdForTopicId(topicId);
+    if (chapterId != null) {
+      final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+      if (playerVm != null && !playerVm.hasSeenChapterIntro(chapterId)) {
+        if (!mounted) return;
+        await showPopDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            key: Key('chapter_intro_$chapterId'),
+            title: Text(chapterIntroTitles[chapterId] ?? 'Nuovo capitolo'),
+            content: Text(chapterIntros[chapterId] ?? ''),
+            actions: [
+              FilledButton(
+                key: const Key('chapter_intro_ok'),
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: const Text('Inizia l\u2019esplorazione'),
+              ),
+            ],
+          ),
+        );
+        playerVm.markChapterIntroSeen(chapterId);
+        if (!mounted) return;
+      }
     }
 
     // Mostra sempre i dettagli del topic quando viene cliccato
@@ -69,10 +102,12 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   }
 
   /// Tap sul nodo boss a fine capitolo (campagna US-04): locked finché
-  /// il capitolo non è interamente completato, altrimenti apre
+  /// il capitolo non è interamente completato, altrimenti mostra il dialog
+  /// lore pre-fight (Fase 1B-A: Combatti/Indietro) e solo su Combatti apre
   /// `BossFightActiveScreen` diretto (stesso setup del push da lista).
-  /// Al rientro ricalcola gli unlock (la vittoria apre il capitolo dopo).
-  void _onBossTap(String bossId, String chapterId) {
+  /// Al rientro ricalcola gli unlock (la vittoria apre il capitolo dopo)
+  /// e controlla il finale campagna.
+  Future<void> _onBossTap(String bossId, String chapterId) async {
     final roadmapVm = context.read<RoadmapViewModel>();
     final chapter = _findTopic(roadmapVm.topics, chapterId);
     if (chapter?.bossId == null) return;
@@ -100,6 +135,34 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
       return;
     }
 
+    // Lore pre-fight (Fase 1B-A): dialog con Combatti/Indietro prima di
+    // ogni boss fight.
+    if (!mounted) return;
+    final bossName = bossNames[bossId] ?? chapter?.bossName ?? 'Boss';
+    final proceed = await showPopDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const Key('boss_lore_dialog'),
+        title: Text('👹 $bossName'),
+        content: Text(
+          bossLores[bossId] ?? 'Un guardiano del web ti sbarra la strada.',
+        ),
+        actions: [
+          TextButton(
+            key: const Key('boss_lore_back'),
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Indietro'),
+          ),
+          FilledButton(
+            key: const Key('boss_lore_fight'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Combatti'),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true || !mounted) return;
+
     Navigator.push(
       context,
       DungeonPageRoute(
@@ -111,10 +174,100 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
           ),
         ),
       ),
-    ).then((_) {
+    ).then((_) async {
       if (!mounted) return;
       context.read<RoadmapViewModel>().reevaluateUnlocks();
+      await _maybeShowCampaignComplete();
     });
+  }
+
+  /// Finale campagna (Fase 1B-A): tutti i capitoli completi + tutti i
+  /// boss sconfitti → schermata "Campagna completata!" con stats, una
+  /// sola volta per completamento (flag persistito), non a ogni apertura.
+  Future<void> _maybeShowCampaignComplete() async {
+    if (!mounted || _campaignDialogOpen) return;
+    final playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+    if (playerVm == null) return;
+    final roadmapVm = context.read<RoadmapViewModel>();
+    if (roadmapVm.topics.isEmpty) return;
+    if (playerVm.hasSeenCampaignCompletion) return;
+    if (!roadmapVm.isCampaignComplete(playerVm.isBossDefeated)) return;
+    _campaignDialogOpen = true;
+    playerVm.markCampaignCompletionSeen();
+    await _showCampaignCompleteDialog(playerVm);
+    _campaignDialogOpen = false;
+  }
+
+  Future<void> _showCampaignCompleteDialog(PlayerViewModel playerVm) {
+    final progress = playerVm.progress;
+    final defeated =
+        campaignBossIds.where(playerVm.isBossDefeated).length;
+    final stats =
+        'XP: ${progress.experience} • Livello ${progress.level}\n'
+        'Serie migliore: x${progress.maxStreak}\n'
+        'Boss sconfitti: $defeated/${campaignBossIds.length}';
+    return showPopDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const Key('campaign_complete_dialog'),
+        title: const Text(campaignCompleteTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(campaignCompleteBody),
+            const SizedBox(height: 12),
+            Text(
+              stats,
+              key: const Key('campaign_complete_stats'),
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            key: const Key('campaign_back'),
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Torna alla roadmap'),
+          ),
+          FilledButton(
+            key: const Key('campaign_replay'),
+            onPressed: () => _confirmReplay(ctx),
+            child: const Text('Rigioca'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Rigioca con conferma stile New Run: wipe + reset roadmap e ritorno
+  /// alla Home.
+  Future<void> _confirmReplay(BuildContext dialogContext) async {
+    final confirmed = await showPopDialog<bool>(
+      context: dialogContext,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Ricominciare la campagna?'),
+        content: const Text(
+          'Perderai topic completati, XP, reward e boss sconfitti. Continuare?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('ANNULLA'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('RICOMINCIA'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await context.read<PlayerViewModel>().wipe();
+    if (!mounted) return;
+    await context.read<RoadmapViewModel>().resetToInitial();
+    if (!mounted) return;
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   /// `PlayerViewModel.isBossDefeated` se registrato (in app da `main.dart`),

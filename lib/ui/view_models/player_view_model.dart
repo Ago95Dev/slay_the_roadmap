@@ -60,13 +60,15 @@ class PlayerViewModel with ChangeNotifier {
   bool get isInventoryFull => !inventory.hasEmptySlots;
 
   /// True se esiste un progresso da continuare (topic completati, XP,
-  /// reward, boss o claim).
+  /// reward, boss, claim, intro viste o finale mostrato).
   bool get hasProgress =>
       _progress.completedTopicIds.isNotEmpty ||
       _claimedRewardTopics.isNotEmpty ||
       _progress.experience > 0 ||
       _progress.inventory.rewards.isNotEmpty ||
-      _progress.bossFights.isNotEmpty;
+      _progress.bossFights.isNotEmpty ||
+      _progress.seenChapterIntros.isNotEmpty ||
+      _progress.campaignCompletionSeen;
 
   bool canClaim(String topicId) =>
       !isTopicClaimed(topicId) && !isInventoryFull;
@@ -102,6 +104,8 @@ class PlayerViewModel with ChangeNotifier {
         newStreak % PlayerProgress.streakBonusEvery == 0 ? PlayerProgress.streakBonusXp : 0;
     final updated = _progress.addCompletedTopic(topicId).copyWith(
           streak: newStreak,
+          maxStreak:
+              newStreak > _progress.maxStreak ? newStreak : _progress.maxStreak,
           lives: newLives,
           experience: _progress.experience + 100 + bonus,
         );
@@ -167,6 +171,31 @@ class PlayerViewModel with ChangeNotifier {
       );
     }
     return isFirst;
+  }
+
+  /// Intro capitolo già mostrata in questo save (Fase 1B-A).
+  bool hasSeenChapterIntro(String chapterId) =>
+      _progress.seenChapterIntros.contains(chapterId);
+
+  /// Segna l'intro del capitolo come mostrata (una-tantum per save).
+  void markChapterIntroSeen(String chapterId) {
+    if (hasSeenChapterIntro(chapterId)) return;
+    _progress = _progress.copyWith(
+      seenChapterIntros: [..._progress.seenChapterIntros, chapterId],
+    );
+    _autosave();
+    notifyListeners();
+  }
+
+  /// Finale campagna già mostrato per questo completamento (Fase 1B-A).
+  bool get hasSeenCampaignCompletion => _progress.campaignCompletionSeen;
+
+  /// Segna il finale come mostrato (una volta per completamento).
+  void markCampaignCompletionSeen() {
+    if (_progress.campaignCompletionSeen) return;
+    _progress = _progress.copyWith(campaignCompletionSeen: true);
+    _autosave();
+    notifyListeners();
   }
 
   /// Ripristina il save da [persistence]; ritorna false se assente.
