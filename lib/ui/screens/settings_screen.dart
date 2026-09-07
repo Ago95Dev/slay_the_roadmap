@@ -5,9 +5,13 @@ import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
 
 /// Impostazioni minime (F5, US-05): Reset progressi + About.
+/// F10: "Cambia utente" (logout, torna alla scelta profilo senza
+/// cancellare nulla) quando [onLogout] è fornito (sessione attiva).
 /// Niente profilo/achievements (§2 OUT).
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final Future<void> Function()? onLogout;
+
+  const SettingsScreen({super.key, this.onLogout});
 
   @override
   Widget build(BuildContext context) {
@@ -31,6 +35,20 @@ class SettingsScreen extends StatelessWidget {
               onTap: () => _confirmReset(context),
             ),
           ),
+          if (onLogout != null) ...[
+            const SizedBox(height: 8),
+            Card(
+              child: ListTile(
+                key: const Key('settings_logout'),
+                leading: const Icon(Icons.switch_account),
+                title: const Text('Cambia utente'),
+                subtitle: const Text(
+                  'Torna alla scelta del profilo (nessun dato cancellato)',
+                ),
+                onTap: () => onLogout!(),
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           const Card(
             child: ListTile(

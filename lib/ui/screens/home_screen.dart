@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../view_models/player_view_model.dart';
 import '../view_models/roadmap_view_model.dart';
+import '../view_models/session_controller.dart';
 import '../animations/dungeon_motion.dart';
 import '../widgets/avatar_picker.dart';
 import '../widgets/player_hud.dart';
@@ -266,10 +267,13 @@ class HomeScreen extends StatelessWidget {
           Icons.settings,
           [Colors.purple, Colors.pink],
           () {
+            final session = SessionController.maybeOf(context);
             Navigator.push(
               context,
               DungeonPageRoute(
-                builder: (context) => const SettingsScreen(),
+                builder: (context) => SettingsScreen(
+                  onLogout: session == null ? null : session.logout,
+                ),
               ),
             );
           },

@@ -7,3 +7,4 @@ export 'roadmap_screen.dart';
 export 'quiz_screen.dart';
 export 'topic_detail_screen.dart';
 export 'reward_choice_screen.dart';
+export 'profile_screen.dart';

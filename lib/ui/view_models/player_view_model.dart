@@ -324,8 +324,13 @@ class PlayerViewModel with ChangeNotifier {
   }
 
   /// Azzera progresso + claim e cancella il save (Nuovo percorso / Reset).
+  /// L'identità (nome/id) è conservata: il reset cancella i progressi di
+  /// gioco, non il profilo (F10: il nome resta quello dell'utente attivo).
   Future<void> wipe() async {
-    _progress = PlayerProgress.initial();
+    final name = _progress.playerName;
+    final id = _progress.playerId;
+    _progress = PlayerProgress.initial()
+        .copyWith(playerName: name, playerId: id);
     _claimedRewardTopics.clear();
     await _persistence?.resetProgress();
     notifyListeners();

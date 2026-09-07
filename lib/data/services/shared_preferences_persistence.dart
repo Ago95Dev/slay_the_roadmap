@@ -14,9 +14,23 @@ class SharedPreferencesPersistence implements PersistenceRepository {
 
   final SharedPreferences? _overrides;
 
+  /// Quando [userId] è impostato il save vive sotto `slay_data_<userId>`
+  /// (un save isolato per profilo, F10); altrimenti sotto il legacy
+  /// [saveKey] (usato solo dalla migrazione una-tantum e dai vecchi test).
+  final String? _userId;
+
   /// [_overrides] serve solo ai test (istanza già pronta, niente platform
   /// channel); in app usare il costruttore senza argomenti.
-  SharedPreferencesPersistence([this._overrides]);
+  SharedPreferencesPersistence([this._overrides]) : _userId = null;
+
+  /// Persistenza del save del profilo [userId] (F10).
+  SharedPreferencesPersistence.forUser(this._overrides, String userId)
+      : _userId = userId;
+
+  /// Chiave del save per il profilo [userId].
+  static String dataKey(String userId) => 'slay_data_$userId';
+
+  String get _key => _userId == null ? saveKey : dataKey(_userId!);
 
   Future<SharedPreferences> get _prefs async =>
       _overrides ?? await SharedPreferences.getInstance();
@@ -24,7 +38,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<void> savePlayerProgress(PlayerProgress progress) async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(_key);
     final claimed = raw == null
         ? <String>[]
         : List<String>.from(
@@ -51,7 +65,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<void> resetProgress() async {
     final prefs = await _prefs;
-    await prefs.remove(saveKey);
+    await prefs.remove(_key);
   }
 
   @override
@@ -83,7 +97,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<bool> hasSave() async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(_key);
     if (raw == null || raw.isEmpty) return false;
     try {
       final envelope = jsonDecode(raw) as Map<String, dynamic>;
@@ -108,7 +122,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
 
   Future<Map<String, dynamic>?> _readEnvelope() async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(_key);
     if (raw == null || raw.isEmpty) return null;
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
@@ -127,6 +141,6 @@ class SharedPreferencesPersistence implements PersistenceRepository {
       'completedTopicIds': progress.completedTopicIds,
       'claimedRewardTopics': claimed.toList(),
     };
-    await prefs.setString(saveKey, jsonEncode(envelope));
+    await prefs.setString(_key, jsonEncode(envelope));
   }
 }

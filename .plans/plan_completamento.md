@@ -18,7 +18,8 @@ Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignme
 - [x] F7 Hub minimo (`6ece7d0` console: action/xp/level/badge/3 rule verificate E2E)
 - [x] F7-app EngineClient offline-first (`dart-define`, Fake fallback)
 - [x] Fase 1B A-E CHIUSA (A narrativa+endgame, B titoli+avatar, C passive boss, D leaderboard, E daily) — Fase 1B CHIUSA
-- [ ] F10 profili+login ← PROSSIMO
+- [x] F10 profili+login (auth locale prototype FNV+salt, migrazione v1)
+- [ ] F11 N campagne ← PROSSIMO
 - [ ] F10 profili+login (~1g) — UserProfile multipli, auth locale hash, migrazione slay_save_v1
 - [ ] F11 N campagne (~1g) — modello Campaign, selezione, coming soon, progress per campagna
 - [ ] F12 personalizzazione (~0.5g) — Da-ripassare da failCount, analytics locali
