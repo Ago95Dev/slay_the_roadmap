@@ -36,22 +36,20 @@ Future<UserStore> _store() async =>
     UserStore(await SharedPreferences.getInstance());
 
 /// Rispecchia la struttura reale di [MyAppRoot]: i ViewModel sono forniti
-/// come `home:` del MaterialApp, quindi le route pushate (Classifica,
-/// Settings, Roadmap) NON li ereditano (sorelle, non discendenti).
+/// SOPRA il MaterialApp, quindi TUTTE le route pushate (Classifica,
+/// Settings, Roadmap) li ereditano.
 Future<void> _pumpHome(
   WidgetTester tester,
   PlayerViewModel player,
   RoadmapViewModel roadmap,
 ) async {
   await tester.pumpWidget(
-    MaterialApp(
-      home: MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: player),
-          ChangeNotifierProvider.value(value: roadmap),
-        ],
-        child: const HomeScreen(),
-      ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: player),
+        ChangeNotifierProvider.value(value: roadmap),
+      ],
+      child: const MaterialApp(home: HomeScreen()),
     ),
   );
   await tester.pumpAndSettle();
@@ -259,14 +257,12 @@ void main() {
       expect(session.player!.hasProgress, isTrue);
 
       await tester.pumpWidget(
-        MaterialApp(
-          home: MultiProvider(
-            providers: [
-              ChangeNotifierProvider.value(value: session.player!),
-              ChangeNotifierProvider.value(value: session.roadmap!),
-            ],
-            child: const HomeScreen(),
-          ),
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider.value(value: session.player!),
+            ChangeNotifierProvider.value(value: session.roadmap!),
+          ],
+          child: const MaterialApp(home: HomeScreen()),
         ),
       );
       await tester.pumpAndSettle();

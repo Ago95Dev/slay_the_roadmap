@@ -140,22 +140,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Le route pushate sono sorelle dell'`home:` (non ne ereditano i
-  /// provider): si inoltrano i ViewModel attivi esplicitamente, altrimenti
-  /// Classifica/Settings/Roadmap vanno in ProviderNotFound sul device
-  /// reale (BUG 2, BUG 3). Da chiamare col [context] della Home (che li ha).
-  MultiProvider _withViewModels(BuildContext context, Widget child) {
-    final player = context.read<PlayerViewModel>();
-    final roadmap = context.read<RoadmapViewModel>();
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: player),
-        ChangeNotifierProvider.value(value: roadmap),
-      ],
-      child: child,
-    );
-  }
-
   /// Torna alla selezione campagne (F11): azzera il flag così l'Hub
   /// nasconde CONTINUA e mostra l'invito, POI apre davvero la lista
   /// (BUG 1: il solo reset del flag non navigava — dal device il tap
@@ -193,8 +177,7 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 DungeonPageRoute(
-                  builder: (_) =>
-                      _withViewModels(context, const RoadmapScreen()),
+                  builder: (_) => const RoadmapScreen(),
                 ),
               );
             },
@@ -263,11 +246,8 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               DungeonPageRoute(
-                builder: (_) => _withViewModels(
-                  context,
-                  SettingsScreen(
-                    onLogout: session == null ? null : session.logout,
-                  ),
+                builder: (_) => SettingsScreen(
+                  onLogout: session == null ? null : session.logout,
                 ),
               ),
             );
@@ -317,7 +297,7 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (_) => _withViewModels(context, const RoadmapScreen()),
+        builder: (_) => const RoadmapScreen(),
       ),
     );
   }

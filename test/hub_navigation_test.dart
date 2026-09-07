@@ -17,20 +17,19 @@ import 'package:slay_the_roadmap/ui/view_models/session_controller.dart';
 Future<UserStore> _store() async =>
     UserStore(await SharedPreferences.getInstance());
 
-/// Monta l'Hub con la stessa struttura della root (sessione sopra il
-/// MaterialApp, ViewModel dentro come `home:`).
+/// Monta l'Hub con la stessa struttura della root (sessione e ViewModel
+/// SOPRA il MaterialApp, come [MyAppRoot]: ogni route pushata eredita
+/// tutto senza inoltri).
 Future<void> _pumpHub(WidgetTester tester, SessionController session) async {
   await tester.pumpWidget(
     ChangeNotifierProvider<SessionController>.value(
       value: session,
-      child: MaterialApp(
-        home: MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: session.player!),
-            ChangeNotifierProvider.value(value: session.roadmap!),
-          ],
-          child: const HubScreen(),
-        ),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: session.player!),
+          ChangeNotifierProvider.value(value: session.roadmap!),
+        ],
+        child: const MaterialApp(home: HubScreen()),
       ),
     ),
   );

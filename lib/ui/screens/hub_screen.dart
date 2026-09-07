@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../animations/dungeon_motion.dart';
 import '../view_models/player_view_model.dart';
-import '../view_models/roadmap_view_model.dart';
 import '../view_models/session_controller.dart';
 import '../widgets/avatar_picker.dart';
 import '../widgets/daily_reward_banner.dart';
@@ -27,35 +26,21 @@ import 'settings_screen.dart';
 ///   sottotitolo dell'ultima campagna), CAMPAGNE, CLASSIFICA,
 ///   I MIEI NUMERI, IMPOSTAZIONI.
 /// - Prima campagna mai scelta: CONTINUA nascosto + invito a scegliere.
+///
+/// I ViewModel (e la sessione) sono forniti dalla root SOPRA il MaterialApp
+/// ([MyAppRoot]): il Navigator li rende ereditabili a TUTTE le route
+/// pushate, quindi qui si naviga diretto senza inoltri per-push.
 class HubScreen extends StatelessWidget {
   const HubScreen({super.key});
-
-  /// Le route pushate sono sorelle dell'`home:` (non ne ereditano i
-  /// provider): si inoltrano i ViewModel attivi esplicitamente, come in
-  /// [HomeScreen] (BUG 2, BUG 3). Da chiamare col [context] dell'Hub.
-  MultiProvider _withViewModels(BuildContext context, Widget child) {
-    final player = context.read<PlayerViewModel>();
-    final roadmap = context.read<RoadmapViewModel>();
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(value: player),
-        ChangeNotifierProvider.value(value: roadmap),
-      ],
-      child: child,
-    );
-  }
 
   void _openContinue(BuildContext context) {
     final session = SessionController.maybeOf(context);
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (_) => _withViewModels(
-          context,
-          HomeScreen(
-            key: ValueKey(
-              '${session?.activeProfile?.userId}_${session?.activeCampaignId}',
-            ),
+        builder: (_) => HomeScreen(
+          key: ValueKey(
+            '${session?.activeProfile?.userId}_${session?.activeCampaignId}',
           ),
         ),
       ),
@@ -91,7 +76,7 @@ class HubScreen extends StatelessWidget {
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (_) => _withViewModels(context, const MyNumbersScreen()),
+        builder: (_) => const MyNumbersScreen(),
       ),
     );
   }
@@ -101,11 +86,8 @@ class HubScreen extends StatelessWidget {
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (_) => _withViewModels(
-          context,
-          SettingsScreen(
-            onLogout: session == null ? null : session.logout,
-          ),
+        builder: (_) => SettingsScreen(
+          onLogout: session == null ? null : session.logout,
         ),
       ),
     );

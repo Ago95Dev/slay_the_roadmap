@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../domain/models/campaign.dart';
 import '../animations/dungeon_motion.dart';
@@ -31,24 +30,16 @@ class CampaignSelectionScreen extends StatelessWidget {
     }
     if (!context.mounted) return;
     // Flusso Hub: pushata sopra l'Hub, dopo la scelta si entra nella Home
-    // della campagna con i ViewModel aggiornati. Come root (test) resta
+    // della campagna (i ViewModel sono ereditati dalla root sopra il
+    // MaterialApp: niente inoltri per-push). Come root (test) resta
     // ferma: niente route sotto a cui tornare.
     if (!Navigator.canPop(context)) return;
-    final player = session.player;
-    final roadmap = session.roadmap;
-    if (player == null || roadmap == null) return;
     final profileId = session.activeProfile?.userId;
     final campaignId = session.activeCampaignId;
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (_) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider.value(value: player),
-            ChangeNotifierProvider.value(value: roadmap),
-          ],
-          child: HomeScreen(key: ValueKey('${profileId}_$campaignId')),
-        ),
+        builder: (_) => HomeScreen(key: ValueKey('${profileId}_$campaignId')),
       ),
     );
   }

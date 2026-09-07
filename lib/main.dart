@@ -52,13 +52,38 @@ Future<void> main() async {
 
 /// Root con sessione (F10, F11): osserva [SessionController] e monta lo
 /// switch profili, poi l'Hub personale (dopo il login, centro di tutto),
-/// da cui si raggiungono selezione campagna e Home di gioco (i ViewModel
-/// per-utente e per-campagna sono forniti qui; il cambio utente o campagna
-/// ricostruisce l'Hub da zero via [ValueKey]).
+/// da cui si raggiungono selezione campagna e Home di gioco.
+///
+/// I ViewModel per-utente e per-campagna sono forniti SOPRA il MaterialApp:
+/// il Navigator crea le route come sorelle dell'`home:` (non discendenti),
+/// quindi ogni provider montato come `home:` NON sarebbe ereditato dai
+/// push (ProviderNotFound su Classifica/Settings/Roadmap/Quiz sul device
+/// reale). Con lo scope qui sopra, TUTTE le route ereditano ViewModel e
+/// SessionController senza inoltri per-push.
+///
+/// Il cambio utente o campagna ricostruisce tutto da zero via [ValueKey]
+/// (niente stati mescolati); il logout smonta i ViewModel e azzera lo
+/// stack tornando alla scelta profilo.
 class MyAppRoot extends StatelessWidget {
   final SessionController session;
 
   const MyAppRoot({super.key, required this.session});
+
+  ThemeData _lightTheme() => ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+      );
+
+  ThemeData _darkTheme() => ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -70,46 +95,47 @@ class MyAppRoot extends StatelessWidget {
           final active = watched.activeProfile;
           final player = watched.player;
           final roadmap = watched.roadmap;
-          final Widget home;
           if (!watched.ready) {
-            home = const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          } else if (active == null || player == null || roadmap == null) {
-            home = ProfileSwitchScreen(session: watched);
-          } else {
-            // Hub personale: la selezione campagna non è più forzata, è
-            // raggiungibile da qui; la prima campagna mai scelta mostra
-            // l'invito (CONTINUA nascosto).
-            home = MultiProvider(
-              providers: [
-                ChangeNotifierProvider.value(value: roadmap),
-                ChangeNotifierProvider.value(value: player),
-              ],
-              child: HubScreen(
-                key: ValueKey(
-                    'hub_${active.userId}_${watched.activeCampaignId}'),
+            return MaterialApp(
+              title: 'Slay the Roadmap',
+              theme: _lightTheme(),
+              darkTheme: _darkTheme(),
+              home: const Scaffold(
+                body: Center(child: CircularProgressIndicator()),
               ),
+              debugShowCheckedModeBanner: false,
             );
           }
-          return MaterialApp(
-            title: 'Slay the Roadmap',
-            theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.blue,
-                brightness: Brightness.light,
-              ),
-              useMaterial3: true,
+          if (active == null || player == null || roadmap == null) {
+            // Nessuna sessione: niente ViewModel da fornire, solo la
+            // scelta profilo (il logout atterra qui con stack azzerato).
+            return MaterialApp(
+              title: 'Slay the Roadmap',
+              theme: _lightTheme(),
+              darkTheme: _darkTheme(),
+              home: ProfileSwitchScreen(session: watched),
+              debugShowCheckedModeBanner: false,
+            );
+          }
+          // Hub personale: la selezione campagna non è più forzata, è
+          // raggiungibile da qui; la prima campagna mai scelta mostra
+          // l'invito (CONTINUA nascosto).
+          final scopeKey =
+              'hub_${active.userId}_${watched.activeCampaignId}';
+          return MultiProvider(
+            key: ValueKey('vms_$scopeKey'),
+            providers: [
+              ChangeNotifierProvider.value(value: roadmap),
+              ChangeNotifierProvider.value(value: player),
+            ],
+            child: MaterialApp(
+              key: ValueKey('app_$scopeKey'),
+              title: 'Slay the Roadmap',
+              theme: _lightTheme(),
+              darkTheme: _darkTheme(),
+              home: HubScreen(key: ValueKey(scopeKey)),
+              debugShowCheckedModeBanner: false,
             ),
-            darkTheme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(
-                seedColor: Colors.blue,
-                brightness: Brightness.dark,
-              ),
-              useMaterial3: true,
-            ),
-            home: home,
-            debugShowCheckedModeBanner: false,
           );
         },
       ),
