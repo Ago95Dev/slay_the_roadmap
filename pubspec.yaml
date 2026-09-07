@@ -1,5 +1,5 @@
 name: slay_the_roadmap
-description: "A gamified learning app for roadmap.sh Dart roadmap"
+description: A gamified Dart learning application with deck-building mechanics inspired by Slay the Spire
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,11 +9,21 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # State Management
   provider: ^6.1.1
-  equatable: ^2.0.5
-  url_launcher: ^6.1.11
-  shared_preferences: ^2.5.5
-  http: ^1.6.0
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  
+  # Utilities
+  uuid: ^4.2.2
+  intl: ^0.18.1
+  url_launcher: ^6.3.1
+  webview_flutter: ^4.4.22
+  
+  # Icons
+  cupertino_icons: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -22,4 +32,8 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-
+  assets:
+    - assets/images/
+    - assets/images/backgrounds/
+    - assets/images/bosses/
+    - assets/images/cards/
