@@ -18,6 +18,9 @@ Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignme
 - [x] F7 Hub minimo (`6ece7d0` console: action/xp/level/badge/3 rule verificate E2E)
 - [x] F7-app EngineClient offline-first (`dart-define`, Fake fallback)
 - [ ] Fase 1B A-E (gap Octalysis/Toda) ← PROSSIMO
+- [ ] F10 profili+login (~1g) — UserProfile multipli, auth locale hash, migrazione slay_save_v1
+- [ ] F11 N campagne (~1g) — modello Campaign, selezione, coming soon, progress per campagna
+- [ ] F12 personalizzazione (~0.5g) — Da-ripassare da failCount, analytics locali
 - [ ] F8 docs esame (GamiDOC aggiornato ALLA FINE con tutto)
 
 ## §0 — Convenzione commit (obbligatoria a fine fase/sottofase)
@@ -59,7 +62,8 @@ Leaderboard/social/share/deck-code, shop/coins, classi, coop/PVP, login/signup (
 
 ## Fase 1B — Chiusura gap Octalysis/Toda (prima di F8, ~3-3.5g)
 
-Scope approvato 2026-09-07. Restano tagliati: shop/coins, classi, coop/PVP, eventi random, branching, difficoltà adattiva.
+Scope approvato 2026-09-07. Restano tagliati: shop/coins, classi, coop/PVP, eventi random, branching, difficoltà adattiva, auth remota/recupero password.
+Escono dai tagli (vedi docs/assignment/utenti_campagne_hub.md): login/registrazione locale + profili multipli (F10), N campagne con coming soon (F11), Da-ripassare + analytics (F12).
 
 | ID | Feature (gap) | Acceptance | Stima |
 |---|---|---|---|
