@@ -60,12 +60,13 @@ class SessionController with ChangeNotifier {
   /// Tutte le campagne per la schermata di selezione.
   List<Campaign> get availableCampaigns => CampaignRepository.list();
 
-  /// Ripristina l'utente attivo (se presente) al bootstrap in `main`.
+  /// Bootstrap (BUG 1): NON ripristina mai la sessione precedente.
+  ///
+  /// Segna solo la root come pronta: l'avvio mostra sempre
+  /// [ProfileSwitchScreen] e il profilo si carica SOLO dopo login o
+  /// registrazione espliciti. La migrazione legacy resta in `main`
+  /// (l'utente migrato esiste ma va sbloccato con login esplicito).
   Future<void> restore() async {
-    final active = users.activeUser();
-    if (active != null) {
-      await _openSession(active);
-    }
     ready = true;
     notifyListeners();
   }

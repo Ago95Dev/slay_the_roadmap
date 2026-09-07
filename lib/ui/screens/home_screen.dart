@@ -205,6 +205,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Le route pushate sono sorelle dell'`home:` (non ne ereditano i
+  /// provider): si inoltrano i ViewModel attivi esplicitamente, altrimenti
+  /// Classifica/Settings/Roadmap vanno in ProviderNotFound sul device
+  /// reale (BUG 2, BUG 3). Da chiamare col [context] della Home (che li ha).
+  MultiProvider _withViewModels(BuildContext context, Widget child) {
+    final player = context.read<PlayerViewModel>();
+    final roadmap = context.read<RoadmapViewModel>();
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: player),
+        ChangeNotifierProvider.value(value: roadmap),
+      ],
+      child: child,
+    );
+  }
+
   Widget _buildMenuColumn(
     BuildContext context,
     double cardWidth,
@@ -224,7 +240,8 @@ class HomeScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 DungeonPageRoute(
-                  builder: (context) => const RoadmapScreen(),
+                  builder: (_) =>
+                      _withViewModels(context, const RoadmapScreen()),
                 ),
               );
             },
@@ -265,10 +282,17 @@ class HomeScreen extends StatelessWidget {
           Icons.emoji_events,
           [Colors.amber, Colors.orange],
           () {
+            // Override espliciti (BUG 2): la Classifica pushata non dipende
+            // dallo scope dei provider (offline calcolato qui, mai throw).
+            final playerVm = context.read<PlayerViewModel>();
             Navigator.push(
               context,
               DungeonPageRoute(
-                builder: (context) => const LeaderboardScreen(),
+                builder: (_) => LeaderboardScreen(
+                  engine: playerVm.engine,
+                  playerId: playerVm.hubPlayerId,
+                  offlineOverride: playerVm.isLeaderboardOffline,
+                ),
               ),
             );
           },
@@ -286,8 +310,11 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               DungeonPageRoute(
-                builder: (context) => SettingsScreen(
-                  onLogout: session == null ? null : session.logout,
+                builder: (_) => _withViewModels(
+                  context,
+                  SettingsScreen(
+                    onLogout: session == null ? null : session.logout,
+                  ),
                 ),
               ),
             );
@@ -337,7 +364,7 @@ class HomeScreen extends StatelessWidget {
     Navigator.push(
       context,
       DungeonPageRoute(
-        builder: (context) => const RoadmapScreen(),
+        builder: (_) => _withViewModels(context, const RoadmapScreen()),
       ),
     );
   }

@@ -16,9 +16,10 @@ import 'ui/view_models/session_controller.dart';
 /// 1. Migrazione una-tantum del vecchio save singolo `slay_save_v1`
 ///    → utente "Giocatore" (poi il legacy è ignorato per sempre).
 /// 2. Hub offline-first (F7): login fire-and-forget a ogni avvio.
-/// 3. Se nessun profilo è attivo → schermata di scelta profilo PRIMA
-///    della Home; altrimenti Home con i ViewModel dell'utente attivo.
-///    Il logout da Settings torna alla scelta profilo.
+/// 3. Bootstrap NON ripristina mai la sessione (BUG 1): l'eventuale
+///    utente attivo persistito viene sloggato, l'avvio mostra sempre
+///    la scelta profilo e il profilo si carica SOLO dopo login o
+///    registrazione espliciti.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -29,6 +30,12 @@ Future<void> main() async {
   } catch (_) {
     // Save legacy corrotto: si parte freschi, mai un crash all'avvio.
   }
+  try {
+    // Mai auto-login al riavvio (BUG 1): solo login esplicito.
+    await users.logout();
+  } catch (_) {
+    // Logout best-effort: un fallimento qui non blocca mai l'avvio.
+  }
 
   final engine = HttpEngineClient();
   unawaited(engine.login());
@@ -37,7 +44,7 @@ Future<void> main() async {
   try {
     await session.restore();
   } catch (_) {
-    // Nessun utente attivo o save corrotto: mostra lo switch profili.
+    // restore() non apre sessioni: segna solo la root come pronta.
   }
 
   runApp(MyAppRoot(session: session));

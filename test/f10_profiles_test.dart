@@ -215,16 +215,23 @@ void main() {
       expect(store.activeUser(), isNull);
     });
 
-    test('restore riapre utente attivo con roadmap applicata', () async {
+    test('restore NON riapre l\'utente: serve login esplicito (BUG 1)',
+        () async {
       final store = await _store();
       final first = SessionController(store);
       await first.register(username: 'Ada', password: 'x');
       first.player!.addCompletedTopic('web_network');
       await Future.delayed(const Duration(milliseconds: 100));
 
+      // Bootstrap: restore segna pronto ma non apre nessuna sessione.
       final second = SessionController(store);
       await second.restore();
       expect(second.ready, isTrue);
+      expect(second.isLoggedIn, isFalse);
+      expect(second.player, isNull);
+
+      // Login esplicito: progressi ripristinati con roadmap applicata.
+      await second.login(username: 'Ada', password: 'x');
       expect(second.activeProfile!.displayName, 'Ada');
       expect(second.player!.progress.completedTopicIds, ['web_network']);
       expect(second.roadmap!.topics, isNotEmpty);

@@ -89,6 +89,12 @@ class PlayerViewModel with ChangeNotifier {
   Set<String> get claimedRewardTopics =>
       Set.unmodifiable(_claimedRewardTopics);
 
+  /// Catena di salvataggi (BUG 3): gli autosave fire-and-forget sono
+  /// serializzati in ordine d'arrivo, così `wipe()` (che attende la catena
+  /// prima di resettare) non può essere sovrascritto da un save partito
+  /// prima del reset (claimed/progressi "resuscitati"). Mai throw.
+  Future<void> _saveChain = Future.value();
+
   bool isTopicClaimed(String topicId) =>
       _claimedRewardTopics.contains(topicId);
 
@@ -371,9 +377,16 @@ class PlayerViewModel with ChangeNotifier {
   int failCountOf(String topicId) => _progress.failCount[topicId] ?? 0;
 
   /// Ripristina il save da [persistence]; ritorna false se assente.
+  /// Attende gli autosave pendenti così la lettura non precede un save
+  /// partito prima della chiamata.
   Future<bool> load() async {
     final persistence = _persistence;
     if (persistence == null) return false;
+    try {
+      await _saveChain;
+    } catch (_) {
+      // Best-effort: la lettura procede comunque.
+    }
     final saved = await persistence.loadPlayerProgress();
     if (saved == null) return false;
     _progress = saved;
@@ -384,25 +397,45 @@ class PlayerViewModel with ChangeNotifier {
     return true;
   }
 
-  /// Azzera progresso + claim e cancella il save (Nuovo percorso / Reset).
+  /// Reset totale della campagna attiva (BUG 3): azzera progressi, claim,
+  /// fail/streak (serie e "da ripassare"), analytics e vite.
+  ///
+  /// Decisione documentata: le vite resettano a [PlayerProgress.maxLives]
+  /// (3, run fresca e semplice) invece di restare al valore corrente.
   /// L'identità (nome/id) è conservata: il reset cancella i progressi di
   /// gioco, non il profilo (F10: il nome resta quello dell'utente attivo).
+  /// Solo il bucket della campagna corrente è toccato (F11: le altre
+  /// campagne, `activeCampaign`/`campaignSelected` e la sessione restano
+  /// intatti). Niente eccezioni verso i chiamanti (Settings/Home).
   Future<void> wipe() async {
     final name = _progress.playerName;
     final id = _progress.playerId;
     _progress = PlayerProgress.initial()
         .copyWith(playerName: name, playerId: id);
     _claimedRewardTopics.clear();
-    await _persistence?.resetProgress();
+    try {
+      // Flush degli autosave pendenti: evita che un save pre-reset
+      // riscriva progressi/claimed dopo la pulizia.
+      await _saveChain;
+      await _persistence?.resetProgress();
+    } catch (_) {
+      // Reset best-effort: la memoria è comunque pulita.
+    }
     notifyListeners();
   }
 
   void _autosave() {
     final persistence = _persistence;
     if (persistence == null) return;
-    unawaited(persistence.savePlayerProgress(_progress));
-    unawaited(
-      persistence.saveClaimedRewardTopics(_claimedRewardTopics),
-    );
+    final progress = _progress;
+    final claimed = Set<String>.from(_claimedRewardTopics);
+    _saveChain = _saveChain.then((_) async {
+      try {
+        await persistence.savePlayerProgress(progress);
+        await persistence.saveClaimedRewardTopics(claimed);
+      } catch (_) {
+        // Autosave best-effort: mai un crash per un save fallito.
+      }
+    });
   }
 }

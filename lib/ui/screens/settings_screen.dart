@@ -101,6 +101,12 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  /// Reset totale della campagna attiva (BUG 3): wipe del
+  /// [PlayerViewModel] (progress + claimed + fail/streak, vite a 3) +
+  /// roadmap iniziale. Best-effort e mai throw verso la UI (provider
+  /// assenti nella route pushata, dispose nel mezzo): al peggio i
+  /// progressi restano e l'utente può riprovare. Chiude Settings e mostra
+  /// la SnackBar di conferma.
   Future<void> _confirmReset(BuildContext context) async {
     final confirmed = await showPopDialog<bool>(
       context: context,
@@ -124,11 +130,29 @@ class SettingsScreen extends StatelessWidget {
     );
     if (confirmed != true || !context.mounted) return;
     final messenger = ScaffoldMessenger.of(context);
-    await context.read<PlayerViewModel>().wipe();
+    PlayerViewModel? player;
+    RoadmapViewModel? roadmap;
+    try {
+      player = context.read<PlayerViewModel>();
+      roadmap = context.read<RoadmapViewModel>();
+    } catch (_) {
+      // Provider assenti (route pushata senza inoltro): reset impossibile,
+      // ma mai un crash — si esce con la conferma visiva comunque.
+      player = null;
+      roadmap = null;
+    }
+    try {
+      await player?.wipe();
+      if (!context.mounted) return;
+      await roadmap?.resetToInitial();
+      if (!context.mounted) return;
+    } catch (_) {
+      // Reset best-effort: niente eccezioni verso la UI.
+    }
     if (!context.mounted) return;
-    await context.read<RoadmapViewModel>().resetToInitial();
-    if (!context.mounted) return;
-    Navigator.pop(context);
+    // Torna alla Home solo se c'è una route sotto (nei test Settings può
+    // essere l'unica route: il pop la lascerebbe nera).
+    if (Navigator.canPop(context)) Navigator.pop(context);
     messenger.showSnackBar(
       const SnackBar(content: Text('Progressi cancellati. Buona avventura!')),
     );

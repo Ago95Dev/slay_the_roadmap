@@ -27,41 +27,80 @@ class LeaderboardScreen extends StatefulWidget {
 }
 
 class _LeaderboardScreenState extends State<LeaderboardScreen> {
-  late Future<List<LeaderboardEntry>> _future;
+  Future<List<LeaderboardEntry>> _future =
+      Future.value(const <LeaderboardEntry>[]);
+  bool _started = false;
 
+  // Niente `context.read` in initState (BUG 2): il load parte in
+  // didChangeDependencies (dipendenze disponibili) con mounted implicito
+  // (nessun setState post-completamento: il Future è già agganciato).
   @override
-  void initState() {
-    super.initState();
-    _future = _load();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_started) {
+      _started = true;
+      _future = _loadSafe();
+    }
   }
 
-  EngineClient? _effectiveEngine(BuildContext context) =>
-      widget.engine ?? context.read<PlayerViewModel>().engine;
+  /// Engine effettivo: override del costruttore oppure quello del
+  /// [PlayerViewModel]; null se non disponibile. Mai throw (la schermata
+  /// è pushata come sorella dell'`home:`, i provider potrebbero mancare).
+  EngineClient? _effectiveEngine() {
+    if (widget.engine != null) return widget.engine;
+    try {
+      return context.read<PlayerViewModel>().engine;
+    } catch (_) {
+      return null;
+    }
+  }
 
-  String _effectivePlayerId(BuildContext context) =>
-      widget.playerId ?? context.read<PlayerViewModel>().hubPlayerId;
+  String _effectivePlayerId() {
+    if (widget.playerId != null) return widget.playerId!;
+    try {
+      return context.read<PlayerViewModel>().hubPlayerId;
+    } catch (_) {
+      return '';
+    }
+  }
 
-  bool _isOffline(BuildContext context) {
+  bool _isOffline() {
     if (widget.offlineOverride != null) return widget.offlineOverride!;
-    final engine = _effectiveEngine(context);
-    if (engine == null) return true;
-    if (engine is HttpEngineClient) return engine.isOffline;
-    return false;
+    try {
+      final engine = _effectiveEngine();
+      if (engine == null) return true;
+      if (engine is HttpEngineClient) return engine.isOffline;
+      return false;
+    } catch (_) {
+      return true;
+    }
   }
 
-  Future<List<LeaderboardEntry>> _load() async {
-    final engine = widget.engine;
-    if (engine != null) return engine.getLeaderboard();
-    if (!mounted) return const <LeaderboardEntry>[];
-    return context.read<PlayerViewModel>().fetchLeaderboard();
+  /// Caricamento best-effort: lista vuota su qualsiasi errore (engine che
+  /// lancia, provider assente, snapshot con errore), mai throw verso la UI.
+  Future<List<LeaderboardEntry>> _loadSafe() async {
+    try {
+      final engine = _effectiveEngine();
+      if (engine == null) return const <LeaderboardEntry>[];
+      return await engine.getLeaderboard();
+    } catch (_) {
+      return const <LeaderboardEntry>[];
+    }
   }
 
+  /// Refresh con mounted guard: mai setState dopo dispose, mai throw
+  /// verso [RefreshIndicator]/UI.
   Future<void> _refresh() async {
-    final next = _load();
+    if (!mounted) return;
+    final next = _loadSafe();
     setState(() {
       _future = next;
     });
-    await next;
+    try {
+      await next;
+    } catch (_) {
+      // Best-effort: lo stato vuoto resta mostrato.
+    }
   }
 
   /// Medaglia per il podio, numero di posizione altrimenti.
@@ -74,7 +113,18 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isOffline(context)) {
+    // Doppia guardia (BUG 2): nessun throw sincrono verso la UI in
+    // nessun caso (provider assenti nella route pushata, engine nulli).
+    bool offline = true;
+    String ownId = '';
+    try {
+      offline = _isOffline();
+      ownId = _effectivePlayerId();
+    } catch (_) {
+      offline = true;
+      ownId = '';
+    }
+    if (offline) {
       return Scaffold(
         appBar: AppBar(title: const Text('🏆 Classifica')),
         body: const Center(
@@ -86,7 +136,6 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
         ),
       );
     }
-    final ownId = _effectivePlayerId(context);
     return Scaffold(
       appBar: AppBar(title: const Text('🏆 Classifica')),
       body: RefreshIndicator(
@@ -101,7 +150,10 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
                 ),
               );
             }
-            final entries = snapshot.data ?? const <LeaderboardEntry>[];
+            // snapshot con errore → stato vuoto esistente, mai throw.
+            final entries = snapshot.hasError
+                ? const <LeaderboardEntry>[]
+                : (snapshot.data ?? const <LeaderboardEntry>[]);
             if (entries.isEmpty) {
               return ListView(
                 physics: const AlwaysScrollableScrollPhysics(),

@@ -270,7 +270,8 @@ void main() {
           throwsStateError);
     });
 
-    test('backToCampaignSelection + restore persistono la scelta', () async {
+    test('backToCampaignSelection + login persistono la scelta (BUG 1)',
+        () async {
       final store = await _store();
       final session = SessionController(store);
       await session.register(username: 'Ada', password: 'x');
@@ -283,14 +284,16 @@ void main() {
       // I progress salvati sono intatti dietro la selezione.
       expect(session.player!.progress.completedTopicIds, ['web_network']);
 
+      // Il bootstrap non riapre nulla: serve login esplicito, che rilegge
+      // scelta campagna + progressi persistiti.
       final second = SessionController(store);
-      await second.restore();
+      await second.login(username: 'Ada', password: 'x');
       expect(second.hasSelectedCampaign, isFalse);
       expect(second.player!.progress.completedTopicIds, ['web_network']);
 
       await second.selectCampaign('web_foundations');
       final third = SessionController(store);
-      await third.restore();
+      await third.login(username: 'Ada', password: 'x');
       expect(third.hasSelectedCampaign, isTrue);
       expect(third.activeCampaignId, 'web_foundations');
       expect(third.player!.progress.completedTopicIds, ['web_network']);
