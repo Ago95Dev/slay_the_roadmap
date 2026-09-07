@@ -23,6 +23,67 @@ abstract class EngineClient {
     required String playerId,
     Map<String, dynamic> data = const {},
   });
+
+  /// Classifica XP (`overall_xp`): lista ordinata per posizione.
+  /// Ritorna lista vuota su qualsiasi errore/offline, mai throw.
+  Future<List<LeaderboardEntry>> getLeaderboard();
+}
+
+/// Riga della classifica XP dell'Hub (Fase 1B-D).
+///
+/// Shape API: `GET /games/{gameId}/classifications/overall_xp/board` →
+/// `{board: {content: [{position, playerId, score}]}}`.
+@immutable
+class LeaderboardEntry {
+  final int position;
+  final String playerId;
+  final int score;
+
+  const LeaderboardEntry({
+    required this.position,
+    required this.playerId,
+    required this.score,
+  });
+
+  /// Parsing tollerante: chiavi mancanti → valori di default (mai throw).
+  factory LeaderboardEntry.fromJson(Map<String, dynamic> json) {
+    int asInt(Object? value) {
+      if (value is int) return value;
+      if (value is num) return value.toInt();
+      if (value is String) return int.tryParse(value) ?? 0;
+      return 0;
+    }
+
+    final rawPlayer = json['playerId'] ?? json['player_id'] ?? '';
+    return LeaderboardEntry(
+      position: asInt(json['position']),
+      playerId: rawPlayer is String ? rawPlayer : '$rawPlayer',
+      score: asInt(json['score']),
+    );
+  }
+
+  /// Estrae la lista tollerando le forme `{board:{content:[...]}}`,
+  /// `{content:[...]}` e lista nuda (mai throw).
+  static List<LeaderboardEntry> parseBoard(Object? decoded) {
+    try {
+      Object? content = decoded;
+      if (content is Map<String, dynamic>) {
+        final board = content['board'];
+        if (board is Map<String, dynamic>) {
+          content = board['content'];
+        } else {
+          content = content['content'] ?? content['board'];
+        }
+      }
+      if (content is! List) return const [];
+      return content
+          .whereType<Map<String, dynamic>>()
+          .map(LeaderboardEntry.fromJson)
+          .toList();
+    } catch (_) {
+      return const [];
+    }
+  }
 }
 
 /// Implementazione HTTP di [EngineClient] con `http.Client` iniettabile.
@@ -33,6 +94,7 @@ class HttpEngineClient implements EngineClient {
   final http.Client _client;
   final String baseUrl;
   final String gameId;
+  final String classification;
   final String username;
   final String password;
 
@@ -42,6 +104,7 @@ class HttpEngineClient implements EngineClient {
     http.Client? client,
     this.baseUrl = HubConfig.baseUrl,
     this.gameId = HubConfig.gameId,
+    this.classification = HubConfig.overallXpClassification,
     this.username = const String.fromEnvironment('HUB_USER', defaultValue: ''),
     this.password = const String.fromEnvironment('HUB_PASS', defaultValue: ''),
   }) : _client = client ?? http.Client();
@@ -110,6 +173,50 @@ class HttpEngineClient implements EngineClient {
     }
   }
 
+  /// Classifica XP `overall_xp` (Fase 1B-D): GET board con Bearer.
+  /// Lista vuota su offline o qualsiasi errore, mai throw.
+  Future<List<LeaderboardEntry>> getLeaderboard() async {
+    if (isOffline) return const [];
+    try {
+      if (_token == null && !await login()) return const [];
+      var board = await _getBoard();
+      if (board == null) {
+        // Token scaduto (24h) o 401: un re-login trasparente + un retry.
+        _token = null;
+        if (!await login()) return const [];
+        board = await _getBoard();
+      }
+      if (board == null) return const [];
+      return LeaderboardEntry.parseBoard(board);
+    } catch (e) {
+      debugPrint('Hub getLeaderboard fallito: $e');
+      return const [];
+    }
+  }
+
+  /// GET board grezzo (decoded JSON) o null in caso di errore/401.
+  Future<Object?> _getBoard() async {
+    try {
+      final response = await _client
+          .get(
+            Uri.parse('$baseUrl/games/$gameId/classifications/$classification/board'),
+            headers: {'Authorization': 'Bearer $_token'},
+          )
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 401) return null;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        debugPrint('Hub getLeaderboard HTTP ${response.statusCode}');
+        return null;
+      }
+      return jsonDecode(response.body);
+    } on TimeoutException {
+      debugPrint('Hub getLeaderboard fallito: timeout');
+      return null;
+    } catch (e) {
+      debugPrint('Hub getLeaderboard fallito: $e');
+      return null;
+    }
+  }
   Future<bool> _postExecution(
     String actionId,
     String playerId,
@@ -160,6 +267,7 @@ class HttpEngineClient implements EngineClient {
 
 /// Fake no-op di [EngineClient] (sempre successo): fallback offline e
 /// test del cablaggio senza rete. Registra le chiamate per le asserzioni.
+/// [leaderboardSeed] alimenta [getLeaderboard] nei test (default vuota).
 class FakeEngineClient implements EngineClient {
   /// Esito simulato di [execute] (default true = successo).
   bool result;
@@ -167,7 +275,11 @@ class FakeEngineClient implements EngineClient {
   /// Eventi inviati: `{actionId, playerId, data}`.
   final List<Map<String, dynamic>> calls = [];
 
-  FakeEngineClient({this.result = true});
+  /// Righe simulate della classifica (Fase 1B-D).
+  final List<LeaderboardEntry> leaderboardSeed;
+
+  FakeEngineClient({this.result = true, List<LeaderboardEntry>? leaderboardSeed})
+      : leaderboardSeed = List.unmodifiable(leaderboardSeed ?? const []);
 
   @override
   Future<bool> execute({
@@ -182,4 +294,8 @@ class FakeEngineClient implements EngineClient {
     });
     return result;
   }
+
+  @override
+  Future<List<LeaderboardEntry>> getLeaderboard() async =>
+      List<LeaderboardEntry>.unmodifiable(leaderboardSeed);
 }

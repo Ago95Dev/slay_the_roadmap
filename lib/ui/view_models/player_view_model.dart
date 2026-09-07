@@ -50,6 +50,29 @@ class PlayerViewModel with ChangeNotifier {
   String get _effectiveHubPlayerId =>
       _hubPlayerId.isNotEmpty ? _hubPlayerId : _progress.playerId;
 
+  /// playerId Hub effettivo (Fase 1B-D): usato per evidenziare "Tu".
+  String get hubPlayerId => _effectiveHubPlayerId;
+
+  /// Engine collegato (null = offline). Mai usato per logica locale.
+  EngineClient? get engine => _engine;
+
+  /// True quando la classifica non è consultabile (Fase 1B-D):
+  /// nessun engine oppure [HttpEngineClient] senza credenziali.
+  bool get isLeaderboardOffline {
+    final engine = _engine;
+    if (engine == null) return true;
+    if (engine is HttpEngineClient) return engine.isOffline;
+    return false;
+  }
+
+  /// Classifica XP best-effort (Fase 1B-D): lista vuota su offline/errore,
+  /// mai throw (garantito da [EngineClient.getLeaderboard]).
+  Future<List<LeaderboardEntry>> fetchLeaderboard() {
+    final engine = _engine;
+    if (engine == null) return Future.value(const <LeaderboardEntry>[]);
+    return engine.getLeaderboard();
+  }
+
   PlayerProgress get progress => _progress;
   PlayerInventory get inventory => _progress.inventory;
   Set<String> get claimedRewardTopics =>

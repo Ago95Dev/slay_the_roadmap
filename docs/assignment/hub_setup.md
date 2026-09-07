@@ -40,6 +40,11 @@ Senza define, nessuna chiamata di rete (Fake/offline).
 - boss `{badge:syntax_guardian}` → xp 200 (+100 bonus), level `Level 2`.
 - Stato letto da `GET /games/{id}/players/{pid}` (badge in chiave `badges`).
 
+## Classifica (voce D)
+
+- Classification `overall_xp` (GENERAL su `xp`, cron lun 8:00): `GET /games/{id}/classifications/overall_xp/board` → `{board:{content:[{position,playerId,score}]}}` (verificata con dati reali).
+- App: `EngineClient.getLeaderboard()` best-effort + schermata con stati vuota/offline.
+
 ## Resta per F7 (lato app)
 
 `EngineClient` + `FakeEngineClient`, login a runtime, chiamate best-effort in quiz/boss viewmodel, `gameId` in config.

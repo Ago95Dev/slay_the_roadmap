@@ -6,6 +6,7 @@ import '../animations/dungeon_motion.dart';
 import '../widgets/avatar_picker.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
+import 'leaderboard_screen.dart';
 import 'settings_screen.dart';
 
 /// Home (F5, US-05): CONTINUA solo se esiste un save con progressi,
@@ -166,6 +167,23 @@ class HomeScreen extends StatelessWidget {
           Icons.map,
           [Colors.blue, Colors.lightBlue],
           () => _startNewRun(context, hasProgress),
+          cardWidth,
+        ),
+        const SizedBox(height: 16),
+        _buildMenuCard(
+          context,
+          '🏆 CLASSIFICA',
+          'I migliori punteggi XP',
+          Icons.emoji_events,
+          [Colors.amber, Colors.orange],
+          () {
+            Navigator.push(
+              context,
+              DungeonPageRoute(
+                builder: (context) => const LeaderboardScreen(),
+              ),
+            );
+          },
           cardWidth,
         ),
         const SizedBox(height: 16),
