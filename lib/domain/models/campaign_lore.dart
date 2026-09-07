@@ -56,6 +56,23 @@ const Map<String, String> bossLores = {
       'davanti a chi costruisce con ordine e spedisce con cura.',
 };
 
+/// Tratti passivi dei boss (Voce C, 1 per boss): mostrati come riga
+/// "Tratto: ..." nel dialog lore pre-fight. Solo flavor + promemoria
+/// della meccanica, nessun numero nascosto.
+const Map<String, String> bossTraits = {
+  'man_in_the_middle':
+      'Tratto: Intercettazione — sotto il 75% di HP i suoi colpi '
+      'diventano speciali (-2).',
+  'the_amnesiac':
+      'Tratto: Oblio — ogni risposta errata ti fa dimenticare (-1 ⚡).',
+  'spaghetti_colossus':
+      'Tratto: Corazza — ignora il primo punto danno da carte '
+      '(i quiz la aggirano).',
+};
+
+/// Tratto passivo del boss (stringa vuota se boss sconosciuto).
+String bossTrait(String bossId) => bossTraits[bossId] ?? '';
+
 /// Finale narrativo con stats (chiude il bug endgame aperto).
 const String campaignCompleteTitle = 'Campagna completata! 🎉';
 
@@ -74,6 +91,42 @@ const List<String> campaignBossIds = [
   'the_amnesiac',
   'spaghetti_colossus',
 ];
+
+/// Titoli per capitolo (Fase 1B-B): assegnati al completamento del
+/// capitolo (tutti i topic + boss sconfitto). L'ultimo vinto è attivo.
+const Map<String, String> chapterTitles = {
+  'web_network': 'Sentinella della Rete',
+  'web_data': 'Custode dei Dati',
+  'web_building': 'Architetto del Web',
+};
+
+/// Capitolo di appartenenza di un boss finale.
+String? chapterIdForBossId(String bossId) {
+  switch (bossId) {
+    case 'man_in_the_middle':
+      return 'web_network';
+    case 'the_amnesiac':
+      return 'web_data';
+    case 'spaghetti_colossus':
+      return 'web_building';
+    default:
+      return null;
+  }
+}
+
+/// Boss finale di un capitolo root.
+String? bossIdForChapterId(String chapterId) {
+  switch (chapterId) {
+    case 'web_network':
+      return 'man_in_the_middle';
+    case 'web_data':
+      return 'the_amnesiac';
+    case 'web_building':
+      return 'spaghetti_colossus';
+    default:
+      return null;
+  }
+}
 
 /// Capitolo di appartenenza di un topic (root o subtopic).
 String? chapterIdForTopicId(String topicId) {
