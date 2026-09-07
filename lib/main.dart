@@ -43,9 +43,11 @@ Future<void> main() async {
   runApp(MyAppRoot(session: session));
 }
 
-/// Root con sessione (F10): osserva [SessionController] e monta lo switch
-/// profili oppure la Home dell'utente attivo (i ViewModel per-utente sono
-/// forniti qui; il cambio utente ricostruisce il Navigator da zero).
+/// Root con sessione (F10, F11): osserva [SessionController] e monta lo
+/// switch profili, poi la selezione campagna (dopo il login, prima della
+/// Home), poi la Home dell'utente per la campagna attiva (i ViewModel
+/// per-utente e per-campagna sono forniti qui; il cambio utente o campagna
+/// ricostruisce il Navigator da zero).
 class MyAppRoot extends StatelessWidget {
   final SessionController session;
 
@@ -68,13 +70,20 @@ class MyAppRoot extends StatelessWidget {
             );
           } else if (active == null || player == null || roadmap == null) {
             home = ProfileSwitchScreen(session: watched);
+          } else if (!watched.hasSelectedCampaign) {
+            home = CampaignSelectionScreen(
+              key: ValueKey('campaign_${active.userId}'),
+              session: watched,
+            );
           } else {
             home = MultiProvider(
               providers: [
                 ChangeNotifierProvider.value(value: roadmap),
                 ChangeNotifierProvider.value(value: player),
               ],
-              child: HomeScreen(key: ValueKey(active.userId)),
+              child: HomeScreen(
+                key: ValueKey('${active.userId}_${watched.activeCampaignId}'),
+              ),
             );
           }
           return MaterialApp(

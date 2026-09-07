@@ -210,6 +210,7 @@ class HomeScreen extends StatelessWidget {
     double cardWidth,
     bool hasProgress,
   ) {
+    final session = SessionController.maybeOf(context);
     return Column(
       children: [
         if (hasProgress) ...[
@@ -242,6 +243,20 @@ class HomeScreen extends StatelessWidget {
           () => _startNewRun(context, hasProgress),
           cardWidth,
         ),
+        // Cambio campagna (F11): solo con sessione attiva (nascosto nei
+        // test che montano la Home senza SessionController).
+        if (session != null) ...[
+          const SizedBox(height: 16),
+          _buildMenuCard(
+            context,
+            '🗺️ CAMPAGNE',
+            'Cambia campagna o scopri le prossime',
+            Icons.explore,
+            [Colors.teal, Colors.cyan],
+            () => session.backToCampaignSelection(),
+            cardWidth,
+          ),
+        ],
         const SizedBox(height: 16),
         _buildMenuCard(
           context,

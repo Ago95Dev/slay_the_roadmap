@@ -3,15 +3,18 @@ import 'package:provider/provider.dart';
 
 import '../../data/repositories/roadmap_repository.dart';
 import '../../data/services/engine_client.dart';
+import '../../data/services/hub_identity.dart';
 import '../../data/services/user_store.dart';
+import '../../domain/models/campaign.dart';
 import '../../domain/models/player_progress.dart';
 import '../../domain/models/user_profile.dart';
 import 'player_view_model.dart';
 import 'roadmap_view_model.dart';
 
-/// Sessione utente (F10): tiene il profilo attivo + i ViewModel caricati
-/// per quell'utente (save isolato `slay_data_<id>`). Logout = smonta i
-/// ViewModel e torna alla schermata di scelta profilo.
+/// Sessione utente (F10, F11): tiene il profilo attivo + i ViewModel caricati
+/// per quell'utente e per la campagna attiva (save isolato per coppia
+/// utente×campagna). Logout = smonta i ViewModel e torna alla schermata
+/// di scelta profilo.
 class SessionController with ChangeNotifier {
   final UserStore users;
   final EngineClient? engine;
@@ -20,6 +23,12 @@ class SessionController with ChangeNotifier {
   PlayerViewModel? player;
   RoadmapViewModel? roadmap;
   bool ready = false;
+
+  /// Campagna attiva (id, default spedita) + flag di selezione esplicita
+  /// (persistito): finché false la root mostra la selezione campagne
+  /// prima della Home.
+  String activeCampaignId = CampaignRepository.webFoundationsId;
+  bool campaignSelected = false;
 
   SessionController(this.users, {this.engine});
 
@@ -34,12 +43,22 @@ class SessionController with ChangeNotifier {
     }
   }
 
-  /// playerId Hub del profilo (disegno utenti_campagne_hub §2: un player
-  /// per coppia utente×campagna; campagna unica oggi → solo userId, la
-  /// F11 aggiungerà il suffisso campagna senza cambiare meccaniche).
-  static String hubPlayerIdFor(String userId) => 'slay_$userId';
+  /// playerId Hub della coppia (utente, campagna)
+  /// (disegno utenti_campagne_hub §2: `slay_<userId>_<campaignId>`).
+  static String hubPlayerIdFor(String userId, [String? campaignId]) =>
+      HubIdentity.playerIdFor(userId, campaignId);
 
   bool get isLoggedIn => activeProfile != null;
+
+  /// True quando l'utente ha già scelto la campagna (niente selezione).
+  bool get hasSelectedCampaign => isLoggedIn && campaignSelected;
+
+  /// Campagna attiva (sempre nota, default spedita).
+  Campaign? get activeCampaign =>
+      CampaignRepository.byId(activeCampaignId);
+
+  /// Tutte le campagne per la schermata di selezione.
+  List<Campaign> get availableCampaigns => CampaignRepository.list();
 
   /// Ripristina l'utente attivo (se presente) al bootstrap in `main`.
   Future<void> restore() async {
@@ -74,16 +93,68 @@ class SessionController with ChangeNotifier {
     return profile;
   }
 
+  /// Sceglie la campagna [campaignId] e carica il suo progress isolato.
+  /// Lancia [StateError] se la campagna è coming soon (non selezionabile):
+  /// in quel caso la sessione resta sulla campagna corrente.
+  Future<void> selectCampaign(String campaignId) async {
+    final profile = activeProfile;
+    if (profile == null) {
+      throw StateError('Nessun utente attivo: accedi prima.');
+    }
+    if (!CampaignRepository.isSelectable(campaignId)) {
+      throw StateError('Campagna "$campaignId" non disponibile (coming soon).');
+    }
+    final persistence = users.dataFor(profile.userId);
+    await persistence.saveActiveCampaignId(campaignId);
+    await persistence.saveCampaignSelected(true);
+    await _openCampaign(profile, campaignId, selected: true);
+    notifyListeners();
+  }
+
+  /// Torna alla selezione campagne (la Home resta dietro, i progress
+  /// salvati sono intatti). Usato da "Cambia campagna" in Home.
+  Future<void> backToCampaignSelection() async {
+    final profile = activeProfile;
+    if (profile == null) return;
+    await users.dataFor(profile.userId).saveCampaignSelected(false);
+    campaignSelected = false;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     await users.logout();
     activeProfile = null;
     player = null;
     roadmap = null;
+    activeCampaignId = CampaignRepository.webFoundationsId;
+    campaignSelected = false;
     notifyListeners();
   }
 
   Future<void> _openSession(UserProfile profile) async {
     final persistence = users.dataFor(profile.userId);
+    String? savedCampaign;
+    bool selected = false;
+    try {
+      savedCampaign = await persistence.loadActiveCampaignId();
+      selected = await persistence.loadCampaignSelected();
+    } on Exception {
+      savedCampaign = null;
+      selected = false;
+    }
+    await _openCampaign(
+      profile,
+      savedCampaign ?? CampaignRepository.webFoundationsId,
+      selected: selected,
+    );
+  }
+
+  Future<void> _openCampaign(
+    UserProfile profile,
+    String campaignId, {
+    required bool selected,
+  }) async {
+    final persistence = users.dataFor(profile.userId, campaignId: campaignId);
     PlayerProgress? saved;
     Set<String> claimed = {};
     try {
@@ -100,16 +171,19 @@ class SessionController with ChangeNotifier {
       claimedTopics: claimed,
       persistence: persistence,
       engine: engine,
-      hubPlayerId: hubPlayerIdFor(profile.userId),
+      hubPlayerId: hubPlayerIdFor(profile.userId, campaignId),
     );
     final roadmapVm = RoadmapViewModel(
       LocalRoadmapRepository(),
+      campaignId: campaignId,
       // Campagna US-04: il gate `requiredBossId` legge le vittorie reali.
       isBossDefeated: playerVm.isBossDefeated,
     );
     await roadmapVm.loadRoadmap();
     roadmapVm.applyCompletedTopics(saved.completedTopicIds);
     activeProfile = profile;
+    activeCampaignId = campaignId;
+    campaignSelected = selected;
     player = playerVm;
     roadmap = roadmapVm;
   }

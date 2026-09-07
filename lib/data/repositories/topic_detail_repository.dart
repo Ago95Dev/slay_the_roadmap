@@ -1,8 +1,9 @@
+import '../../domain/models/campaign.dart';
 import '../../domain/models/topic_detail.dart';
 
 abstract class TopicDetailRepository {
-  Future<TopicDetail?> getTopicDetail(String topicId);
-  Future<Map<String, TopicDetail>> getAllTopicDetails();
+  Future<TopicDetail?> getTopicDetail(String topicId, {String? campaignId});
+  Future<Map<String, TopicDetail>> getAllTopicDetails({String? campaignId});
 }
 
 class LocalTopicDetailRepository implements TopicDetailRepository {
@@ -238,13 +239,17 @@ class LocalTopicDetailRepository implements TopicDetailRepository {
   };
 
   @override
-  Future<TopicDetail?> getTopicDetail(String topicId) async {
+  Future<TopicDetail?> getTopicDetail(String topicId,
+      {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 300));
     return _topicDetails[topicId];
   }
 
   @override
-  Future<Map<String, TopicDetail>> getAllTopicDetails() async {
+  Future<Map<String, TopicDetail>> getAllTopicDetails(
+      {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 500));
     return _topicDetails;
   }

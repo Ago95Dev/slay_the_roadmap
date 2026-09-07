@@ -14,10 +14,11 @@ class _FakeRoadmapRepository implements RoadmapRepository {
   _FakeRoadmapRepository(this.seed);
 
   @override
-  Future<List<Topic>> getDartRoadmap() async => seed;
+  Future<List<Topic>> getDartRoadmap({String? campaignId}) async => seed;
 
   @override
-  Future<Topic?> getTopicWithDetail(String topicId) async =>
+  Future<Topic?> getTopicWithDetail(String topicId,
+          {String? campaignId}) async =>
       seed.firstWhere((t) => t.id == topicId);
 
   @override

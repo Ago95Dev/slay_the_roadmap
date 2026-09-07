@@ -6,6 +6,9 @@ import '../../data/repositories/roadmap_repository.dart';
 class RoadmapViewModel with ChangeNotifier {
   final RoadmapRepository _repository;
 
+  /// Campagna di cui caricare la roadmap (F11, default seed Web).
+  final String? campaignId;
+
   /// Campagna US-04: true se il boss [bossId] è stato sconfitto.
   /// Opzionale (default: sempre false) così i vecchi test senza
   /// PlayerViewModel restano invariati. Cablata in `main.dart` da
@@ -18,6 +21,7 @@ class RoadmapViewModel with ChangeNotifier {
 
   RoadmapViewModel(
     this._repository, {
+    this.campaignId,
     bool Function(String bossId)? isBossDefeated,
   }) : isBossDefeated = isBossDefeated ?? ((_) => false);
 
@@ -31,7 +35,7 @@ class RoadmapViewModel with ChangeNotifier {
     notifyListeners();
 
     try {
-      _topics = await _repository.getDartRoadmap();
+      _topics = await _repository.getDartRoadmap(campaignId: campaignId);
       _error = null;
     } catch (e) {
       _error = 'Failed to load roadmap: $e';
@@ -44,7 +48,8 @@ class RoadmapViewModel with ChangeNotifier {
 
   Future<Topic?> getTopicWithDetail(String topicId) async {
     try {
-      return await _repository.getTopicWithDetail(topicId);
+      return await _repository.getTopicWithDetail(topicId,
+          campaignId: campaignId);
     } catch (e) {
       print('Error loading topic detail: $e');
       return null;

@@ -1,7 +1,8 @@
+import '../../domain/models/campaign.dart';
 import '../../domain/models/quiz.dart';
 
 abstract class QuizRepository {
-  Future<Quiz> getQuizForTopic(String topicId);
+  Future<Quiz> getQuizForTopic(String topicId, {String? campaignId});
   Future<QuizResult> submitQuizAnswers(String quizId, List<int> selectedAnswers);
 }
 
@@ -754,7 +755,8 @@ class LocalQuizRepository implements QuizRepository {
   };
 
   @override
-  Future<Quiz> getQuizForTopic(String topicId) async {
+  Future<Quiz> getQuizForTopic(String topicId, {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 300)); // Simulate loading
     final quiz = _quizzes['quiz_$topicId'];
     if (quiz == null) {

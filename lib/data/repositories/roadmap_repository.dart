@@ -1,12 +1,13 @@
+import '../../domain/models/campaign.dart';
 import '../../domain/models/topic.dart';
 import 'topic_detail_repository.dart';
 
 abstract class RoadmapRepository {
-  Future<List<Topic>> getDartRoadmap();
+  Future<List<Topic>> getDartRoadmap({String? campaignId});
   Future<void> updateTopicStatus(String topicId, TopicStatus status);
   Future<void> expandCollapseTopic(String topicId, bool isExpanded);
   Future<void> unlockNextTopic(String completedTopicId);
-  Future<Topic?> getTopicWithDetail(String topicId);
+  Future<Topic?> getTopicWithDetail(String topicId, {String? campaignId});
 }
 
 class LocalRoadmapRepository implements RoadmapRepository {
@@ -138,7 +139,8 @@ class LocalRoadmapRepository implements RoadmapRepository {
   ];
 
   @override
-  Future<List<Topic>> getDartRoadmap() async {
+  Future<List<Topic>> getDartRoadmap({String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 500));
     return _dartRoadmap;
   }
@@ -162,7 +164,9 @@ class LocalRoadmapRepository implements RoadmapRepository {
   }
 
   @override
-  Future<Topic?> getTopicWithDetail(String topicId) async {
+  Future<Topic?> getTopicWithDetail(String topicId,
+      {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     final topic = _findTopic(_dartRoadmap, topicId);
     if (topic != null) {
       final detail = await _detailRepository.getTopicDetail(topicId);

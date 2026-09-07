@@ -113,7 +113,8 @@ void main() {
       await session.register(username: 'Bob', password: 'y');
       expect(session.activeProfile!.displayName, 'Bob');
       expect(session.player!.hasProgress, isFalse);
-      expect(session.player!.hubPlayerId, 'slay_${session.activeProfile!.userId}');
+      expect(session.player!.hubPlayerId,
+          'slay_${session.activeProfile!.userId}_web_foundations');
 
       await session.login(username: 'Ada', password: 'x');
       expect(session.player!.progress.completedTopicIds, ['web_network']);

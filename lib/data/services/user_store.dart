@@ -105,9 +105,11 @@ class UserStore {
 
   Future<void> logout() => setActive(null);
 
-  /// Persistenza del save isolato del profilo [userId].
-  SharedPreferencesPersistence dataFor(String userId) =>
-      SharedPreferencesPersistence.forUser(prefs, userId);
+  /// Persistenza del save isolato del profilo [userId] (F10), bucket
+  /// campagna [campaignId] (F11, default campagna spedita).
+  SharedPreferencesPersistence dataFor(String userId, {String? campaignId}) =>
+      SharedPreferencesPersistence.forUser(prefs, userId,
+          campaignId: campaignId);
 
   // ------------------------------------------------------- registrazione
 

@@ -1,4 +1,5 @@
 import '../../domain/models/boss_fight.dart';
+import '../../domain/models/campaign.dart';
 import '../../domain/models/reward.dart';
 import '../../domain/models/quiz.dart';
 import 'quiz_repository.dart';
@@ -11,7 +12,9 @@ class BossRepository {
       : _quizRepository = quizRepository ?? LocalQuizRepository();
 
   /// Topic del capitolo: da qui si pescano le domande del turno boss.
-  static List<String> chapterTopicIds(String chapterId) {
+  static List<String> chapterTopicIds(String chapterId,
+      [String? campaignId]) {
+    CampaignRepository.requireActive(campaignId);
     switch (chapterId) {
       case 'web_network':
         return const [
@@ -40,29 +43,36 @@ class BossRepository {
   }
 
   // Mock boss fights for now
-  Future<List<BossFight>> getAllBosses() async {
+  Future<List<BossFight>> getAllBosses({String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 300));
     return [
-      for (final boss in _mockBosses) await _withChapterQuizzes(boss),
+      for (final boss in _mockBosses)
+        await _withChapterQuizzes(boss, campaignId),
     ];
   }
 
-  Future<BossFight?> getBossById(String id) async {
+  Future<BossFight?> getBossById(String id, {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 200));
     try {
       return await _withChapterQuizzes(
         _mockBosses.firstWhere((boss) => boss.id == id),
+        campaignId,
       );
     } catch (e) {
       return null;
     }
   }
 
-  Future<BossFight?> getBossByChapterId(String chapterId) async {
+  Future<BossFight?> getBossByChapterId(String chapterId,
+      {String? campaignId}) async {
+    CampaignRepository.requireActive(campaignId);
     await Future.delayed(const Duration(milliseconds: 200));
     try {
       return await _withChapterQuizzes(
         _mockBosses.firstWhere((boss) => boss.chapterId == chapterId),
+        campaignId,
       );
     } catch (e) {
       return null;
@@ -72,15 +82,18 @@ class BossRepository {
   /// Se il boss non ha adaptiveQuizzes, li popola con i quiz dei topic
   /// del suo capitolo (fallback per il turno boss).
   @visibleForTesting
-  Future<BossFight> populateChapterQuizzes(BossFight boss) =>
-      _withChapterQuizzes(boss);
+  Future<BossFight> populateChapterQuizzes(BossFight boss,
+          {String? campaignId}) =>
+      _withChapterQuizzes(boss, campaignId);
 
-  Future<BossFight> _withChapterQuizzes(BossFight boss) async {
+  Future<BossFight> _withChapterQuizzes(BossFight boss,
+      [String? campaignId]) async {
     if (boss.adaptiveQuizzes.isNotEmpty) return boss;
     final quizzes = <Quiz>[];
-    for (final topicId in chapterTopicIds(boss.chapterId)) {
+    for (final topicId in chapterTopicIds(boss.chapterId, campaignId)) {
       try {
-        quizzes.add(await _quizRepository.getQuizForTopic(topicId));
+        quizzes.add(await _quizRepository.getQuizForTopic(topicId,
+            campaignId: campaignId));
       } catch (_) {
         // Topic senza quiz: si salta, le altre domande bastano.
       }
