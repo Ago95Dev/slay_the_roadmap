@@ -128,10 +128,26 @@ class _LeaderboardScreenState extends State<LeaderboardScreen> {
       return Scaffold(
         appBar: AppBar(title: const Text('🏆 Classifica')),
         body: const Center(
-          child: Text(
-            'Classifica non disponibile offline',
-            key: Key('leaderboard_offline'),
-            textAlign: TextAlign.center,
+          child: Padding(
+            padding: EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Classifica non disponibile offline',
+                  key: Key('leaderboard_offline'),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  "Avvia l'app con le credenziali Hub "
+                  '(--dart-define=HUB_USER/...) per vedere '
+                  'la classifica mondiale.',
+                  key: Key('leaderboard_offline_hint'),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         ),
       );

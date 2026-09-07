@@ -9,6 +9,7 @@ import '../widgets/daily_reward_banner.dart';
 import '../widgets/player_hud.dart';
 import 'roadmap_screen.dart';
 import 'leaderboard_screen.dart';
+import 'campaign_selection_screen.dart';
 import 'settings_screen.dart';
 
 /// Home (F5, US-05): CONTINUA solo se esiste un save con progressi,
@@ -155,6 +156,24 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  /// Torna alla selezione campagne (F11): azzera il flag così l'Hub
+  /// nasconde CONTINUA e mostra l'invito, POI apre davvero la lista
+  /// (BUG 1: il solo reset del flag non navigava — dal device il tap
+  /// sembrava non fare nulla). Da chiamare col [context] della Home.
+  Future<void> _openCampaigns(
+    BuildContext context,
+    SessionController session,
+  ) async {
+    await session.backToCampaignSelection();
+    if (!context.mounted) return;
+    Navigator.push(
+      context,
+      DungeonPageRoute(
+        builder: (_) => CampaignSelectionScreen(session: session),
+      ),
+    );
+  }
+
   Widget _buildMenuColumn(
     BuildContext context,
     double cardWidth,
@@ -204,7 +223,7 @@ class HomeScreen extends StatelessWidget {
             'Cambia campagna o scopri le prossime',
             Icons.explore,
             [Colors.teal, Colors.cyan],
-            () => session.backToCampaignSelection(),
+            () => _openCampaigns(context, session),
             cardWidth,
           ),
         ],
