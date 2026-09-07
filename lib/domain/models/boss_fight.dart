@@ -46,6 +46,14 @@ class BossFight extends Equatable {
   bool get isBossDefeated => currentHp <= 0;
   bool get isPlayerDefeated => currentPlayerHp <= 0;
 
+  /// Soglia enrage per boss (Voce C): il Man-in-the-Middle intercetta
+  /// tutto ciò che non è cifrato e si arrabbia prima (special già sotto
+  /// il 75% di HP); gli altri boss a HP ≤50%.
+  double get enrageThreshold =>
+      id == 'man_in_the_middle' ? 0.75 : 0.5;
+
+  bool get isEnraged => bossHpPercentage <= enrageThreshold;
+
   /// Una carta costa 1 energia; a 0 le carte sono bloccate (il quiz resta
   /// sempre disponibile).
   bool get canUseCard =>
@@ -56,7 +64,7 @@ class BossFight extends Equatable {
   List<BossActionType> get availableBossActions {
     if (bossHpPercentage <= 0.25) {
       return [BossActionType.specialAttack];
-    } else if (bossHpPercentage <= 0.5) {
+    } else if (bossHpPercentage <= enrageThreshold) {
       return [BossActionType.specialAttack, BossActionType.normalAttack];
     } else if (bossHpPercentage <= 0.75) {
       return [BossActionType.normalAttack, BossActionType.heal];

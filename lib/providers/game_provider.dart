@@ -2,6 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../config/hub_config.dart';
+import '../domain/models/analytics_log.dart';
+import '../domain/models/campaign_lore.dart';
+import '../domain/models/player_progress.dart';
 import '../models/types.dart';
 import '../data/skill_tree_data.dart';
 import '../data/roadmap_data.dart' as data;
@@ -44,6 +47,14 @@ class GameProvider with ChangeNotifier {
   String? _selectedPath;
   bool _hasStartedJourney = false;
 
+  // --- Fase 1B / F12: Avatar, Daily Reward, Analytics ---
+  int _avatarIconIndex = 0;
+  int _avatarFrameIndex = 0;
+  String _activeTitle = '';
+  String _lastDailyClaim = '';
+  Map<String, int> _failCount = {};
+  AnalyticsLog _analytics = const AnalyticsLog();
+
   // Getters
   List<String> get completedTopics => _completedTopics;
   List<String> get skippedTopics => _skippedTopics;
@@ -62,6 +73,113 @@ class GameProvider with ChangeNotifier {
   int get gold => _gold;
   String? get selectedPath => _selectedPath;
   bool get hasStartedJourney => _hasStartedJourney;
+
+  // --- Fase 1B / F12: Getters ---
+  int get avatarIconIndex => _avatarIconIndex;
+  int get avatarFrameIndex => _avatarFrameIndex;
+  String get activeTitle => _activeTitle;
+  bool get hasTitle => _activeTitle.isNotEmpty;
+  String get lastDailyClaim => _lastDailyClaim;
+  Map<String, int> get failCount => _failCount;
+  AnalyticsLog get analytics => _analytics;
+  String get hubPlayerId => _hubPlayerId;
+
+  /// Icona avatar corrente (indice clampato per i save corrotti).
+  String get avatarIcon => PlayerProgress.avatarIcons[
+      _avatarIconIndex.clamp(0, PlayerProgress.avatarIcons.length - 1)];
+
+  /// Valore ARGB della cornice avatar corrente (indice clampato).
+  int get avatarFrameColorValue => PlayerProgress.avatarFrameColorValues[
+      _avatarFrameIndex.clamp(0, PlayerProgress.avatarFrameColorValues.length - 1)];
+
+  /// XP del bonus giornaliero (Fase 1B-E).
+  static const int dailyRewardXp = 25;
+
+  /// Data odierna in formato `yyyy-MM-dd`.
+  static String dailyDateString(DateTime date) {
+    final m = date.month.toString().padLeft(2, '0');
+    final d = date.day.toString().padLeft(2, '0');
+    return '${date.year}-$m-$d';
+  }
+
+  /// True se la ricompensa giornaliera è ancora da riscattare oggi.
+  bool get isDailyRewardAvailable =>
+      _lastDailyClaim != dailyDateString(DateTime.now());
+
+  /// Riscatta il bonus giornaliero (+25 XP). Ritorna true al primo claim.
+  bool claimDailyReward({DateTime? now}) {
+    final today = dailyDateString(now ?? DateTime.now());
+    if (_lastDailyClaim == today) return false;
+    _lastDailyClaim = today;
+    _awardExperience(dailyRewardXp);
+    _analytics = _analytics.record(
+      AnalyticsEvent.rewardClaim,
+      value: dailyRewardXp,
+    );
+    _saveProgress();
+    notifyListeners();
+    return true;
+  }
+
+  /// Avatar (Fase 1B-B): cambia icona e/o cornice.
+  void setAvatar({int? iconIndex, int? frameIndex}) {
+    final icons = PlayerProgress.avatarIcons.length;
+    final frames = PlayerProgress.avatarFrameColorValues.length;
+    final nextIcon = (iconIndex ?? _avatarIconIndex).clamp(0, icons - 1);
+    final nextFrame = (frameIndex ?? _avatarFrameIndex).clamp(0, frames - 1);
+    if (nextIcon == _avatarIconIndex && nextFrame == _avatarFrameIndex) return;
+    _avatarIconIndex = nextIcon;
+    _avatarFrameIndex = nextFrame;
+    _saveProgress();
+    notifyListeners();
+  }
+
+  /// Titolo capitolo (Fase 1B-B): assegnato al completamento.
+  bool checkAndAwardChapterTitle(
+    String chapterId, {
+    required bool chapterComplete,
+    required bool bossDefeated,
+  }) {
+    if (!chapterComplete || !bossDefeated) return false;
+    final title = chapterTitles[chapterId];
+    if (title == null || title.isEmpty) return false;
+    if (_activeTitle == title) return false;
+    _activeTitle = title;
+    _saveProgress();
+    notifyListeners();
+    return true;
+  }
+
+  /// Topic "da ripassare" (F12): id con almeno 2 fallimenti.
+  List<String> get reviewTopics {
+    final entries = _failCount.entries
+        .where((e) => e.value >= PlayerProgress.reviewThreshold)
+        .toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return [for (final e in entries) e.key];
+  }
+
+  /// Fallimenti registrati per [topicId].
+  int failCountOf(String topicId) => _failCount[topicId] ?? 0;
+
+  /// Registra un fallimento per il topic (F12).
+  void recordQuizFail(String topicId) {
+    _failCount = Map<String, int>.from(_failCount);
+    _failCount[topicId] = (_failCount[topicId] ?? 0) + 1;
+    _analytics = _analytics.record(
+      AnalyticsEvent.quizFail,
+      topicId: topicId,
+    );
+    _saveProgress();
+    notifyListeners();
+  }
+
+  /// Registra l'avvio di una sessione (F12).
+  void recordSessionStart() {
+    _analytics = _analytics.record(AnalyticsEvent.sessionStart);
+    _saveProgress();
+    notifyListeners();
+  }
 
   int get availableSkillPoints {
     final used = _skillTree.where((s) => s.unlocked).fold(0, (sum, s) => sum + s.cost);
@@ -133,6 +251,17 @@ class GameProvider with ChangeNotifier {
       _viewedResources = Set<String>.from(progress['viewedResources'] ?? []);
       _selectedPath = progress['selectedPath'];
       _hasStartedJourney = progress['hasStartedJourney'] ?? false;
+      // Fase 1B / F12: carica nuovi campi con default per save vecchi
+      _avatarIconIndex = progress['avatarIconIndex'] ?? 0;
+      _avatarFrameIndex = progress['avatarFrameIndex'] ?? 0;
+      _activeTitle = progress['activeTitle'] ?? '';
+      _lastDailyClaim = progress['lastDailyClaim'] ?? '';
+      _failCount = Map<String, int>.from(
+        (progress['failCount'] as Map<String, dynamic>?)?.map(
+          (k, v) => MapEntry(k, (v as num).toInt()),
+        ) ?? {},
+      );
+      _analytics = AnalyticsLog.fromJson(progress['analytics'] as List?);
       
       if (progress['cardUpgrades'] != null) {
         _cardUpgrades = (progress['cardUpgrades'] as Map<String, dynamic>).map(
@@ -188,6 +317,13 @@ class GameProvider with ChangeNotifier {
       'selectedPath': _selectedPath,
       'hasStartedJourney': _hasStartedJourney,
       'cardUpgrades': _cardUpgrades.map((k, v) => MapEntry(k, v.toJson())),
+      // Fase 1B / F12
+      'avatarIconIndex': _avatarIconIndex,
+      'avatarFrameIndex': _avatarFrameIndex,
+      'activeTitle': _activeTitle,
+      'lastDailyClaim': _lastDailyClaim,
+      'failCount': _failCount,
+      'analytics': _analytics.toJson(),
     };
     await _storage.saveProgress(progress);
   }
@@ -243,6 +379,8 @@ class GameProvider with ChangeNotifier {
   // Complete a topic quiz
   void completeTopicQuiz(String topicId, int score, bool passed) {
     if (!passed) {
+      // F12: registra il fallimento per "Da ripassare"
+      recordQuizFail(topicId);
       _saveProgress();
       notifyListeners();
       return;
@@ -261,6 +399,14 @@ class GameProvider with ChangeNotifier {
         'xp_amount': HubConfig.quizXpAmount,
         'badge': topicId,
       });
+
+      // F12: registra analytics quiz passato e pulisci failCount
+      _analytics = _analytics.record(
+        AnalyticsEvent.quizPass,
+        topicId: topicId,
+        value: experienceReward,
+      );
+      _failCount = Map<String, int>.from(_failCount)..remove(topicId);
       
       // Find and complete the corresponding roadmap node
       final topicNode = _roadmapNodes.where((node) => 
@@ -550,6 +696,11 @@ class GameProvider with ChangeNotifier {
       _hubEvent(HubConfig.bossDefeatedAction, {
         'badge': node.bossId!,
       });
+      // F12: analytics boss sconfitto
+      _analytics = _analytics.record(
+        AnalyticsEvent.bossWin,
+        topicId: node.bossId,
+      );
     }
 
     _saveProgress();
@@ -792,6 +943,13 @@ class GameProvider with ChangeNotifier {
     _prestigeLevel = 0;
     _runHistory = [];
     _gold = 0;
+    // Fase 1B / F12: reset nuovi campi
+    _avatarIconIndex = 0;
+    _avatarFrameIndex = 0;
+    _activeTitle = '';
+    _lastDailyClaim = '';
+    _failCount = {};
+    _analytics = const AnalyticsLog();
     _initializeRoadmap();
     await _storage.resetProgress();
     notifyListeners();

@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'analytics_log.dart';
 import 'reward.dart';
 import 'quiz.dart';
 import 'boss_fight.dart';
@@ -51,6 +52,52 @@ class PlayerProgress extends Equatable {
   /// completamento, non a ogni apertura della roadmap.
   final bool campaignCompletionSeen;
 
+  /// Avatar scelto (Fase 1B-B, default 0, persistiti): indici in
+  /// [avatarIcons] / [avatarFrameColorValues]. I save vecchi senza
+  /// questi campi ripartono dal default (mago + cornice viola).
+  final int avatarIconIndex;
+  final int avatarFrameIndex;
+
+  /// Titolo attivo (Fase 1B-B, default '', persistito): ultimo titolo
+  /// di capitolo vinto (niente scelta multipla). '' = nessun titolo.
+  final String activeTitle;
+
+  /// Ultimo claim della ricompensa giornaliera (Fase 1B-E, default '',
+  /// persistito): data `yyyy-MM-dd` dell'ultimo claim, '' = mai riscattata.
+  final String lastDailyClaim;
+
+  /// Quiz topic falliti per topic (F12, default {}, persistito): +1 a ogni
+  /// quiz topic fallito (mai nei boss), azzerato al passaggio del topic.
+  final Map<String, int> failCount;
+
+  /// Soglia fallimenti per entrare in "Da ripassare" (F12).
+  static const int reviewThreshold = 2;
+
+  /// Analytics locali per l'Evaluation (F12, default vuoto, persistito):
+  /// solo conteggi (quiz pass/fail, boss win/lose, reward, sessioni).
+  final AnalyticsLog analytics;
+
+  /// Icone avatar tra cui scegliere (emoji semplici, tema fantasy).
+  static const List<String> avatarIcons = ['🧙', '🦊', '🤖'];
+
+  /// Cornici avatar tra cui scegliere (ARGB, mappate a Color in UI).
+  static const List<int> avatarFrameColorValues = [
+    0xFF7C4DFF, // viola
+    0xFF009688, // teal
+    0xFFF57C00, // arancio
+  ];
+
+  /// Icona avatar corrente (indice clampato per i save corrotti).
+  String get avatarIcon => avatarIcons[
+      avatarIconIndex.clamp(0, avatarIcons.length - 1)];
+
+  /// Valore ARGB della cornice avatar corrente (indice clampato).
+  int get avatarFrameColorValue => avatarFrameColorValues[
+      avatarFrameIndex.clamp(0, avatarFrameColorValues.length - 1)];
+
+  /// True se il giocatore ha già vinto almeno un titolo.
+  bool get hasTitle => activeTitle.isNotEmpty;
+
   /// Livello derivato da [experience] (F6: niente più level salvato).
   int get level => levelForXp(experience);
 
@@ -95,6 +142,12 @@ class PlayerProgress extends Equatable {
     this.maxStreak = 0,
     this.seenChapterIntros = const [],
     this.campaignCompletionSeen = false,
+    this.avatarIconIndex = 0,
+    this.avatarFrameIndex = 0,
+    this.activeTitle = '',
+    this.lastDailyClaim = '',
+    this.failCount = const {},
+    this.analytics = const AnalyticsLog(),
   });
 
   factory PlayerProgress.initial() {
@@ -111,6 +164,16 @@ class PlayerProgress extends Equatable {
   }
 
   bool isTopicCompleted(String topicId) => completedTopicIds.contains(topicId);
+
+  /// Topic "da ripassare" (F12): id con almeno [reviewThreshold]
+  /// fallimenti, ordinati per fallimenti desc (i più deboli prima).
+  List<String> get topicsToReview {
+    final entries = failCount.entries
+        .where((e) => e.value >= reviewThreshold)
+        .toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return [for (final e in entries) e.key];
+  }
 
   PlayerProgress addCompletedTopic(String topicId) {
     return copyWith(
@@ -153,6 +216,12 @@ class PlayerProgress extends Equatable {
     int? maxStreak,
     List<String>? seenChapterIntros,
     bool? campaignCompletionSeen,
+    int? avatarIconIndex,
+    int? avatarFrameIndex,
+    String? activeTitle,
+    String? lastDailyClaim,
+    Map<String, int>? failCount,
+    AnalyticsLog? analytics,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -169,6 +238,12 @@ class PlayerProgress extends Equatable {
       seenChapterIntros: seenChapterIntros ?? this.seenChapterIntros,
       campaignCompletionSeen:
           campaignCompletionSeen ?? this.campaignCompletionSeen,
+      avatarIconIndex: avatarIconIndex ?? this.avatarIconIndex,
+      avatarFrameIndex: avatarFrameIndex ?? this.avatarFrameIndex,
+      activeTitle: activeTitle ?? this.activeTitle,
+      lastDailyClaim: lastDailyClaim ?? this.lastDailyClaim,
+      failCount: failCount ?? this.failCount,
+      analytics: analytics ?? this.analytics,
     );
   }
 
@@ -191,6 +266,12 @@ class PlayerProgress extends Equatable {
       'maxStreak': maxStreak,
       'seenChapterIntros': seenChapterIntros,
       'campaignCompletionSeen': campaignCompletionSeen,
+      'avatarIconIndex': avatarIconIndex,
+      'avatarFrameIndex': avatarFrameIndex,
+      'activeTitle': activeTitle,
+      'lastDailyClaim': lastDailyClaim,
+      'failCount': failCount,
+      'analytics': analytics.toJson(),
     };
   }
 
@@ -218,7 +299,30 @@ class PlayerProgress extends Equatable {
           (json['seenChapterIntros'] as List?)?.map((e) => e as String).toList() ??
               const [],
       campaignCompletionSeen: (json['campaignCompletionSeen'] as bool?) ?? false,
+      // Fase 1B-B: default sensati per i save vecchi (mago + viola,
+      // nessun titolo). Indici fuori range clampati dai getter.
+      avatarIconIndex: (json['avatarIconIndex'] as num?)?.toInt() ?? 0,
+      avatarFrameIndex: (json['avatarFrameIndex'] as num?)?.toInt() ?? 0,
+      activeTitle: (json['activeTitle'] as String?) ?? '',
+      // Fase 1B-E: default '' per i save vecchi (claim disponibile).
+      lastDailyClaim: (json['lastDailyClaim'] as String?) ?? '',
+      // F12: default {} per i save vecchi (nessun topic da ripassare).
+      failCount: _failCountFromJson(json['failCount']),
+      // F12: default vuoto per i save vecchi (nessun evento registrato).
+      analytics: AnalyticsLog.fromJson(json['analytics'] as List?),
     );
+  }
+
+  /// Legge `failCount` in modo tollerante (save vecchi/corruzione):
+  /// valori non numerici o negativi vengono ignorati.
+  static Map<String, int> _failCountFromJson(dynamic raw) {
+    if (raw is! Map) return const {};
+    final parsed = <String, int>{};
+    for (final entry in raw.entries) {
+      final value = (entry.value as num?)?.toInt() ?? 0;
+      if (value > 0) parsed[entry.key.toString()] = value;
+    }
+    return parsed;
   }
 
   static Map<String, dynamic> _quizResultToJson(QuizResult result) => {
@@ -356,5 +460,11 @@ class PlayerProgress extends Equatable {
     maxStreak,
     seenChapterIntros,
     campaignCompletionSeen,
+    avatarIconIndex,
+    avatarFrameIndex,
+    activeTitle,
+    lastDailyClaim,
+    failCount,
+    analytics,
   ];
 }
