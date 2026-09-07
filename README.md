@@ -3,7 +3,10 @@
 Dungeon-crawler deck-building per imparare le **fondamenta del Web** (HTML, CSS, JavaScript):
 una **campagna** di 3 capitoli con nodi topic → quiz → **reward pick-1-of-3** → **boss di fine capitolo**
 con meccaniche passive uniche. XP e livelli (L1 0 / L2 100 / L3 500) coincidono tra app e Hub;
-autosave locale, profili multipli, leaderboard Hub e daily reward completano il quadro.
+autosave locale, profili multipli con **login sempre richiesto (mai auto-login)**,
+**Hub personale post-login** come centro (profilo/HUD/daily/CONTINUA/CAMPAGNE/CLASSIFICA/NUMERI/IMPOSTAZIONI),
+**replay quiz a 0 XP**, leaderboard Hub e daily reward completano il quadro.
+I ViewModel sono forniti **sopra il MaterialApp** così tutte le route li ereditano.
 
 Team: D'Agostino (matr. 303226) + Di Giacomo (matr. 303377). Corso EGS, A.A. 2025/26.
 
@@ -33,7 +36,7 @@ ai giri successivi **Continue** ripristina il save (`Save v1` in SharedPreferenc
 Test:
 
 ```bash
-flutter test   # 215/215 verdi (2026-09-07)
+flutter test   # 243/243 verdi (2026-09-07)
 ```
 
 ## Hub (Gamification Hub)
@@ -47,7 +50,7 @@ flutter test   # 215/215 verdi (2026-09-07)
 | Path | Cosa contiene |
 |---|---|
 | `lib/` | app Flutter (screens, view model, data, contenuti campagna Web) |
-| `test/` | 215 test (unit + widget + regressione per F1–F12) |
+| `test/` | 243 test (unit + widget + regressione per F1–F12, hub, replay, provider) |
 | `docs/assignment/` | sprint, video script, protocollo valutazione, user stories |
 | `docs/gamidoc.pdf` | GamiDOC di progetto (design gamification) |
 | `docs/specifica.pdf`, `docs/aspetti_teorici.pdf` | specifica e aspetti teorici (sorgenti LaTeX in `docs/src/`) |

@@ -50,6 +50,30 @@ DoD raggiunta: con rete XP/badge/leaderboard da Hub, senza rete app identica (fa
 
 DoD raggiunta: `flutter test` 215/215 verdi (2026-09-07).
 
+## Sprint 4 — Hub personale + fix login/classifica/reset/quiz-provider + replay
+
+| Lavoro | Commit |
+|---|---|
+| Fix login all'avvio, crash classifica, reset con race | `d25c5d0` |
+| Docs esame (README, sprint, video script, protocollo valutazione) | `5374d92` |
+| GamiDOC finalizzato senza placeholder (resta solo Evaluation) | `e3ae4ea` |
+| Hub personale post-login come centro (profilo/HUD/daily/CONTINUA/CAMPAGNE/CLASSIFICA/NUMERI/IMPOSTAZIONI) | `38f3546` |
+| Fix voci hub/home morte e hint offline classifica | `1d8ff34` |
+| Replay quiz dei topic completati a 0 XP (streak/vite/fail ok, niente doppi premi) | `ce646ba` |
+| Provider sopra MaterialApp: tutte le route ereditano i ViewModel (addio ProviderNotFound) | `d2ca75b` |
+
+Campagna Web già live dagli sprint precedenti (1 attiva ``Fondamenta Web'' + 2 coming soon).
+
+DoD raggiunta: `flutter test` 243/243 verdi (2026-09-07).
+
+## Stato F8 (docs esame)
+
+Resta da fare: **User Evaluation** (5 utenti, protocollo pronto in
+`docs/assignment/`, capitolo GamiDOC ``Valutazione'' DA COMPLETARE con le sessioni)
+e **video demo** (scaletta pronta in `docs/assignment/video_script.md`,
+link YouTube da caricare nel README). Completato: GamiDOC senza placeholder
+(tranne Evaluation), README con numeri veri, sprint report reale, protocollo valutazione.
+
 ## Ruoli
 
 - D'Agostino (303226): [DA CONFERMARE — divisione da concordare, es. core gameplay F1–F4]
