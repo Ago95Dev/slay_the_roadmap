@@ -20,7 +20,8 @@ Obiettivo: da P0 a consegna esame implementando **solo** US-01..05 dell'assignme
 - [x] Fase 1B A-E CHIUSA (A narrativa+endgame, B titoli+avatar, C passive boss, D leaderboard, E daily) — Fase 1B CHIUSA
 - [x] F10 profili+login (auth locale prototype FNV+salt, migrazione v1)
 - [x] F11 N campagne (modello + selezione + coming soon + progress isolati)
-- [ ] F12 personalizzazione ← PROSSIMO
+- [x] F12 personalizzazione (Da-ripassare + analytics locali)
+- [ ] F8 docs esame (GamiDOC finale, Evaluation, README, video, sprint) ← PROSSIMO
 - [ ] F10 profili+login (~1g) — UserProfile multipli, auth locale hash, migrazione slay_save_v1
 - [ ] F11 N campagne (~1g) — modello Campaign, selezione, coming soon, progress per campagna
 - [ ] F12 personalizzazione (~0.5g) — Da-ripassare da failCount, analytics locali

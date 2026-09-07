@@ -449,6 +449,9 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
             children: [
               // HUD globale (F6): XP bar + livello, sopra le stats.
               _buildHudSlot(),
+              // Da ripassare (F12): topic con 2+ fallimenti, nascosta
+              // se vuota o senza PlayerViewModel (vecchi test).
+              _buildReviewSection(viewModel),
               // Stats header
               Container(
                 width: double.infinity,
@@ -504,6 +507,62 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
       ),
     );
   }
+
+  /// Sezione "Da ripassare" (F12): topic con 2+ quiz falliti, ordinati
+  /// per fallimenti desc; tap → detail (stesso flusso del tap sull'albero:
+  /// gate, intro capitolo, detail). Nascosta se vuota o se PlayerViewModel
+  /// non è registrato (es. vecchi test con solo RoadmapViewModel).
+  Widget _buildReviewSection(RoadmapViewModel viewModel) {
+    return Builder(
+      builder: (context) {
+        try {
+          final playerVm = Provider.of<PlayerViewModel>(context);
+          final review = playerVm.reviewTopics;
+          if (review.isEmpty) return const SizedBox.shrink();
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            child: Card(
+              key: const Key('review_section'),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
+                    child: Text(
+                      '📚 Da ripassare',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  for (final topicId in review)
+                    ListTile(
+                      key: Key('review_topic_$topicId'),
+                      dense: true,
+                      leading: const Icon(Icons.replay),
+                      title: Text(_titleFor(viewModel.topics, topicId)),
+                      trailing: Text(
+                        '❌×${playerVm.failCountOf(topicId)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      onTap: () => _onTopicTap(topicId),
+                    ),
+                ],
+              ),
+            ),
+          );
+        } catch (_) {
+          return const SizedBox.shrink();
+        }
+      },
+    );
+  }
+
+  /// Titolo del topic [topicId] per "Da ripassare"; fallback all'id se
+  /// il topic non è più nell'albero (seed cambiato dopo il save).
+  String _titleFor(List<Topic> topics, String topicId) =>
+      _findTopic(topics, topicId)?.title ?? topicId;
 
   /// HUD globale (F6): nascosto se PlayerViewModel non è registrato
   /// (es. vecchi test che forniscono solo RoadmapViewModel).

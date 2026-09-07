@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'analytics_log.dart';
 import 'reward.dart';
 import 'quiz.dart';
 import 'boss_fight.dart';
@@ -56,6 +57,19 @@ class PlayerProgress extends Equatable {
   /// persistito): data `yyyy-MM-dd` dell'ultimo claim, '' = mai riscattata.
   /// I save vecchi senza questo campo ripartono da '' (claim disponibile).
   final String lastDailyClaim;
+
+  /// Quiz topic falliti per topic (F12, default {}, persistito): +1 a ogni
+  /// quiz topic fallito (mai nei boss), azzerato al passaggio del topic.
+  /// I topic con almeno [reviewThreshold] fallimenti finiscono in
+  /// "Da ripassare" in roadmap.
+  final Map<String, int> failCount;
+
+  /// Soglia fallimenti per entrare in "Da ripassare" (F12).
+  static const int reviewThreshold = 2;
+
+  /// Analytics locali per l'Evaluation (F12, default vuoto, persistito):
+  /// solo conteggi (quiz pass/fail, boss win/lose, reward, sessioni).
+  final AnalyticsLog analytics;
 
   /// Icone avatar tra cui scegliere (emoji semplici, tema fantasy).
   static const List<String> avatarIcons = ['🧙', '🦊', '🤖'];
@@ -135,6 +149,8 @@ class PlayerProgress extends Equatable {
     this.avatarFrameIndex = 0,
     this.activeTitle = '',
     this.lastDailyClaim = '',
+    this.failCount = const {},
+    this.analytics = const AnalyticsLog(),
   });
 
   factory PlayerProgress.initial() {
@@ -151,6 +167,16 @@ class PlayerProgress extends Equatable {
   }
 
   bool isTopicCompleted(String topicId) => completedTopicIds.contains(topicId);
+
+  /// Topic "da ripassare" (F12): id con almeno [reviewThreshold]
+  /// fallimenti, ordinati per fallimenti desc (i più deboli prima).
+  List<String> get topicsToReview {
+    final entries = failCount.entries
+        .where((e) => e.value >= reviewThreshold)
+        .toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return [for (final e in entries) e.key];
+  }
 
   PlayerProgress addCompletedTopic(String topicId) {
     return copyWith(
@@ -197,6 +223,8 @@ class PlayerProgress extends Equatable {
     int? avatarFrameIndex,
     String? activeTitle,
     String? lastDailyClaim,
+    Map<String, int>? failCount,
+    AnalyticsLog? analytics,
   }) {
     return PlayerProgress(
       playerId: playerId ?? this.playerId,
@@ -217,6 +245,8 @@ class PlayerProgress extends Equatable {
       avatarFrameIndex: avatarFrameIndex ?? this.avatarFrameIndex,
       activeTitle: activeTitle ?? this.activeTitle,
       lastDailyClaim: lastDailyClaim ?? this.lastDailyClaim,
+      failCount: failCount ?? this.failCount,
+      analytics: analytics ?? this.analytics,
     );
   }
 
@@ -243,6 +273,8 @@ class PlayerProgress extends Equatable {
       'avatarFrameIndex': avatarFrameIndex,
       'activeTitle': activeTitle,
       'lastDailyClaim': lastDailyClaim,
+      'failCount': failCount,
+      'analytics': analytics.toJson(),
     };
   }
 
@@ -277,7 +309,23 @@ class PlayerProgress extends Equatable {
       activeTitle: (json['activeTitle'] as String?) ?? '',
       // Fase 1B-E: default '' per i save vecchi (claim disponibile).
       lastDailyClaim: (json['lastDailyClaim'] as String?) ?? '',
+      // F12: default {} per i save vecchi (nessun topic da ripassare).
+      failCount: _failCountFromJson(json['failCount']),
+      // F12: default vuoto per i save vecchi (nessun evento registrato).
+      analytics: AnalyticsLog.fromJson(json['analytics'] as List?),
     );
+  }
+
+  /// Legge `failCount` in modo tollerante (save vecchi/corruzione):
+  /// valori non numerici o negativi vengono ignorati.
+  static Map<String, int> _failCountFromJson(dynamic raw) {
+    if (raw is! Map) return const {};
+    final parsed = <String, int>{};
+    for (final entry in raw.entries) {
+      final value = (entry.value as num?)?.toInt() ?? 0;
+      if (value > 0) parsed[entry.key.toString()] = value;
+    }
+    return parsed;
   }
 
   static Map<String, dynamic> _quizResultToJson(QuizResult result) => {
@@ -419,5 +467,7 @@ class PlayerProgress extends Equatable {
     avatarFrameIndex,
     activeTitle,
     lastDailyClaim,
+    failCount,
+    analytics,
   ];
 }

@@ -149,7 +149,7 @@ class TopicDetailScreen extends StatelessWidget {
                   Provider.of<PlayerViewModel?>(
                     context,
                     listen: false,
-                  )?.recordQuizFail();
+                  )?.recordQuizFail(topic.id);
                 }
               },
               tooltip: 'Avvia Quiz',

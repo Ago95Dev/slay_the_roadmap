@@ -25,6 +25,8 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _buildStatsCard(context),
+          const SizedBox(height: 8),
           Card(
             child: ListTile(
               leading: const Icon(Icons.delete_forever, color: Colors.red),
@@ -63,6 +65,38 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  /// "I miei numeri" (F12, Evaluation): solo conteggi locali
+  /// (quiz passati/falliti, boss vinti/persi, reward, serie max,
+  /// sessioni), niente tracking invasivo. Nascosta se PlayerViewModel
+  /// non è registrato (es. vecchi test).
+  Widget _buildStatsCard(BuildContext context) {
+    PlayerViewModel? playerVm;
+    try {
+      playerVm = Provider.of<PlayerViewModel?>(context, listen: false);
+    } catch (_) {
+      playerVm = null;
+    }
+    if (playerVm == null) return const SizedBox.shrink();
+    final progress = playerVm.progress;
+    final rows = [
+      'Quiz superati: ${progress.analytics.quizPassed}',
+      'Quiz falliti: ${progress.analytics.quizFailed}',
+      'Boss vinti: ${progress.analytics.bossWon}',
+      'Boss persi: ${progress.analytics.bossLost}',
+      'Reward riscattate: ${progress.analytics.rewardsClaimed}',
+      'Serie migliore: x${progress.maxStreak}',
+      'Sessioni: ${progress.analytics.sessions}',
+    ];
+    return Card(
+      key: const Key('settings_stats'),
+      child: ListTile(
+        leading: const Icon(Icons.query_stats),
+        title: const Text('📊 I miei numeri'),
+        subtitle: Text(rows.join('\n')),
       ),
     );
   }

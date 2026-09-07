@@ -173,6 +173,8 @@ class SessionController with ChangeNotifier {
       engine: engine,
       hubPlayerId: hubPlayerIdFor(profile.userId, campaignId),
     );
+    // F12: ogni apertura utente×campagna conta come sessione (Evaluation).
+    playerVm.recordSessionStart();
     final roadmapVm = RoadmapViewModel(
       LocalRoadmapRepository(),
       campaignId: campaignId,

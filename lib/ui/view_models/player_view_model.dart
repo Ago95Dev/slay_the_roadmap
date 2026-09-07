@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../config/hub.dart';
 import '../../data/repositories/persistence_repository.dart';
 import '../../data/services/engine_client.dart';
+import '../../domain/models/analytics_log.dart';
 import '../../domain/models/boss_fight.dart';
 import '../../domain/models/campaign_lore.dart';
 import '../../domain/models/player_progress.dart';
@@ -116,7 +117,14 @@ class PlayerViewModel with ChangeNotifier {
   bool claimReward(String topicId, Reward reward) {
     if (isTopicClaimed(topicId)) return false;
     if (isInventoryFull) return false;
-    _progress = _progress.addReward(reward.copyWith(isSelected: true));
+    _progress = _progress
+        .addReward(reward.copyWith(isSelected: true))
+        .copyWith(
+          analytics: _progress.analytics.record(
+            AnalyticsEvent.rewardClaim,
+            topicId: topicId,
+          ),
+        );
     _claimedRewardTopics.add(topicId);
     _autosave();
     notifyListeners();
@@ -139,12 +147,21 @@ class PlayerViewModel with ChangeNotifier {
     final newLives = (_progress.lives + 1).clamp(0, PlayerProgress.maxLives);
     final bonus =
         newStreak % PlayerProgress.streakBonusEvery == 0 ? PlayerProgress.streakBonusXp : 0;
+    // F12: al passaggio il topic esce da "Da ripassare" (fail azzerati).
+    final fails = Map<String, int>.from(_progress.failCount)
+      ..remove(topicId);
     final updated = _progress.addCompletedTopic(topicId).copyWith(
           streak: newStreak,
           maxStreak:
               newStreak > _progress.maxStreak ? newStreak : _progress.maxStreak,
           lives: newLives,
           experience: _progress.experience + 100 + bonus,
+          failCount: fails,
+          analytics: _progress.analytics.record(
+            AnalyticsEvent.quizPass,
+            topicId: topicId,
+            value: 100 + bonus,
+          ),
         );
     _progress = updated;
     _autosave();
@@ -160,9 +177,27 @@ class PlayerViewModel with ChangeNotifier {
   }
 
   /// Quiz topic fallito: azzera la serie (streak 0). Le vite non cambiano.
-  void recordQuizFail() {
-    if (_progress.streak == 0) return;
-    _progress = _progress.copyWith(streak: 0);
+  /// Con [topicId] (quiz topic, mai boss: i boss non chiamano questo
+  /// metodo) incrementa anche `failCount` per "Da ripassare" (F12) e
+  /// registra l'evento analytics. Senza [topicId] resta il solo reset
+  /// serie (compatibilità con i chiamanti storici).
+  void recordQuizFail([String? topicId]) {
+    final fails = Map<String, int>.from(_progress.failCount);
+    var analytics = _progress.analytics;
+    if (topicId != null && topicId.isNotEmpty) {
+      fails[topicId] = (fails[topicId] ?? 0) + 1;
+      analytics = analytics.record(
+        AnalyticsEvent.quizFail,
+        topicId: topicId,
+      );
+    } else if (_progress.streak == 0) {
+      return;
+    }
+    _progress = _progress.copyWith(
+      streak: 0,
+      failCount: fails,
+      analytics: analytics,
+    );
     _autosave();
     notifyListeners();
   }
@@ -170,7 +205,10 @@ class PlayerViewModel with ChangeNotifier {
   /// Sconfitta boss: -1 vita (min 0). Ritorna le vite rimaste.
   int recordBossDefeat() {
     final remaining = (_progress.lives - 1).clamp(0, PlayerProgress.maxLives);
-    _progress = _progress.copyWith(lives: remaining);
+    _progress = _progress.copyWith(
+      lives: remaining,
+      analytics: _progress.analytics.record(AnalyticsEvent.bossLose),
+    );
     _autosave();
     notifyListeners();
     return remaining;
@@ -195,6 +233,11 @@ class PlayerViewModel with ChangeNotifier {
     _progress = _progress.copyWith(
       bossFights: {..._progress.bossFights, boss.id: victorious},
       experience: isFirst ? _progress.experience + 100 : _progress.experience,
+      analytics: _progress.analytics.record(
+        AnalyticsEvent.bossWin,
+        topicId: boss.id,
+        value: isFirst ? 100 : 0,
+      ),
     );
     _autosave();
     notifyListeners();
@@ -308,6 +351,24 @@ class PlayerViewModel with ChangeNotifier {
     notifyListeners();
     return true;
   }
+
+  /// Avvio sessione (F12): registra un evento `session_start` per
+  /// l'Evaluation (conteggio sessioni, niente tracking invasivo).
+  /// Chiamato all'apertura della sessione utente×campagna.
+  void recordSessionStart() {
+    _progress = _progress.copyWith(
+      analytics: _progress.analytics.record(AnalyticsEvent.sessionStart),
+    );
+    _autosave();
+    notifyListeners();
+  }
+
+  /// Topic "da ripassare" (F12): id con almeno 2 fallimenti, ordinati
+  /// per fallimenti desc. Vuota = sezione nascosta in roadmap.
+  List<String> get reviewTopics => _progress.topicsToReview;
+
+  /// Fallimenti registrati per [topicId] (0 se mai fallito).
+  int failCountOf(String topicId) => _progress.failCount[topicId] ?? 0;
 
   /// Ripristina il save da [persistence]; ritorna false se assente.
   Future<bool> load() async {
