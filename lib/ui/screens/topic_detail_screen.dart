@@ -42,10 +42,14 @@ class TopicDetailScreen extends StatelessWidget {
         foregroundColor: Colors.white,
         elevation: 0,
         actions: [
-          if (topic.quizId != null && !topic.isCompleted)
+          if (topic.quizId != null)
             IconButton(
-              icon: const Icon(Icons.quiz),
+              icon: Icon(
+                  topic.isCompleted ? Icons.replay : Icons.quiz),
               onPressed: () async {
+                // Replay: topic già completato -> stesso flusso quiz
+                // (hint, risultato) ma senza doppi premi (vedi sotto).
+                final isReplay = topic.isCompleted;
                 final vm = context.read<RoadmapViewModel>();
                 final result = await Navigator.push<QuizResult>(
                   context,
@@ -68,6 +72,14 @@ class TopicDetailScreen extends StatelessWidget {
                     listen: false,
                   );
                   if (playerVm != null) {
+                    if (isReplay) {
+                      // Replay di un topic già completato: streak/vite
+                      // continuano, ma NIENTE +100 XP (saltato
+                      // `addCompletedTopic`), niente bonus XP, niente
+                      // seconda reward (topic già in claimedRewardTopics),
+                      // niente level-up dialog.
+                      playerVm.recordQuizReplay(topic.id);
+                    } else {
                     final leveledUp = playerVm.addCompletedTopic(topic.id);
                     // Titolo capitolo (Fase 1B-B): se questo quiz chiudeva
                     // il capitolo E il boss è già sconfitto, assegna ora
@@ -141,6 +153,7 @@ class TopicDetailScreen extends StatelessWidget {
                         );
                       }
                     }
+                    }
                   }
                   if (context.mounted) Navigator.pop(context);
                 } else if (result != null && !result.passed) {
@@ -152,7 +165,7 @@ class TopicDetailScreen extends StatelessWidget {
                   )?.recordQuizFail(topic.id);
                 }
               },
-              tooltip: 'Avvia Quiz',
+              tooltip: topic.isCompleted ? 'Rigioca Quiz' : 'Avvia Quiz',
             ),
         ],
       ),

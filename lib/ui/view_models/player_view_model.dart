@@ -182,6 +182,33 @@ class PlayerViewModel with ChangeNotifier {
     return _progress.level > before;
   }
 
+  /// Replay quiz di un topic già completato (rigiocabilità): NIENTE XP
+  /// (né base +100 né bonus +25) e niente invio Hub, ma streak/maxStreak,
+  /// vite (+1 fino a max) e pulizia fail continuano come al primo passaggio.
+  /// Ritorna sempre false (mai level-up: l'XP non cambia).
+  /// La reward resta protetta dal guard esistente `isTopicClaimed`.
+  bool recordQuizReplay(String topicId) {
+    final newStreak = _progress.streak + 1;
+    final newLives = (_progress.lives + 1).clamp(0, PlayerProgress.maxLives);
+    // F12: come al primo passaggio, il topic esce da "Da ripassare".
+    final fails = Map<String, int>.from(_progress.failCount)
+      ..remove(topicId);
+    _progress = _progress.copyWith(
+      streak: newStreak,
+      maxStreak:
+          newStreak > _progress.maxStreak ? newStreak : _progress.maxStreak,
+      lives: newLives,
+      failCount: fails,
+      analytics: _progress.analytics.record(
+        AnalyticsEvent.quizPass,
+        topicId: topicId,
+      ),
+    );
+    _autosave();
+    notifyListeners();
+    return false;
+  }
+
   /// Quiz topic fallito: azzera la serie (streak 0). Le vite non cambiano.
   /// Con [topicId] (quiz topic, mai boss: i boss non chiamano questo
   /// metodo) incrementa anche `failCount` per "Da ripassare" (F12) e
