@@ -4,12 +4,13 @@ Traccia tutti i piani in `.plans/`. Attivo = quello su cui si lavora. Archiviati
 
 | Data | File | Stato | Scope | Note |
 |---|---|---|---|---|
-| 2026-09-08 | `2026-09-08-piano-fix-tecnici-last_version.md` | COMPLETATO Fasi 0-5 | Fix tecnici da `last_version` (HEAD `641fed8`) a consegna US-01..05: Fasi 0 respira → 1 test → 2 conformità → 3 utenti → 4 igiene → 5 docs | F0 2be1de7, F1 fab2666, F2 6e4feda, F3 5888a02, F4 1260089, F5 questo commit. Decisioni: timer/skip RIMOSSI, nuovo branch, Hub offline-first |
-| 2026-09-08 | `2026-09-08-piano-hub-fix.md` | COMPLETATO H1-H8 | Hub fix app↔engine: H1 extra off + H2 claim + H3 numeri 100/100 + H4 boss nodeless + H5 badge card + H6 osservabilità + H7 mock test + H8 docs | Suite 78/78, analyze 0 error |
-| 2026-09-06 | `archive/2026-09-06-plan_completamento.md` | ARCHIVIATO | Piano completamento v2 scope ridotto (F1..F8 + Fase 1B A-E), riferito al fratello / storia precedente | Archiviato 2026-09-08: superato dal piano last_version; tenuto per storico F1..F7/rischi R1-R5 |
+| 2026-09-09 | `2026-09-09-piano-ux-onboarding.md` | ATTIVO | UX onboarding: U1 gate CONTINUE, U2 chip avatar, U3 ritorno al menu, U4 docs | Da test utente nuovo account (screenshot Home) |
+| 2026-09-08 | `archive/2026-09-08-piano-hub-fix.md` | ARCHIVIATO | Hub fix app↔engine H1-H8 completati | Suite 78/78, analyze 0 error, pushato |
+| 2026-09-08 | `archive/2026-09-08-piano-fix-tecnici-last_version.md` | ARCHIVIATO | Fix tecnici Fasi 0-5 completati | Boot, test, conformità, utenti, igiene, docs |
+| 2026-09-06 | `archive/2026-09-06-plan_completamento.md` | ARCHIVIATO | Piano completamento v2 scope ridotto (storico) | Superato dal piano last_version |
 
 ## Regole
 
-- Un solo ATTIVO alla volta. Nuovo piano → archivia il precedente in `archive/` con prefisso data `YYYY-MM-DD-`.
-- Ogni piano cita: base (`ANALISI_E_PIANO.md`), assignment (`docs/assignment/`), stato branch/HEAD.
+- Un solo ATTIVO alla volta. Piano finito → `git mv` in `archive/` con prefisso data `YYYY-MM-DD-`.
+- Ogni piano cita: base, assignment (`docs/assignment/`), stato branch/HEAD.
 - DoD ogni fase: `flutter analyze` + `flutter test` + `flutter build linux --debug` verdi.
