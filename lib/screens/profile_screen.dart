@@ -6,6 +6,7 @@ import '../models/types.dart';
 import '../widgets/active_deck_widget.dart';
 import '../widgets/tiny_card_widget.dart';
 import '../widgets/tiny_skills_bar.dart';
+import '../widgets/hub_profile_card.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -178,6 +179,8 @@ class ProfileScreen extends StatelessWidget {
             
             // Active Deck Section
             _buildSectionHeader('DECK'),
+            const SizedBox(height: 16),
+            const HubProfileCard(),
             const SizedBox(height: 16),
             const ActiveDeckWidget(showClearButton: false, isEditable: false),
             

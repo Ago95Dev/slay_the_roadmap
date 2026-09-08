@@ -290,6 +290,34 @@ class GameProvider with ChangeNotifier {
 
 
   Future<void> _loadProgressInternal() async {
+    // Reset state to default before loading to prevent dirty reads across users
+    _completedTopics = [];
+    _skippedTopics = [];
+    _currentTopic = null;
+    _inventory = [];
+    _activeDeck = [];
+    _chapterProgress = {};
+    _achievements = [];
+    _dungeonRun = null;
+    _playerStats = PlayerStats();
+    _skillTree = List.from(initialSkillTree);
+    _relics = [];
+    _ascensionLevel = 0;
+    _prestigeLevel = 0;
+    _viewedResources = {};
+    _runHistory = [];
+    _roadmapNodes = List.from(data.roadmapNodes);
+    _gold = 0;
+    _selectedPath = null;
+    _hasStartedJourney = false;
+    _avatarIconIndex = 0;
+    _avatarFrameIndex = 0;
+    _activeTitle = '';
+    _lastDailyClaim = '';
+    _failCount = {};
+    _analytics = const AnalyticsLog();
+    _cardUpgrades = {};
+
     // Load local player profile
     final currentUser = await _storage.loadCurrentUser();
     if (currentUser != null && currentUser.isNotEmpty) {
@@ -632,8 +660,9 @@ class GameProvider with ChangeNotifier {
   void unlockSkill(String skillId) {
     final skill = _skillTree.where((s) => s.id == skillId).firstOrNull;
     if (skill == null) return;
-    if (availableSkillPoints >= skill.cost) {
+    if (availableSkillPoints >= skill.cost && !skill.unlocked) {
       skill.unlocked = true;
+      _hubEvent('skill_unlocked', {'skillId': skillId, 'cost': skill.cost}); // Integrazione Hub
       
       // Apply skill effect
       switch (skill.effect.type) {
@@ -874,8 +903,9 @@ class GameProvider with ChangeNotifier {
         addCardToInventory('card_${DateTime.now().millisecondsSinceEpoch}');
         break;
       case 'relic':
-        if (reward.id != null) {
+        if (reward.id != null && !_relics.contains(reward.id!)) {
           _relics.add(reward.id!);
+          _hubEvent('relic_acquired', {'relicId': reward.id!}); // Integrazione Hub
         }
         break;
       case 'gold':
@@ -897,6 +927,7 @@ class GameProvider with ChangeNotifier {
     _saveProgress();
     notifyListeners();
   }
+
 
   // Spend gold
   bool spendGold(int amount) {

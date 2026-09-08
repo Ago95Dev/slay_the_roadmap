@@ -27,6 +27,9 @@ abstract class EngineClient {
   /// Classifica XP (`overall_xp`): lista ordinata per posizione.
   /// Ritorna lista vuota su qualsiasi errore/offline, mai throw.
   Future<List<LeaderboardEntry>> getLeaderboard();
+
+  /// Stato giocatore: XP, livelli, badge. Ritorna null in caso di errore.
+  Future<Map<String, dynamic>?> getPlayerState(String playerId);
 }
 
 /// Riga della classifica XP dell'Hub (Fase 1B-D).
@@ -217,6 +220,44 @@ class HttpEngineClient implements EngineClient {
       return null;
     }
   }
+
+  @override
+  Future<Map<String, dynamic>?> getPlayerState(String playerId) async {
+    if (isOffline || playerId.isEmpty) return null;
+    try {
+      if (_token == null && !await login()) return null;
+      var state = await _getPlayerStateImpl(playerId);
+      if (state == null) {
+        _token = null;
+        if (!await login()) return null;
+        state = await _getPlayerStateImpl(playerId);
+      }
+      return state;
+    } catch (e) {
+      debugPrint('Hub getPlayerState fallito: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> _getPlayerStateImpl(String playerId) async {
+    try {
+      final response = await _client
+          .get(
+            Uri.parse('$baseUrl/games/$gameId/players/$playerId'),
+            headers: {'Authorization': 'Bearer $_token'},
+          )
+          .timeout(const Duration(seconds: 10));
+      if (response.statusCode == 401) return null;
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        debugPrint('Hub getPlayerState HTTP ${response.statusCode}');
+        return null;
+      }
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<bool> _postExecution(
     String actionId,
     String playerId,
@@ -298,4 +339,7 @@ class FakeEngineClient implements EngineClient {
   @override
   Future<List<LeaderboardEntry>> getLeaderboard() async =>
       List<LeaderboardEntry>.unmodifiable(leaderboardSeed);
+
+  @override
+  Future<Map<String, dynamic>?> getPlayerState(String playerId) async => null;
 }
