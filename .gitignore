@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Fase 4 — stabilize: artifact/backup generati (solo unstage, mai sorgenti)
+src/build/
+src/*/flutter/ephemeral/
+src/*/Flutter/ephemeral/
+**/ephemeral/
+build/
+*.backup
+*.bak
+.cache.dill.track.dill
+/tmp/opencode/

@@ -9,6 +9,10 @@ import '../repositories/persistence_repository.dart';
 ///
 /// Tutto il save vive sotto la singola chiave [saveKey] come JSON di
 /// `{progress, completedTopicIds, claimedRewardTopics}`.
+///
+/// Fase 4 — seam persistenza: questo file resta l'unico seam testabile
+/// (nessun duplicato top-level); non spostare, solo estendere via
+/// [PersistenceRepository].
 class SharedPreferencesPersistence implements PersistenceRepository {
   static const String saveKey = 'slay_save_v1';
 
