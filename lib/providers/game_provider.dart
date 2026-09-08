@@ -216,6 +216,34 @@ class GameProvider with ChangeNotifier {
 
 
   Future<void> _loadProgress() async {
+    // Reset state to default before loading to prevent dirty reads across users
+    _completedTopics = [];
+    _skippedTopics = [];
+    _currentTopic = null;
+    _inventory = [];
+    _activeDeck = [];
+    _chapterProgress = {};
+    _achievements = [];
+    _dungeonRun = null;
+    _playerStats = PlayerStats();
+    _skillTree = List.from(initialSkillTree);
+    _relics = [];
+    _ascensionLevel = 0;
+    _prestigeLevel = 0;
+    _viewedResources = {};
+    _runHistory = [];
+    _roadmapNodes = List.from(data.roadmapNodes);
+    _gold = 0;
+    _selectedPath = null;
+    _hasStartedJourney = false;
+    _avatarIconIndex = 0;
+    _avatarFrameIndex = 0;
+    _activeTitle = '';
+    _lastDailyClaim = '';
+    _failCount = {};
+    _analytics = const AnalyticsLog();
+    _cardUpgrades = {};
+
     // Load local player profile
     final currentUser = await _storage.loadCurrentUser();
     if (currentUser != null && currentUser.isNotEmpty) {
@@ -984,6 +1012,7 @@ class GameProvider with ChangeNotifier {
     if (isValid) {
       _hubPlayerId = username;
       await _storage.saveCurrentUser(username);
+      await _loadProgress();
       notifyListeners();
       return true;
     }
@@ -993,6 +1022,7 @@ class GameProvider with ChangeNotifier {
   Future<void> logout() async {
     _hubPlayerId = '';
     await _storage.logoutUser();
+    await _loadProgress();
     notifyListeners();
   }
 
