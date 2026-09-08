@@ -59,6 +59,28 @@ lib/
 - Flutter SDK: >=3.0.0 <4.0.0
 - Dart SDK: >=3.0.0
 
+## ✅ Run consegna (branch `fix/last_version-stabilize`)
+
+```bash
+git checkout fix/last_version-stabilize
+flutter pub get
+flutter analyze        # atteso: 0 error
+flutter test           # atteso: 46/46 verdi
+flutter run -d linux   # app offline-first, senza rete funziona tutto
+flutter build linux --debug
+```
+
+Hub (best-effort, mai segreti nel repo — solo a runtime):
+
+```bash
+flutter run -d linux \
+  --dart-define=HUB_USER=<user> \
+  --dart-define=HUB_PASS=<pw>
+```
+
+Senza `--dart-define` l'app usa `FakeEngineClient` ed è identica (video girabile offline).
+Numeri reali: quiz 5 domande soglia 80% (=4/5), livelli 0/100/500 (=Hub), boss HP10/player HP3, soglie 75/50/25, reward 1-di-3 limite 1/topic, save per utente, auth salt v2.
+
 ## 🚀 Getting Started
 
 ### Installation
