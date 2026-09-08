@@ -20,8 +20,16 @@ class GameProvider with ChangeNotifier {
   final StorageService _storage = StorageService();
   final _uuid = const Uuid();
 
-  /// Indica se l'app è configurata per inviare eventi all'Hub (ha credenziali valide)
-  bool get isHubOnline => _engine is HttpEngineClient;
+  /// True dopo almeno un contatto Hub riuscito (stato reale, H6):
+  /// falso finché nessun contatto è riuscito (default, come l'offline).
+  /// Vedi anche [isHubConfigured] per la sola presenza delle credenziali.
+  bool get isHubOnline =>
+      _engine is HttpEngineClient &&
+      (_engine as HttpEngineClient).hasContactOk;
+
+  /// True quando l'app è configurata per l'Hub (credenziali presenti,
+  /// engine HTTP), anche prima del primo contatto riuscito.
+  bool get isHubConfigured => _engine is HttpEngineClient;
 
   // --- Hub Gamification (F7) ---
   EngineClient get engine => _engine;
@@ -82,10 +90,12 @@ class GameProvider with ChangeNotifier {
       _claimedRewardTopics.contains(topicId);
 
   /// Riscatta la reward del topic (1/topic). Ritorna false se già riscattata
-  /// (re-claim bloccato, nessun effetto).
+  /// (re-claim bloccato, nessun effetto). Al primo claim invia anche
+  /// `claim_reward {badge}` all'Hub (best-effort, come `_processReward`).
   bool claimRewardTopic(String topicId) {
     if (_claimedRewardTopics.contains(topicId)) return false;
     _claimedRewardTopics.add(topicId);
+    _hubEvent(HubConfig.claimRewardAction, {'badge': topicId});
     _saveProgress();
     notifyListeners();
     return true;
@@ -253,13 +263,18 @@ class GameProvider with ChangeNotifier {
     return total - used;
   }
 
-  GameProvider() {
-    // Detect Hub credentials from --dart-define
-    const hubUser = String.fromEnvironment('HUB_USER', defaultValue: '');
-    const hubPass = String.fromEnvironment('HUB_PASS', defaultValue: '');
-    _engine = (hubUser.isNotEmpty && hubPass.isNotEmpty)
-        ? HttpEngineClient(username: hubUser, password: hubPass)
-        : FakeEngineClient();
+  GameProvider({EngineClient? engine}) {
+    if (engine != null) {
+      // Seam di test: engine iniettato (mock HTTP / Fake con seed).
+      _engine = engine;
+    } else {
+      // Detect Hub credentials from --dart-define
+      const hubUser = String.fromEnvironment('HUB_USER', defaultValue: '');
+      const hubPass = String.fromEnvironment('HUB_PASS', defaultValue: '');
+      _engine = (hubUser.isNotEmpty && hubPass.isNotEmpty)
+          ? HttpEngineClient(username: hubUser, password: hubPass)
+          : FakeEngineClient();
+    }
 
     // Solo init sincrona nel ctor: MAI lavoro async qui (H1).
     _initializeRoadmap();
@@ -525,8 +540,10 @@ class GameProvider with ChangeNotifier {
       final topicBadge = 'topic:$topicId';
       if (!_achievements.contains(topicBadge)) _achievements.add(topicBadge);
 
-      // Award experience based on score
-      final experienceReward = 50 + (score * 10);
+      // XP locali allineati all'Hub (H3): quiz pass → quizXpAmount (100),
+      // uguale allo `xp_amount` inviato in `quiz_completed` (niente più
+      // 50+score*10: HUD e Hub coincidono, soglie 0/100/500 invariate).
+      final experienceReward = HubConfig.quizXpAmount;
       _awardExperience(experienceReward);
 
       // --- Hub: notify quiz passed (fire-and-forget) ---
@@ -872,6 +889,8 @@ class GameProvider with ChangeNotifier {
       return;
     }
     if (!_achievements.contains(badge)) _achievements.add(badge);
+    // XP locali allineati all'Hub (H3): vittoria boss → 100 XP
+    // (`GameConstants.xpPerBossDefeated`, come il bonus Hub).
     _awardExperience(GameConstants.xpPerBossDefeated);
     if (node != null && !node.completed) {
       // Sblocco capitolo + reward nodo + evento Hub (in completeRoadmapNode).
@@ -879,6 +898,9 @@ class GameProvider with ChangeNotifier {
       node.unlocked = true;
       completeRoadmapNode(node.id);
     } else {
+      // Senza nodo roadmap (boss extra): l'evento parte SEMPRE (H4),
+      // badge/sblocco locali solo se il nodo esiste (qui: solo analytics).
+      _hubEvent(HubConfig.bossDefeatedAction, {'badge': bossId});
       _analytics = _analytics.record(
         AnalyticsEvent.bossWin,
         topicId: bossId,
@@ -1204,10 +1226,28 @@ class GameProvider with ChangeNotifier {
   }
 
   // --- Hub Gamification: fire-and-forget event dispatch ---
+  /// Action contrattuali inviate all'Hub (H1, da `hub_config.dart`):
+  /// solo queste 3 partono; le altre restano locali e vengono bloccate
+  /// con un log esplicito (engine condiviso: niente 404 extra).
+  static const _hubAllowedActions = {
+    HubConfig.quizCompletedAction,
+    HubConfig.claimRewardAction,
+    HubConfig.bossDefeatedAction,
+  };
+
+  /// True se [actionId] è tra le 3 action contrattuali dell'Hub.
+  bool _isHubActionAllowed(String actionId) =>
+      _hubAllowedActions.contains(actionId);
+
   /// Invia un evento all'Hub senza mai bloccare o lanciare eccezioni.
   /// Se l'Hub è offline o le credenziali mancano, non succede niente.
   Future<void> _hubEvent(String actionId, Map<String, dynamic> data) async {
     if (_hubPlayerId.isEmpty) return; // Prevent sending events if user is not logged in locally
+    if (!_isHubActionAllowed(actionId)) {
+      debugPrint('Hub evento extra bloccato (fuori contratto): $actionId');
+      return;
+    }
+    final wasOnline = isHubOnline;
     try {
       await _engine.execute(
         actionId: actionId,
@@ -1217,5 +1257,8 @@ class GameProvider with ChangeNotifier {
     } catch (_) {
       // fire-and-forget: mai bloccare il gioco per errori Hub
     }
+    // Lo stato reale (H6) cambia solo al primo successo o a un fallimento:
+    // notifica la UI (card/classifica) solo sul cambio.
+    if (isHubOnline != wasOnline) notifyListeners();
   }
 }

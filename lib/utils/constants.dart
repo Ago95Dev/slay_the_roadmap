@@ -14,11 +14,12 @@ class GameConstants {
   static const int xpPerLevel = 100; // Increases by 100 each level
   static const int skillPointsPerLevel = 5;
   
-  // Rewards
+  // Rewards (H3: vittoria boss → 100 XP, allineata al bonus Hub di
+  // `boss_defeated`; soglie livello 0/100/500 invariate).
   static const int xpPerTopicComplete = 50;
   static const int xpPerQuizPerfect = 100;
   static const int xpPerRunVictory = 200;
-  static const int xpPerBossDefeated = 150;
+  static const int xpPerBossDefeated = 100;
   
   // Dungeon Run
   static const int maxDeckSize = 30;

@@ -103,6 +103,12 @@ class HttpEngineClient implements EngineClient {
 
   String? _token;
 
+  /// True dopo almeno un contatto riuscito (login/execute/board/player);
+  /// falso finché nessun contatto è riuscito o l'ultimo è fallito.
+  /// Default false (come l'offline): la UI lo usa per lo stato reale.
+  bool _contactOk = false;
+  bool get hasContactOk => _contactOk;
+
   HttpEngineClient({
     http.Client? client,
     this.baseUrl = HubConfig.baseUrl,
@@ -133,6 +139,7 @@ class HttpEngineClient implements EngineClient {
           .timeout(const Duration(seconds: 10));
       if (response.statusCode < 200 || response.statusCode >= 300) {
         debugPrint('Hub login fallito: HTTP ${response.statusCode}');
+        _contactOk = false;
         return false;
       }
       final token = _extractToken(
@@ -140,15 +147,20 @@ class HttpEngineClient implements EngineClient {
       );
       if (token == null || token.isEmpty) {
         debugPrint('Hub login fallito: token assente nella risposta');
+        _contactOk = false;
         return false;
       }
       _token = token;
+      _contactOk = true;
+      debugPrint('Hub login riuscito');
       return true;
     } on TimeoutException {
       debugPrint('Hub login fallito: timeout');
+      _contactOk = false;
       return false;
     } catch (e) {
       debugPrint('Hub login fallito: $e');
+      _contactOk = false;
       return false;
     }
   }
@@ -166,12 +178,17 @@ class HttpEngineClient implements EngineClient {
       if (!ok) {
         // Token scaduto (24h) o 401: un re-login trasparente + un retry.
         _token = null;
-        if (!await login()) return false;
+        if (!await login()) {
+          _contactOk = false;
+          return false;
+        }
         ok = await _postExecution(actionId, playerId, data);
       }
+      _contactOk = ok;
       return ok;
     } catch (e) {
       debugPrint('Hub execute($actionId) fallito: $e');
+      _contactOk = false;
       return false;
     }
   }
@@ -186,13 +203,23 @@ class HttpEngineClient implements EngineClient {
       if (board == null) {
         // Token scaduto (24h) o 401: un re-login trasparente + un retry.
         _token = null;
-        if (!await login()) return const [];
+        if (!await login()) {
+          _contactOk = false;
+          return const [];
+        }
         board = await _getBoard();
       }
-      if (board == null) return const [];
-      return LeaderboardEntry.parseBoard(board);
+      if (board == null) {
+        _contactOk = false;
+        return const [];
+      }
+      final entries = LeaderboardEntry.parseBoard(board);
+      _contactOk = true;
+      debugPrint('Hub getLeaderboard riuscito: ${entries.length} voci');
+      return entries;
     } catch (e) {
       debugPrint('Hub getLeaderboard fallito: $e');
+      _contactOk = false;
       return const [];
     }
   }
@@ -229,12 +256,22 @@ class HttpEngineClient implements EngineClient {
       var state = await _getPlayerStateImpl(playerId);
       if (state == null) {
         _token = null;
-        if (!await login()) return null;
+        if (!await login()) {
+          _contactOk = false;
+          return null;
+        }
         state = await _getPlayerStateImpl(playerId);
       }
+      if (state == null) {
+        _contactOk = false;
+        return null;
+      }
+      _contactOk = true;
+      debugPrint('Hub getPlayerState riuscito');
       return state;
     } catch (e) {
       debugPrint('Hub getPlayerState fallito: $e');
+      _contactOk = false;
       return null;
     }
   }
@@ -282,6 +319,8 @@ class HttpEngineClient implements EngineClient {
       final ok = response.statusCode >= 200 && response.statusCode < 300;
       if (!ok) {
         debugPrint('Hub execute($actionId) HTTP ${response.statusCode}');
+      } else {
+        debugPrint('Hub execute($actionId) riuscito: HTTP ${response.statusCode}');
       }
       return ok;
     } on TimeoutException {
@@ -319,8 +358,15 @@ class FakeEngineClient implements EngineClient {
   /// Righe simulate della classifica (Fase 1B-D).
   final List<LeaderboardEntry> leaderboardSeed;
 
-  FakeEngineClient({this.result = true, List<LeaderboardEntry>? leaderboardSeed})
-      : leaderboardSeed = List.unmodifiable(leaderboardSeed ?? const []);
+  /// Stato giocatore simulato per [getPlayerState] nei test/widget
+  /// (default null = GET fallita, come l'Hub irraggiungibile).
+  Map<String, dynamic>? playerStateSeed;
+
+  FakeEngineClient({
+    this.result = true,
+    List<LeaderboardEntry>? leaderboardSeed,
+    this.playerStateSeed,
+  }) : leaderboardSeed = List.unmodifiable(leaderboardSeed ?? const []);
 
   @override
   Future<bool> execute({
@@ -341,5 +387,6 @@ class FakeEngineClient implements EngineClient {
       List<LeaderboardEntry>.unmodifiable(leaderboardSeed);
 
   @override
-  Future<Map<String, dynamic>?> getPlayerState(String playerId) async => null;
+  Future<Map<String, dynamic>?> getPlayerState(String playerId) async =>
+      playerStateSeed == null ? null : Map<String, dynamic>.from(playerStateSeed!);
 }

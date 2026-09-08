@@ -65,8 +65,8 @@ void main() {
   group('Fase 2: leveling unico PlayerProgress.levelForXp', () {
     test('provider: livello sempre derivato da XP (0/100/500)', () {
       final provider = makeProvider();
-      // 50 + 5*10 = 100 XP -> soglia L2 con levelForXp, ma col legacy
-      // (100+level*100 sottrattivo) resterebbe L1.
+      // Quiz pass → +100 XP (quizXpAmount, H3) -> soglia L2 con levelForXp,
+      // ma col legacy (100+level*100 sottrattivo) resterebbe L1.
       provider.completeTopicQuiz('level_topic_a', 5, true);
       expect(provider.playerStats.experience, 100);
       expect(
@@ -149,7 +149,8 @@ void main() {
             .unlocked,
         isTrue,
       );
-      expect(provider.playerStats.experience, greaterThanOrEqualTo(150));
+      // H3: 100 XP boss (xpPerBossDefeated) + 200 reward esperienza del nodo.
+      expect(provider.playerStats.experience, 300);
     });
 
     test('defeatBoss idempotente: doppio call, singolo XP e singolo badge',

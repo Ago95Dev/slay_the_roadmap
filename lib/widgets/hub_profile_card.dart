@@ -30,7 +30,10 @@ class _HubProfileCardState extends State<HubProfileCard> {
   @override
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
-    final isOffline = !gameProvider.isHubOnline || gameProvider.hubPlayerId.isEmpty;
+    // Offline = app non configurata per l'Hub (Fake, senza credenziali) o
+    // utente non loggato: card nascosta (comportamento invariato H5).
+    final isOffline =
+        !gameProvider.isHubConfigured || gameProvider.hubPlayerId.isEmpty;
 
     if (isOffline) {
       return const SizedBox.shrink();
@@ -102,11 +105,19 @@ class _HubProfileCardState extends State<HubProfileCard> {
                   }
                 }
 
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHubStat('LIVELLO', levelName, Icons.military_tech),
-                    _buildHubStat('PUNTEGGIO', '${totalXp.toInt()} XP', Icons.bolt),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildHubStat('LIVELLO', levelName, Icons.military_tech),
+                        _buildHubStat(
+                            'PUNTEGGIO', '${totalXp.toInt()} XP', Icons.bolt),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _buildHubBadges(state),
                   ],
                 );
               },
@@ -115,6 +126,39 @@ class _HubProfileCardState extends State<HubProfileCard> {
         ),
       ),
     );
+  }
+
+  /// Badge remoti (H5, chiave `badges` di `getPlayerState`): chip per badge,
+  /// empty-state se assenti. Parsing tollerante (stringhe o mappe con `name`).
+  Widget _buildHubBadges(Map<String, dynamic> state) {
+    final badges = _parseHubBadges(state);
+    if (badges.isEmpty) {
+      return const Text(
+        'Nessun badge Hub.',
+        style: TextStyle(color: Color(0xFF8b6f47)),
+      );
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [for (final badge in badges) Chip(label: Text(badge))],
+    );
+  }
+
+  /// Estrae i badge in modo tollerante: lista assente o non-lista → vuota.
+  static List<String> _parseHubBadges(Map<String, dynamic> state) {
+    final raw = state['badges'];
+    if (raw is! List) return const [];
+    final badges = <String>[];
+    for (final entry in raw) {
+      if (entry is String && entry.isNotEmpty) {
+        badges.add(entry);
+      } else if (entry is Map && entry['name'] is String) {
+        final name = entry['name'] as String;
+        if (name.isNotEmpty) badges.add(name);
+      }
+    }
+    return badges;
   }
 
   Widget _buildHubStat(String label, String value, IconData icon) {
