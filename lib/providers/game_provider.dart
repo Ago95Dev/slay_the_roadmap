@@ -205,8 +205,18 @@ class GameProvider with ChangeNotifier {
         ? HttpEngineClient(username: hubUser, password: hubPass)
         : FakeEngineClient();
 
+    // Solo init sincrona nel ctor: MAI lavoro async qui (H1).
     _initializeRoadmap();
-    _loadProgress();
+  }
+
+  bool _loadStarted = false;
+
+  /// Caricamento async del save, da chiamare FUORI dal ctor (addPostFrameCallback
+  /// in main): così notifyListeners() non può mai avvenire durante il build.
+  Future<void> loadProgress() async {
+    if (_loadStarted) return;
+    _loadStarted = true;
+    await _loadProgress();
   }
 
   void _initializeRoadmap() {
@@ -291,16 +301,22 @@ class GameProvider with ChangeNotifier {
       _skillTree = List.from(initialSkillTree);
     }
     
-    // Always ensure start node is completed and first topics are unlocked
-    // This runs AFTER loading progress to guarantee initial accessibility
-    final startNode = _roadmapNodes.firstWhere((node) => node.id == 'start');
-    startNode.unlocked = true;
-    startNode.completed = true;
-    
-    // Unlock the nodes connected to start (first chapter topics)
-    for (final connectionId in startNode.connections) {
-      final connectedNode = _roadmapNodes.firstWhere((n) => n.id == connectionId);
-      connectedNode.unlocked = true;
+    // Always ensure start node is completed and first topics are unlocked.
+    // This runs AFTER loading progress to guarantee initial accessibility.
+    // Guard con firstOrNull: save corrotti o roadmap senza 'start' non crashano.
+    final startNode =
+        _roadmapNodes.where((node) => node.id == 'start').firstOrNull;
+    if (startNode != null) {
+      startNode.unlocked = true;
+      startNode.completed = true;
+
+      // Unlock the nodes connected to start (first chapter topics)
+      for (final connectionId in startNode.connections) {
+        _roadmapNodes
+            .where((n) => n.id == connectionId)
+            .firstOrNull
+            ?.unlocked = true;
+      }
     }
     
     notifyListeners();
@@ -533,7 +549,8 @@ class GameProvider with ChangeNotifier {
 
   // Unlock skill
   void unlockSkill(String skillId) {
-    final skill = _skillTree.firstWhere((s) => s.id == skillId);
+    final skill = _skillTree.where((s) => s.id == skillId).firstOrNull;
+    if (skill == null) return;
     if (availableSkillPoints >= skill.cost) {
       skill.unlocked = true;
       
@@ -597,7 +614,8 @@ class GameProvider with ChangeNotifier {
   void completeRoom(String roomId, List<String> rewards) {
     if (_dungeonRun == null) return;
     
-    final room = _dungeonRun!.rooms.firstWhere((r) => r.id == roomId);
+    final room = _dungeonRun!.rooms.where((r) => r.id == roomId).firstOrNull;
+    if (room == null) return;
     room.cleared = true;
     _dungeonRun!.currentRoomId = roomId;
     
@@ -686,15 +704,17 @@ class GameProvider with ChangeNotifier {
 
   // Complete roadmap node
   void completeRoadmapNode(String nodeId) {
-    final node = _roadmapNodes.firstWhere((n) => n.id == nodeId);
-    if (!node.unlocked) return;
+    final node = _roadmapNodes.where((n) => n.id == nodeId).firstOrNull;
+    if (node == null || !node.unlocked) return;
 
     node.completed = true;
 
     // Unlock connected nodes
     for (final connectionId in node.connections) {
-      final connectedNode = _roadmapNodes.firstWhere((n) => n.id == connectionId);
-      connectedNode.unlocked = true;
+      _roadmapNodes
+          .where((n) => n.id == connectionId)
+          .firstOrNull
+          ?.unlocked = true;
     }
 
     // Award rewards

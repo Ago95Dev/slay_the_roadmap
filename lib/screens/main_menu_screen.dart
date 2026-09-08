@@ -277,7 +277,9 @@ class MainMenuScreen extends StatelessWidget {
       context: context,
       barrierColor: Colors.black87,
       builder: (context) {
-        final gameProvider = context.watch<GameProvider>();
+        // read (non watch): il dialog non deve risottoscriversi al provider
+        // e ricostruirsi su ogni notify (es. resetProgress prima del pop).
+        final gameProvider = context.read<GameProvider>();
         return Dialog(
           backgroundColor: Colors.transparent,
           child: Container(

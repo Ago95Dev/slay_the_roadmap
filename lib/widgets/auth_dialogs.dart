@@ -32,13 +32,16 @@ class _AuthDialogState extends State<AuthDialog> {
     }
 
     final provider = context.read<GameProvider>();
+    // Cattura il messenger PRIMA dell'await: dopo l'await il context del
+    // dialog potrebbe essere deactivated (dialog chiuso nel frattempo).
+    final messenger = ScaffoldMessenger.of(context);
     final success = _isLogin 
       ? await provider.loginLocal(username, password)
       : await provider.registerLocal(username, password);
 
     if (success) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        messenger.showSnackBar(
           SnackBar(
             content: Text(
               _isLogin 

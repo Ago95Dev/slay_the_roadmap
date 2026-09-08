@@ -25,10 +25,13 @@ class TopicNode extends StatelessWidget {
       children: [
         Container(
           margin: EdgeInsets.only(left: indent, bottom: 8), // 8 is approx 13/1.618
-          child: InkWell(
-            onTap: () => onTopicTap(topic),
-            borderRadius: BorderRadius.circular(13), // Golden ratio: 13
-            child: Container(
+          child: Material(
+            type: MaterialType.transparency,
+            borderRadius: BorderRadius.circular(13),
+            child: InkWell(
+              onTap: () => onTopicTap(topic),
+              borderRadius: BorderRadius.circular(13), // Golden ratio: 13
+              child: Container(
               padding: const EdgeInsets.all(13), // Golden ratio: 13
               decoration: BoxDecoration(
                 color: _getCardColor(topic.status),
@@ -140,6 +143,7 @@ class TopicNode extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ),
         

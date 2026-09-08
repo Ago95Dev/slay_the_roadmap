@@ -33,15 +33,18 @@ class CompactStatsBar extends StatelessWidget {
       child: Row(
         children: [
           // Left: Profile & Progress
-          InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProfileScreen()),
-              );
-            },
+          Material(
+            type: MaterialType.transparency,
             borderRadius: BorderRadius.circular(4),
-            child: Container(
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                );
+              },
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.black, width: 2),
@@ -73,6 +76,7 @@ class CompactStatsBar extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
           ),
 
@@ -213,9 +217,12 @@ class _IconButtonWithLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
+    return Material(
+      type: MaterialType.transparency,
+      borderRadius: BorderRadius.circular(4),
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
           border: Border.all(color: Colors.black, width: 2),
@@ -235,6 +242,7 @@ class _IconButtonWithLabel extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );

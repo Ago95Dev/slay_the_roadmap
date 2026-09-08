@@ -188,9 +188,13 @@ class _PathCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
+    return Material(
+      type: MaterialType.transparency,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
         height: 80,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
@@ -234,6 +238,7 @@ class _PathCard extends StatelessWidget {
                 size: 32,
               ),
           ],
+        ),
         ),
       ),
     );
