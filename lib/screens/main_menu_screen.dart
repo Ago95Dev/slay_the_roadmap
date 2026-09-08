@@ -87,49 +87,22 @@ class MainMenuScreen extends StatelessWidget {
                               color:
                                   const Color(0xFF1e1410).withValues(alpha: 0.8),
                             ),
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => const SignInDialog(),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'SIGN IN',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFf5f5dc),
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => const AuthDialog(),
+                                );
+                              },
+                              child: const Text(
+                                'LOGIN / SIGN UP',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFf5f5dc),
+                                  letterSpacing: 2,
                                 ),
-                                Container(
-                                  height: 1,
-                                  width: 50,
-                                  color: const Color(0xFF8b6f47),
-                                  margin: const EdgeInsets.symmetric(vertical: 4),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => const SignUpDialog(),
-                                    );
-                                  },
-                                  child: const Text(
-                                    'SIGN UP',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFFf5f5dc),
-                                      letterSpacing: 1,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           )
                         else

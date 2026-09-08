@@ -10,17 +10,19 @@ import '../data/skill_tree_data.dart';
 import '../data/roadmap_data.dart' as data;
 import '../data/cards_data.dart' as cards_data;
 import '../services/engine_client.dart';
-import '../services/hub_identity.dart';
 import '../services/storage_service.dart';
 import '../services/dungeon_generator.dart';
 import '../data/topics_and_quizzes.dart';
 
 class GameProvider with ChangeNotifier {
+  late final EngineClient _engine;
   final StorageService _storage = StorageService();
   final _uuid = const Uuid();
 
+  /// Indica se l'app è configurata per inviare eventi all'Hub (ha credenziali valide)
+  bool get isHubOnline => _engine is HttpEngineClient;
+
   // --- Hub Gamification (F7) ---
-  late final EngineClient _engine;
   EngineClient get engine => _engine;
   String _hubPlayerId = '';
 
@@ -113,6 +115,7 @@ class GameProvider with ChangeNotifier {
     if (_lastDailyClaim == today) return false;
     _lastDailyClaim = today;
     _awardExperience(dailyRewardXp);
+    _hubEvent('daily_login', {'xp': dailyRewardXp, 'streak': 1}); // Integrazione Hub
     _analytics = _analytics.record(
       AnalyticsEvent.rewardClaim,
       value: dailyRewardXp,
@@ -472,6 +475,7 @@ class GameProvider with ChangeNotifier {
     
     _awardExperience(xpReward);
     _gold += goldReward;
+    _hubEvent('study_resource_viewed', {'xp': xpReward, 'gold': goldReward, 'topicId': topicId}); // Integrazione Hub
     
     _saveProgress();
     notifyListeners();
@@ -636,6 +640,11 @@ class GameProvider with ChangeNotifier {
     
     if (victory) {
       _awardExperience(200);
+      _hubEvent('dungeon_cleared', {
+        'ascension_level': _dungeonRun?.ascensionLevel ?? 0, 
+        'nodes_visited': _dungeonRun?.floor ?? 1, 
+        'xp': 200
+      });
     }
     
     _saveProgress();
@@ -991,6 +1000,7 @@ class GameProvider with ChangeNotifier {
   /// Invia un evento all'Hub senza mai bloccare o lanciare eccezioni.
   /// Se l'Hub è offline o le credenziali mancano, non succede niente.
   Future<void> _hubEvent(String actionId, Map<String, dynamic> data) async {
+    if (_hubPlayerId.isEmpty) return; // Prevent sending events if user is not logged in locally
     try {
       await _engine.execute(
         actionId: actionId,

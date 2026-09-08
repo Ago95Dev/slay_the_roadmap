@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 
-class SignUpDialog extends StatefulWidget {
-  const SignUpDialog({super.key});
+class AuthDialog extends StatefulWidget {
+  const AuthDialog({super.key});
 
   @override
-  State<SignUpDialog> createState() => _SignUpDialogState();
+  State<AuthDialog> createState() => _AuthDialogState();
 }
 
-class _SignUpDialogState extends State<SignUpDialog> {
+class _AuthDialogState extends State<AuthDialog> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   String _errorMessage = '';
+  bool _isLogin = true;
 
   @override
   void dispose() {
@@ -31,174 +32,172 @@ class _SignUpDialogState extends State<SignUpDialog> {
     }
 
     final provider = context.read<GameProvider>();
-    final success = await provider.registerLocal(username, password);
+    final success = _isLogin 
+      ? await provider.loginLocal(username, password)
+      : await provider.registerLocal(username, password);
 
     if (success) {
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              _isLogin 
+                ? 'Accesso effettuato come $username!' 
+                : 'Profilo "$username" creato con successo! Benvenuto!',
+              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+            ),
+            backgroundColor: const Color(0xFF4caf50),
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context);
+      }
     } else {
-      setState(() => _errorMessage = 'GamerTag già esistente.');
+      setState(() => _errorMessage = _isLogin ? 'Credenziali errate.' : 'GamerTag già esistente.');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildAuthDialog(
-      context,
-      title: 'SIGN UP',
-      buttonText: 'CREA PROFILO',
-      usernameController: _usernameController,
-      passwordController: _passwordController,
-      errorMessage: _errorMessage,
-      onSubmit: _submit,
-    );
-  }
-}
-
-class SignInDialog extends StatefulWidget {
-  const SignInDialog({super.key});
-
-  @override
-  State<SignInDialog> createState() => _SignInDialogState();
-}
-
-class _SignInDialogState extends State<SignInDialog> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  String _errorMessage = '';
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  void _submit() async {
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text.trim();
-
-    if (username.isEmpty || password.isEmpty) {
-      setState(() => _errorMessage = 'Compila tutti i campi.');
-      return;
-    }
-
-    final provider = context.read<GameProvider>();
-    final success = await provider.loginLocal(username, password);
-
-    if (success) {
-      if (mounted) Navigator.pop(context);
-    } else {
-      setState(() => _errorMessage = 'Credenziali errate.');
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildAuthDialog(
-      context,
-      title: 'SIGN IN',
-      buttonText: 'ENTRA',
-      usernameController: _usernameController,
-      passwordController: _passwordController,
-      errorMessage: _errorMessage,
-      onSubmit: _submit,
-    );
-  }
-}
-
-Widget _buildAuthDialog(
-  BuildContext context, {
-  required String title,
-  required String buttonText,
-  required TextEditingController usernameController,
-  required TextEditingController passwordController,
-  required String errorMessage,
-  required VoidCallback onSubmit,
-}) {
-  return Dialog(
-    backgroundColor: Colors.transparent,
-    child: Container(
-      constraints: const BoxConstraints(maxWidth: 400),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1a1410),
-        border: Border.all(color: const Color(0xFFd4af37), width: 2),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.w900,
-              color: Color(0xFFd4af37),
-              letterSpacing: 2,
-            ),
-          ),
-          const SizedBox(height: 24),
-          TextField(
-            controller: usernameController,
-            style: const TextStyle(color: Color(0xFFf5f5dc)),
-            decoration: const InputDecoration(
-              labelText: 'GamerTag',
-              labelStyle: TextStyle(color: Color(0xFF8b6f47)),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFF8b6f47)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFd4af37)),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: passwordController,
-            obscureText: true,
-            style: const TextStyle(color: Color(0xFFf5f5dc)),
-            decoration: const InputDecoration(
-              labelText: 'Password',
-              labelStyle: TextStyle(color: Color(0xFF8b6f47)),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFF8b6f47)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xFFd4af37)),
-              ),
-            ),
-          ),
-          if (errorMessage.isNotEmpty) ...[
-            const SizedBox(height: 16),
-            Text(
-              errorMessage,
-              style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
-            ),
-          ],
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('ANNULLA', style: TextStyle(color: Color(0xFF8b6f47))),
-              ),
-              const SizedBox(width: 8),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFd4af37),
-                  foregroundColor: const Color(0xFF1a1410),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1a1410),
+          border: Border.all(color: const Color(0xFFd4af37), width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Tabs toggle
+            Row(
+              children: [
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      _isLogin = true;
+                      _errorMessage = '';
+                    }),
+                    child: Column(
+                      children: [
+                        Text(
+                          'LOGIN',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: _isLogin ? FontWeight.w900 : FontWeight.w500,
+                            color: _isLogin ? const Color(0xFFd4af37) : const Color(0xFF8b6f47),
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 2,
+                          color: _isLogin ? const Color(0xFFd4af37) : Colors.transparent,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                onPressed: onSubmit,
-                child: Text(buttonText, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => setState(() {
+                      _isLogin = false;
+                      _errorMessage = '';
+                    }),
+                    child: Column(
+                      children: [
+                        Text(
+                          'SIGN UP',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: !_isLogin ? FontWeight.w900 : FontWeight.w500,
+                            color: !_isLogin ? const Color(0xFFd4af37) : const Color(0xFF8b6f47),
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Container(
+                          height: 2,
+                          color: !_isLogin ? const Color(0xFFd4af37) : Colors.transparent,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _usernameController,
+              style: const TextStyle(color: Color(0xFFf5f5dc)),
+              decoration: const InputDecoration(
+                labelText: 'GamerTag',
+                labelStyle: TextStyle(color: Color(0xFF8b6f47)),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF8b6f47)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFd4af37)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              style: const TextStyle(color: Color(0xFFf5f5dc)),
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                labelStyle: TextStyle(color: Color(0xFF8b6f47)),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF8b6f47)),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFd4af37)),
+                ),
+              ),
+            ),
+            if (_errorMessage.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ],
-          ),
-        ],
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('ANNULLA', style: TextStyle(color: Color(0xFF8b6f47))),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFd4af37),
+                    foregroundColor: const Color(0xFF1a1410),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  onPressed: _submit,
+                  child: Text(
+                    _isLogin ? 'ENTRA' : 'CREA PROFILO', 
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

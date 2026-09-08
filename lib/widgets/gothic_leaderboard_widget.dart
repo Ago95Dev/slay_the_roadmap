@@ -48,7 +48,7 @@ class _GothicLeaderboardWidgetState extends State<GothicLeaderboardWidget> {
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
     final ownId = gameProvider.hubPlayerId;
-    final isOffline = ownId.isEmpty;
+    final isOffline = !gameProvider.isHubOnline;
 
     if (isOffline) {
       return Center(

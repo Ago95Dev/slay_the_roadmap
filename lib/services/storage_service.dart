@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
 
 class StorageService {
   static const String _progressKey = 'dart_quest_progress';
@@ -44,13 +45,17 @@ class StorageService {
 
   Future<void> saveLocalUser(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('user_pwd_$username', password);
+    final bytes = utf8.encode(password);
+    final hash = sha256.convert(bytes).toString();
+    await prefs.setString('user_pwd_$username', hash);
   }
 
   Future<bool> checkLocalUser(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     final savedPwd = prefs.getString('user_pwd_$username');
-    return savedPwd == password;
+    final bytes = utf8.encode(password);
+    final hash = sha256.convert(bytes).toString();
+    return savedPwd == hash || savedPwd == password; // Fallback for old unhashed passwords
   }
 
   Future<void> saveCurrentUser(String username) async {
