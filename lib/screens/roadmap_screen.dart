@@ -29,6 +29,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
       'chapter-1': {'title': 'BASICS', 'topics': <Topic>[]},
       'chapter-2': {'title': 'CONTROL FLOW', 'topics': <Topic>[]},
       'chapter-3': {'title': 'OOP', 'topics': <Topic>[]},
+      'chapter-4': {'title': 'FLUTTER BASICS', 'topics': <Topic>[]},
     };
 
     // Populate chapters with topics
@@ -76,11 +77,19 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               children: [
                 _buildChapterNode(context, 'chapter-1', chapters['chapter-1']!),
                 _buildConnectorLine(),
+                _buildMidBossNode('SYNTAX SENTINEL', 'syntax_sentinel'),
+                _buildConnectorLine(),
                 _buildChapterNode(context, 'chapter-2', chapters['chapter-2']!),
                 _buildConnectorLine(),
-                _buildMidBossNode('BASIC TEST'),
+                _buildMidBossNode('LOGIC LEVIATHAN', 'logic_leviathan'),
                 _buildConnectorLine(),
                 _buildChapterNode(context, 'chapter-3', chapters['chapter-3']!),
+                _buildConnectorLine(),
+                _buildMidBossNode('ABSTRACTION ARCHON', 'abstraction_archon'),
+                _buildConnectorLine(),
+                _buildChapterNode(context, 'chapter-4', chapters['chapter-4']!),
+                _buildConnectorLine(),
+                _buildMidBossNode('WIDGET WARLORD', 'widget_warlord'),
               ],
             ),
           ),
@@ -100,7 +109,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     if (idx > 0) return completedTopics.contains(siblings[idx - 1].id);
     // Primo del capitolo: capitolo 1 sempre aperto, gli altri richiedono
     // l'ultimo topic del capitolo precedente completato.
-    const chapterOrder = ['chapter-1', 'chapter-2', 'chapter-3'];
+    const chapterOrder = ['chapter-1', 'chapter-2', 'chapter-3', 'chapter-4'];
     final ci = chapterOrder.indexOf(topic.chapterId);
     if (ci <= 0) return true;
     final prev = topicsData
@@ -220,7 +229,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     );
   }
 
-  Widget _buildMidBossNode(String title) {
+  Widget _buildMidBossNode(String title, String bossId) {
     return Column(
       children: [
         Material(
@@ -230,7 +239,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const BossFightScreen(bossId: 'syntax_sentinel'),
+                  builder: (_) => BossFightScreen(bossId: bossId),
                 ),
               );
             },

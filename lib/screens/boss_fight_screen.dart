@@ -405,6 +405,9 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
       _phase = TurnPhase.bossAttack;
     });
     
+    // Boss attack animation
+    _shakeController.forward(from: 0);
+    
     Future.delayed(const Duration(milliseconds: 500), () {
       _takeDamage(_bossIntent?.damage ?? 5);
       
@@ -681,10 +684,11 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                   child: Container(
                     color: Colors.black54,
                     padding: const EdgeInsets.all(10),
-                    child: Column(
-                      children: [
-                        // Player Stats Row
-                        Row(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          // Player Stats Row
+                          Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // HP (Hearts)
@@ -715,7 +719,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                             ),
                           ],
                         ),
-                        const Spacer(),
+                        const SizedBox(height: 10),
                         
                         // Hand (Row, Spaced, Drag OR Double Tap)
                         Row(
@@ -833,6 +837,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                           child: const Text('END TURN'),
                         ),
                       ],
+                      ),
                     ),
                   ),
                 ),
