@@ -14,3 +14,66 @@ combattere meglio. La soglia 80\,\% mantiene il flow senza frustrare
 giocatore con quiz-danno a fine turno crea archi di tensione brevi e
 leggibili. Nessun dato di esperienza utente \`e ancora raccolto: si veda
 il Cap.~\ref{g:valutazione}.
+
+\section{Struttura dei capitoli (esempio)}
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}lXlX@{}}
+\toprule
+Capitolo & Boss & Dominio & Meccanica distintiva \\
+\midrule
+1 -- La Rete & Man-in-the-Middle & HTTP, DNS, client/server & Enrage al 75\,\% HP \\
+2 -- Dati e Stato & The Amnesiac & Rappresentazione, stato & $-$1 energia al giocatore \\
+3 -- Costruire & Spaghetti Colossus & Browser, framework, deploy & Corazza (danni ridotti) \\
+\bottomrule
+\end{tabularx}
+\caption{Capitoli, boss e passive uniche.}
+\label{tab:capitoli}
+\end{table}
+
+\section{Carte evolutive (esempio)}
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabular}{@{}llcl@{}}
+\toprule
+Rarit\`a & Esempio & Danno & Effetto bonus \\
+\midrule
+Comune (7) & Strike & 6 & Nessuno \\
+Rara (5) & Bash & 8 & Vulnerable $\times$2 \\
+Epica (5) & Critical Strike & 12 & Critico 50\,\% $\times$2 \\
+Leggendaria (4) & Apocalypse & 25 & Poison/Burn/Bleed $\times$10 \\
+\bottomrule
+\end{tabular}
+\caption{Rarit\`a reali delle 21 carte (costo in energia 1--4).}
+\label{tab:rarita}
+\end{table}
+
+\section{Dinamiche positive}
+Chi studia con costanza accumula deck forti e sale di livello prima dei
+boss; chi ragiona sul boss (passive in Tab.~\ref{tab:capitoli})
+ottimizza il deck e vince con meno tentativi; la scelta 1-di-3 abitua a
+valutare trade-off rischio/ricompensa.
+
+\section{Dinamiche negative e mitigazioni}
+\begin{itemize}
+\item \textbf{Quiz anxiety}: la soglia 80\,\% pu\`o spaventare -- mitigata
+da tentativi illimitati, hint (explanation) dopo errori ripetuti e
+assenza di timer;
+\item \textbf{Stress da classifica}: mitigato da leaderboard solo
+remota e opzionale, con enfasi su progressione individuale e stati
+offline chiari;
+\item \textbf{Frustrazione da sconfitta boss}: mitigata da retry a HP
+pieni senza perdita di progressi (solo senza XP).
+\end{itemize}
+
+\section{Personalizzazione}
+Titoli di capitolo, avatar con cornici e deck costruito dalle proprie
+scelte: il profilo racconta come giochi, non solo quanto hai studiato.
+
+\section{Adattabilit\`a}
+I quiz del boss sono pescati dai topic del capitolo (pi\`u hai studiato,
+pi\`u domande riconosci); topic falliti tornano in evidenza come ripasso.
+La difficolt\`a resta fissa per scelta (niente scaling nascosto): la
+variabilit\`a viene da pesca, passive ed enrage.

@@ -30,6 +30,54 @@ di approfondimento (MDN, Cloudflare, web.dev, roadmap.sh) sono opzionali.
 Il gioco \`e pensato per sessioni brevi (pochi minuti per topic) e per
 essere rigiocabile da zero (New Run).
 
+\section{Domain}
+Ambito applicativo: sviluppo software e tecnologie Web, con allineamento
+agli standard di industria (HTTP, JSON, DOM, git come orizzonte, non
+come prerequisito). La campagna ``Web -- fondamenta'' copre rete, dati
+e stato, costruzione e spedizione di pagine: gli stessi assi su cui un
+junior viene valutato nel mercato del lavoro.
+
+\section{Comportamenti incoraggiati}
+\begin{itemize}
+\item \textbf{Costanza}: sessioni brevi e quotidiane (daily reward) invece
+di maratone;
+\item \textbf{Mastery concettuale}: soglia 80\,\% al quiz, ripasso dei
+topic falliti, hint dopo errori ripetuti;
+\item \textbf{Pensiero strategico}: scelta 1-di-3 e ottimizzazione del
+deck in funzione del boss;
+\item \textbf{Problem solving adattivo}: quiz del boss pescati dai topic
+del capitolo, passive diverse per boss.
+\end{itemize}
+
+\section{Tecnologia}
+Flutter con un'unica codebase (sviluppo e verifica su Linux desktop,
+stessa logica su mobile/web): manutenibilit\`a e portabilit\`a senza
+backend proprio. Persistenza offline-first su SharedPreferences (save
+per utente); Gamification Hub esterno usato solo come specchio di XP,
+badge e livelli con fallback totale (dettagli al Cap.~\ref{g:arch}).
+
+\section{Fasi e durate tipiche}
+\begin{table}[ht]
+\centering
+\footnotesize
+\begin{tabularx}{\linewidth}{@{}lclX@{}}
+\toprule
+Fase & Durata & Attivit\`a & Obiettivo \\
+\midrule
+Studio & 6--8 min & Lettura topic & Acquisizione modelli mentali \\
+Quiz & 3--5 min & Verifica 5Q & Comprensione (soglia 80\,\%) \\
+Deck building & 2--3 min & Scelta 1-di-3 & Scelte motivanti \\
+Boss fight & 10--15 min & Applicazione & Prova sommativa \\
+\bottomrule
+\end{tabularx}
+\caption{Durate indicative per fase di gioco.}
+\label{tab:fasi}
+\end{table}
+\noindent Sequenza: selezione topic $\rightarrow$ studio $\rightarrow$
+quiz $\rightarrow$ ricompensa + XP $\rightarrow$ costruzione e
+ottimizzazione deck $\rightarrow$ sfida boss $\rightarrow$
+ricompensa e sblocco del capitolo successivo, in modo iterativo.
+
 \section{Struttura della campagna}
 Tre capitoli, ciascuno con un inquadramento (root) + 3 topic + 1 boss
 finale, per un totale di 12 nodi quiz. Tutti gli ID sono stabili in
