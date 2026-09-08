@@ -562,8 +562,9 @@ class GameProvider with ChangeNotifier {
   // Unlock skill
   void unlockSkill(String skillId) {
     final skill = _skillTree.firstWhere((s) => s.id == skillId);
-    if (availableSkillPoints >= skill.cost) {
+    if (availableSkillPoints >= skill.cost && !skill.unlocked) {
       skill.unlocked = true;
+      _hubEvent('skill_unlocked', {'skillId': skillId, 'cost': skill.cost}); // Integrazione Hub
       
       // Apply skill effect
       switch (skill.effect.type) {
@@ -766,8 +767,9 @@ class GameProvider with ChangeNotifier {
         addCardToInventory('card_${DateTime.now().millisecondsSinceEpoch}');
         break;
       case 'relic':
-        if (reward.id != null) {
+        if (reward.id != null && !_relics.contains(reward.id!)) {
           _relics.add(reward.id!);
+          _hubEvent('relic_acquired', {'relicId': reward.id!}); // Integrazione Hub
         }
         break;
       case 'gold':
@@ -789,6 +791,7 @@ class GameProvider with ChangeNotifier {
     _saveProgress();
     notifyListeners();
   }
+
 
   // Spend gold
   bool spendGold(int amount) {
