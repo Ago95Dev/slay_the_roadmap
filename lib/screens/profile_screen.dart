@@ -97,7 +97,9 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        gameProvider.hubPlayerId.isNotEmpty ? gameProvider.hubPlayerId : stats.playerName,
+                        gameProvider.isLoggedIn
+                            ? gameProvider.displayName
+                            : stats.playerName,
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,

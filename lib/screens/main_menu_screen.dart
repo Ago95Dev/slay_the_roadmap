@@ -77,7 +77,7 @@ class MainMenuScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        if (gameProvider.hubPlayerId.isEmpty)
+                        if (!gameProvider.isLoggedIn)
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 8),
@@ -119,7 +119,7 @@ class MainMenuScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  gameProvider.hubPlayerId,
+                                  gameProvider.displayName,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -367,7 +367,7 @@ class MainMenuScreen extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(Icons.cloud_done,
-                                color: gameProvider.hubPlayerId.isNotEmpty
+                                color: gameProvider.isLoggedIn
                                     ? Colors.green
                                     : Colors.grey,
                                 size: 24),
@@ -385,12 +385,12 @@ class MainMenuScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    gameProvider.hubPlayerId.isNotEmpty
-                                        ? 'GamerTag: ${gameProvider.hubPlayerId}'
+                                    gameProvider.isLoggedIn
+                                        ? 'GamerTag: ${gameProvider.displayName}'
                                         : 'Non sei autenticato. Fai il Sign In.',
                                     style: TextStyle(
                                       fontSize: 12,
-                                      color: gameProvider.hubPlayerId.isNotEmpty
+                                      color: gameProvider.isLoggedIn
                                           ? const Color(0xFFd4af37)
                                           : Colors.grey,
                                     ),

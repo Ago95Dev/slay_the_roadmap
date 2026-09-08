@@ -27,6 +27,40 @@ class GameProvider with ChangeNotifier {
   EngineClient get engine => _engine;
   String _hubPlayerId = '';
 
+  // --- Fase 3: sessione per utente ---
+  // `_currentUsername` è il GamerTag loggato (null = anonimo). `_hubPlayerId`
+  // è invece lo `slay_<uuid>` stabile per utente (persistito), mai lo
+  // username in chiaro: è l'unico id inviato all'Hub (offline-first,
+  // FakeEngineClient di default, nessun segreto nel codice).
+  String? _currentUsername;
+
+  /// GamerTag loggato (`null` se anonimo). Gate minimo Fase 3: senza utente
+  /// non si accede ai save per-utente (chiavi `..._<username>`).
+  String? get currentUsername => _currentUsername;
+
+  /// True quando un utente è loggato (gate minimo per l'accesso ai progress).
+  bool get isLoggedIn =>
+      _currentUsername != null && _currentUsername!.isNotEmpty;
+
+  /// Nome mostrato in UI (username, mai lo slay_id).
+  String get displayName => _currentUsername ?? '';
+
+  /// Chiave dello slay_id stabile per utente.
+  static String hubPlayerKeyForUser(String username) =>
+      'slay_hub_player_id_$username';
+
+  /// Carica lo `slay_<uuid>` persistito per [username] o lo crea (`slay_` +
+  /// uuid v4) una sola volta. Mai username in chiaro come playerId.
+  Future<String> _resolveHubPlayerId(String username) async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = hubPlayerKeyForUser(username);
+    final existing = prefs.getString(key);
+    if (existing != null && existing.isNotEmpty) return existing;
+    final id = 'slay_${_uuid.v4()}';
+    await prefs.setString(key, id);
+    return id;
+  }
+
   // Player State
   List<String> _completedTopics = [];
   List<String> _skippedTopics = []; // Track skipped topics separately
@@ -238,7 +272,15 @@ class GameProvider with ChangeNotifier {
   Future<void> loadProgress() async {
     if (_loadStarted) return;
     _loadStarted = true;
-    await _loadProgress();
+    await _loadProgressInternal();
+  }
+
+  /// Ricarica il save dell'utente corrente (Fase 3: usata al login per
+  /// caricare il save per-utente e notificare la UI). Bypassa il guard
+  /// `_loadStarted` (boot una tantum) perché il login può avvenire dopo.
+  Future<void> _reloadForUser() async {
+    _loadStarted = true;
+    await _loadProgressInternal();
   }
 
   void _initializeRoadmap() {
@@ -247,12 +289,14 @@ class GameProvider with ChangeNotifier {
 
 
 
-  Future<void> _loadProgress() async {
+  Future<void> _loadProgressInternal() async {
     // Load local player profile
     final currentUser = await _storage.loadCurrentUser();
     if (currentUser != null && currentUser.isNotEmpty) {
-      _hubPlayerId = currentUser;
+      _currentUsername = currentUser;
+      _hubPlayerId = await _resolveHubPlayerId(currentUser);
     } else {
+      _currentUsername = null;
       _hubPlayerId = '';
     }
 
@@ -1064,7 +1108,7 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // --- Auth & Profile ---
+  // --- Auth & Profile (Fase 3: save per utente + slay_id stabile) ---
   Future<bool> registerLocal(String username, String password) async {
     final exists = await _storage.checkUserExists(username);
     if (exists) return false;
@@ -1075,18 +1119,57 @@ class GameProvider with ChangeNotifier {
   Future<bool> loginLocal(String username, String password) async {
     final isValid = await _storage.checkLocalUser(username, password);
     if (isValid) {
-      _hubPlayerId = username;
+      _currentUsername = username;
+      _hubPlayerId = await _resolveHubPlayerId(username);
       await _storage.saveCurrentUser(username);
-      notifyListeners();
+      // Reload del save per-utente + notify (isolamento tra utenti).
+      await _reloadForUser();
       return true;
     }
     return false;
   }
 
+  /// Logout (Fase 3): rimuove solo `current_user`, pulisce TUTTO lo stato
+  /// in-memory (nessun accesso ai progress senza utente) e notifica. I save
+  /// per-utente restano persistiti sotto le chiavi `..._<username>`.
   Future<void> logout() async {
+    _currentUsername = null;
     _hubPlayerId = '';
     await _storage.logoutUser();
+    _clearInMemoryState();
     notifyListeners();
+  }
+
+  /// Azzera lo stato in-memory ai default (senza toccare lo storage).
+  /// Usata dal logout; il wipe persistente resta in [resetProgress].
+  void _clearInMemoryState() {
+    _completedTopics = [];
+    _skippedTopics = [];
+    _claimedRewardTopics.clear();
+    _currentTopic = null;
+    _inventory = [];
+    _activeDeck = [];
+    _chapterProgress = {};
+    _achievements = [];
+    _dungeonRun = null;
+    _playerStats = PlayerStats();
+    _skillTree = List.from(initialSkillTree);
+    _relics = [];
+    _ascensionLevel = 0;
+    _prestigeLevel = 0;
+    _viewedResources = {};
+    _runHistory = [];
+    _gold = 0;
+    _selectedPath = null;
+    _hasStartedJourney = false;
+    _avatarIconIndex = 0;
+    _avatarFrameIndex = 0;
+    _activeTitle = '';
+    _lastDailyClaim = '';
+    _failCount = {};
+    _analytics = const AnalyticsLog();
+    _cardUpgrades = {};
+    _initializeRoadmap();
   }
 
   // --- Hub Gamification: fire-and-forget event dispatch ---

@@ -12,11 +12,32 @@ import '../repositories/persistence_repository.dart';
 class SharedPreferencesPersistence implements PersistenceRepository {
   static const String saveKey = 'slay_save_v1';
 
+  /// Chiave del save per utente (Fase 3): globale oppure
+  /// `slay_save_v1_<username>` quando loggato.
+  static String saveKeyForUser(String? username) {
+    if (username == null || username.isEmpty) return saveKey;
+    return '${saveKey}_$username';
+  }
+
   final SharedPreferences? _overrides;
+
+  /// Utente proprietario del save (`null` = globale legacy). Usare
+  /// [forUser] per lo scope per-utente (Fase 3).
+  final String? username;
+
+  /// Chiave effettiva di questo repository (per-utente o globale).
+  String get effectiveSaveKey => saveKeyForUser(username);
 
   /// [_overrides] serve solo ai test (istanza già pronta, niente platform
   /// channel); in app usare il costruttore senza argomenti.
-  SharedPreferencesPersistence([this._overrides]);
+  SharedPreferencesPersistence([this._overrides, this.username]);
+
+  /// Scope per-utente (Fase 3): stesso envelope, chiave dedicata.
+  factory SharedPreferencesPersistence.forUser(
+    SharedPreferences prefs,
+    String? username,
+  ) =>
+      SharedPreferencesPersistence(prefs, username);
 
   Future<SharedPreferences> get _prefs async =>
       _overrides ?? await SharedPreferences.getInstance();
@@ -24,7 +45,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<void> savePlayerProgress(PlayerProgress progress) async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(effectiveSaveKey);
     final claimed = raw == null
         ? <String>[]
         : List<String>.from(
@@ -51,7 +72,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<void> resetProgress() async {
     final prefs = await _prefs;
-    await prefs.remove(saveKey);
+    await prefs.remove(effectiveSaveKey);
   }
 
   @override
@@ -83,7 +104,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
   @override
   Future<bool> hasSave() async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(effectiveSaveKey);
     if (raw == null || raw.isEmpty) return false;
     try {
       final envelope = jsonDecode(raw) as Map<String, dynamic>;
@@ -108,7 +129,7 @@ class SharedPreferencesPersistence implements PersistenceRepository {
 
   Future<Map<String, dynamic>?> _readEnvelope() async {
     final prefs = await _prefs;
-    final raw = prefs.getString(saveKey);
+    final raw = prefs.getString(effectiveSaveKey);
     if (raw == null || raw.isEmpty) return null;
     try {
       return jsonDecode(raw) as Map<String, dynamic>;
@@ -127,6 +148,6 @@ class SharedPreferencesPersistence implements PersistenceRepository {
       'completedTopicIds': progress.completedTopicIds,
       'claimedRewardTopics': claimed.toList(),
     };
-    await prefs.setString(saveKey, jsonEncode(envelope));
+    await prefs.setString(effectiveSaveKey, jsonEncode(envelope));
   }
 }
