@@ -32,10 +32,18 @@ Test widget: tap menu → MainMenuScreen visibile; back → Home con stato intat
 File: `lib/screens/home_screen.dart`, stesso test file.
 Commit `[UX 3]`.
 
-## U4 — Docs e chiusura
+## U5 — NEW RUN riparte pulita (priorità alta, aggiunto 2026-09-09)
 
-`docs/assignment/02_stato.md` (+3 righe esiti), INDEX → COMPLETATO. Nessun cambio numeri/Editoriale GamiDOC (fix solo UX).
-Commit `[UX 4]` (solo docs) oppure squash in U3 se banale — default commit separato.
+Causa: il flusso NEW RUN (classe → percorso) imposta solo classe/deck/`hasStartedJourney`, senza azzerare il save per-utente → topic/XP/gold vecchi sopravvivono.
+Cosa: NEW RUN → dialog di conferma ("i progressi di questo utente verranno azzerati") → `resetProgressForUser` + ripartenza (classe scelta, 0 XP, solo primo topic sbloccato). Annulla → nessun cambiamento. RESET manuale esistente invariato.
+Test: save popolato → NEW RUN confermato → tutto a zero + classe nuova; annulla → save intatto.
+File: path/class selection flow + `lib/providers/game_provider.dart`, stesso test file.
+Commit `[UX 5]`.
+
+## U6 — Docs e chiusura
+
+`docs/assignment/02_stato.md` (+righe esiti U5), INDEX → COMPLETATO. Nessun cambio numeri/Editoriale GamiDOC (fix solo UX).
+Commit `[UX 6]` (solo docs).
 
 ## Rischi
 
@@ -49,3 +57,4 @@ Commit `[UX 4]` (solo docs) oppure squash in U3 se banale — default commit sep
 | MU1 | account nuovo non può finire in Home vuota |
 | MU2 | chip sempre con icona/immagine valida |
 | MU3 | menu raggiungibile e rientrabile senza perdite |
+| MU5 | NEW RUN confermato riparte da zero, annulla conserva |

@@ -42,8 +42,6 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final gameProvider = context.read<GameProvider>();
-
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -215,11 +213,41 @@ class _ClassSelectionScreenState extends State<ClassSelectionScreen> {
                   height: 56,
                   child: ElevatedButton(
                     onPressed: _selectedClass != null
-                        ? () {
-                            gameProvider.selectClass(_selectedClass!);
+                        ? () async {
+                            // U5: con save avviato, NEW RUN chiede conferma:
+                            // i progressi di questo utente verranno azzerati.
+                            final gameProvider = context.read<GameProvider>();
+                            if (gameProvider.hasStartedJourney) {
+                              final confirmed = await showDialog<bool>(
+                                context: context,
+                                builder: (dialogContext) => AlertDialog(
+                                  title: const Text('Start new run?'),
+                                  content: const Text(
+                                    'Progress for this user will be reset.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(
+                                          dialogContext, false),
+                                      child: const Text('CANCEL'),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () => Navigator.pop(
+                                          dialogContext, true),
+                                      child: const Text('CONFIRM'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                              if (confirmed != true) return;
+                            }
+                            await gameProvider
+                                .startNewRun(_selectedClass!);
+                            if (!context.mounted) return;
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (_) => const HomeScreen()),
+                              MaterialPageRoute(
+                                  builder: (_) => const HomeScreen()),
                             );
                           }
                         : null,

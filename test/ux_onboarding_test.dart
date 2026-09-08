@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slay_the_roadmap/providers/game_provider.dart';
+import 'package:slay_the_roadmap/screens/class_selection_screen.dart';
 import 'package:slay_the_roadmap/screens/deck_builder_screen.dart';
 import 'package:slay_the_roadmap/screens/home_screen.dart';
 import 'package:slay_the_roadmap/screens/main_menu_screen.dart';
@@ -33,6 +34,14 @@ void main() {
     addTearDown(() {
       FlutterError.onError = saved;
     });
+  }
+
+  /// ClassSelection cards overflow at the default 800px test width
+  /// (pre-existing layout, no restyle per U5 constraints): pump it wide.
+  void useWideSurface(WidgetTester tester) {
+    tester.view.physicalSize = const Size(1600, 1200);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() => tester.view.resetPhysicalSize());
   }
 
   // ---------------------------------------------------------------- U1
@@ -142,6 +151,102 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(HomeScreen), findsOneWidget);
       expect(find.byType(DeckBuilderScreen), findsOneWidget);
+    });
+  });
+
+  // ---------------------------------------------------------------- U5
+  group('U5 NEW RUN riparte pulita', () {
+    GameProvider populatedProvider() {
+      final provider = GameProvider();
+      provider.selectClass('warrior');
+      provider.completeTopic('variables-types');
+      provider.addGold(100);
+      return provider;
+    }
+
+    test('startNewRun azzera il save e applica la nuova classe', () async {
+      final provider = populatedProvider();
+      expect(provider.completedTopics, isNotEmpty);
+      expect(provider.playerStats.experience, greaterThan(0));
+      expect(provider.gold, 100);
+
+      await provider.startNewRun('mage');
+
+      expect(provider.playerStats.playerClass, 'Mage');
+      expect(provider.playerStats.experience, 0);
+      expect(provider.completedTopics, isEmpty);
+      expect(provider.gold, 0);
+      expect(provider.activeDeck, isNotEmpty);
+      expect(provider.hasStartedJourney, isTrue);
+      final start =
+          provider.roadmapNodes.where((n) => n.id == 'start').firstOrNull;
+      expect(start, isNotNull);
+      expect(start!.completed, isTrue);
+      expect(
+        provider.roadmapNodes.where((n) => n.completed && n.id != 'start'),
+        isEmpty,
+      );
+      expect(
+        provider.roadmapNodes.where((n) =>
+            n.unlocked && n.id != 'start' && !start.connections.contains(n.id)),
+        isEmpty,
+      );
+    });
+
+    testWidgets('save popolato + CONFIRM -> run pulita con nuova classe',
+        (tester) async {
+      final provider = populatedProvider();
+      suppressMissingAssets();
+      useWideSurface(tester);
+      await tester.pumpWidget(
+          withProvider(provider, const ClassSelectionScreen()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('MAGE'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('BEGIN ADVENTURE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('CONFIRM'), findsOneWidget);
+      expect(find.text('CANCEL'), findsOneWidget);
+      await tester.tap(find.text('CONFIRM'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(provider.playerStats.playerClass, 'Mage');
+      expect(provider.playerStats.experience, 0);
+      expect(provider.completedTopics, isEmpty);
+      expect(provider.gold, 0);
+      expect(provider.hasStartedJourney, isTrue);
+    });
+
+    testWidgets('ANNULLA -> save intatto, nessuna navigazione',
+        (tester) async {
+      final provider = populatedProvider();
+      final topicsBefore = List.of(provider.completedTopics);
+      final xpBefore = provider.playerStats.experience;
+      suppressMissingAssets();
+      useWideSurface(tester);
+      await tester.pumpWidget(
+          withProvider(provider, const ClassSelectionScreen()));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('MAGE'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('BEGIN ADVENTURE'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('CANCEL'), findsOneWidget);
+      await tester.tap(find.text('CANCEL'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ClassSelectionScreen), findsOneWidget);
+      expect(find.byType(HomeScreen), findsNothing);
+      expect(provider.playerStats.playerClass, 'Warrior');
+      expect(provider.completedTopics, topicsBefore);
+      expect(provider.playerStats.experience, xpBefore);
+      expect(provider.gold, 100);
+      expect(provider.hasStartedJourney, isTrue);
     });
   });
 }

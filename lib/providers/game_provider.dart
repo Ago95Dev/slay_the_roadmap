@@ -673,6 +673,38 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// U5: NEW RUN riparte pulita — azzera il save per-utente e applica la
+  /// nuova classe/deck (0 XP, solo primo topic sbloccato, journey avviata).
+  /// Il RESET manuale ([resetProgress]) resta invariato: qui si aggiunge
+  /// solo la pulizia che [resetProgress] non fa (risorse viste, roadmap,
+  /// skill) più la [selectClass] finale.
+  Future<void> startNewRun(String className) async {
+    final path = _selectedPath;
+    await resetProgress();
+    _selectedPath = path;
+    _viewedResources = {};
+    for (final skill in _skillTree) {
+      skill.unlocked = false;
+    }
+    for (final node in _roadmapNodes) {
+      node.unlocked = false;
+      node.completed = false;
+    }
+    final startNode =
+        _roadmapNodes.where((node) => node.id == 'start').firstOrNull;
+    if (startNode != null) {
+      startNode.unlocked = true;
+      startNode.completed = true;
+      for (final connectionId in startNode.connections) {
+        _roadmapNodes
+            .where((n) => n.id == connectionId)
+            .firstOrNull
+            ?.unlocked = true;
+      }
+    }
+    selectClass(className);
+  }
+
   // Unlock skill
   void unlockSkill(String skillId) {
     final skill = _skillTree.where((s) => s.id == skillId).firstOrNull;

@@ -4,7 +4,7 @@ Traccia tutti i piani in `.plans/`. Attivo = quello su cui si lavora. Archiviati
 
 | Data | File | Stato | Scope | Note |
 |---|---|---|---|---|
-| 2026-09-09 | `2026-09-09-piano-ux-onboarding.md` | COMPLETATO U1-U4 | UX onboarding: U1 gate CONTINUE, U2 chip avatar, U3 ritorno al menu, U4 docs | Suite 83/83, analyze 0 error |
+| 2026-09-09 | `2026-09-09-piano-ux-onboarding.md` | COMPLETATO U1-U6 | UX onboarding: gate CONTINUE, chip avatar, menu, NEW RUN pulita, docs | Suite 86/86, analyze 0 error |
 | 2026-09-08 | `archive/2026-09-08-piano-hub-fix.md` | ARCHIVIATO | Hub fix app↔engine H1-H8 completati | Suite 78/78, analyze 0 error, pushato |
 | 2026-09-08 | `archive/2026-09-08-piano-fix-tecnici-last_version.md` | ARCHIVIATO | Fix tecnici Fasi 0-5 completati | Boot, test, conformità, utenti, igiene, docs |
 | 2026-09-06 | `archive/2026-09-06-plan_completamento.md` | ARCHIVIATO | Piano completamento v2 scope ridotto (storico) | Superato dal piano last_version |
