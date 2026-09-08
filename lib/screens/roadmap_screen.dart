@@ -90,13 +90,25 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
   }
 
   bool _isTopicUnlocked(Topic topic, List<String> completedTopics) {
-    // Logic to determine if topic is unlocked
-    // For now, unlock if previous topic is completed or it's the first one
-    if (topic.order == 1 && topic.chapterId == 'chapter-1') return true;
-    
-    // Find previous topic
-    // This is simplified; real logic would check dependencies
-    return true; // Unlock all for demo/testing purposes or implement real logic
+    // Fase 2: gate reale (prima demo-always-true, nota Fase 1). Sblocco solo
+    // via quiz passato ≥80% (skip non sblocca, vedi GameProvider).
+    final siblings = topicsData
+        .where((t) => t.chapterId == topic.chapterId)
+        .toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+    final idx = siblings.indexWhere((t) => t.id == topic.id);
+    if (idx > 0) return completedTopics.contains(siblings[idx - 1].id);
+    // Primo del capitolo: capitolo 1 sempre aperto, gli altri richiedono
+    // l'ultimo topic del capitolo precedente completato.
+    const chapterOrder = ['chapter-1', 'chapter-2', 'chapter-3'];
+    final ci = chapterOrder.indexOf(topic.chapterId);
+    if (ci <= 0) return true;
+    final prev = topicsData
+        .where((t) => t.chapterId == chapterOrder[ci - 1])
+        .toList()
+      ..sort((a, b) => a.order.compareTo(b.order));
+    if (prev.isEmpty) return true;
+    return completedTopics.contains(prev.last.id);
   }
 
   Widget _buildChapterNode(

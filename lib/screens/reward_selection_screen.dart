@@ -125,8 +125,35 @@ class _RewardSelectionScreenState extends State<RewardSelectionScreen> {
     final selectedReward = widget.rewards[_selectedIndex!];
     final gameProvider = context.read<GameProvider>();
 
+    // Fase 2, US-03 enforce 1/topic: re-claim bloccato con messaggio.
+    if (gameProvider.isRewardClaimed(widget.topicId)) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.block, color: Colors.orange),
+              SizedBox(width: 8),
+              Text('Già riscattata'),
+            ],
+          ),
+          content: const Text(
+            'Hai già riscattato la reward di questo topic (limite 1/topic).',
+          ),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     // Process the selected reward
     _processReward(gameProvider, selectedReward);
+    gameProvider.claimRewardTopic(widget.topicId);
 
     // Show confirmation and return
     showDialog(

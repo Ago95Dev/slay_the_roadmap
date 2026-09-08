@@ -7,6 +7,7 @@ import '../models/types.dart';
 import '../providers/game_provider.dart';
 import '../data/cards_data.dart' as cards_data;
 import '../data/roadmap_data.dart';
+import '../utils/constants.dart';
 import '../widgets/tiny_card_widget.dart';
 
 class BossFightScreen extends StatefulWidget {
@@ -37,10 +38,9 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   BossAbility? _bossIntent;
   double _lastThresholdCrossed = 100.0;
   
-  // Quiz State
+  // Quiz State (Fase 2: quiz boss SENZA scadenza — decisione utente:
+  // timer 25s rimosso. Nessun Timer.periodic per le domande.)
   QuizQuestion? _currentQuestion;
-  Timer? _quizTimer;
-  int _quizTimeLeft = 25;
   bool _quizAnswered = false;
   bool _quizCorrect = false;
   bool _isThresholdQuiz = false;
@@ -51,6 +51,9 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   int _dialogueIndex = 0;
   String _currentDialogueText = '';
   Timer? _typewriterTimer;
+
+  // Fase 2: la vittoria assegna badge+XP+sblocco una sola volta.
+  bool _victoryReported = false;
 
   // Animations
   late AnimationController _shakeController;
@@ -73,7 +76,6 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
 
   @override
   void dispose() {
-    _quizTimer?.cancel();
     _shakeController.dispose();
     super.dispose();
   }
@@ -334,32 +336,14 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
       _phase = isThreshold ? TurnPhase.thresholdQuiz : TurnPhase.bossQuiz;
       _isThresholdQuiz = isThreshold;
       _currentQuestion = questions.first;
-      _quizTimeLeft = 25;
       _quizAnswered = false;
       _quizCorrect = false;
     });
-
-    _quizTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_quizTimeLeft > 0) {
-          _quizTimeLeft--;
-        } else {
-          _handleQuizTimeout();
-        }
-      });
-    });
-  }
-
-  void _handleQuizTimeout() {
-    _quizTimer?.cancel();
-    if (!_quizAnswered) {
-      _handleQuizResult(false);
-    }
+    // Fase 2: nessun timer — il quiz boss non ha scadenza.
   }
 
   void _handleQuizAnswer(int index) {
     if (_quizAnswered) return;
-    _quizTimer?.cancel();
     
     bool correct = index == _currentQuestion!.correctAnswer;
     setState(() {
@@ -574,10 +558,12 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   }
 
   void _retryFight() {
+    // Fase 2: retry con conseguenze — nessun XP guadagnato o perso, solo
+    // full-heal (ok da design). Il contatore vite boss resta invariato.
     final provider = context.read<GameProvider>();
-    provider.playerStats.currentHp = provider.playerStats.maxHp; 
+    provider.playerStats.currentHp = provider.playerStats.maxHp;
     provider.notifyListeners();
-    
+
     _initializeFight();
   }
 
@@ -951,36 +937,23 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                         ],
                                       ),
                                     ),
-                                    // Timer with dramatic styling
+                                    // Fase 2: quiz senza scadenza (timer 25s rimosso).
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: _quizTimeLeft <= 5 
-                                            ? const Color(0xFF7f1d1d) 
-                                            : const Color(0xFF422006),
+                                        color: const Color(0xFF422006),
                                         border: Border.all(
-                                          color: _quizTimeLeft <= 5 
-                                              ? const Color(0xFFef4444) 
-                                              : const Color(0xFFd4af37),
+                                          color: const Color(0xFFd4af37),
                                           width: 2,
                                         ),
-                                        boxShadow: _quizTimeLeft <= 5 ? [
-                                          BoxShadow(
-                                            color: const Color(0xFFef4444).withValues(alpha: 0.5),
-                                            blurRadius: 8,
-                                            spreadRadius: 2,
-                                          ),
-                                        ] : [],
                                       ),
-                                      child: Text(
-                                        '$_quizTimeLeft',
+                                      child: const Text(
+                                        '∞ Senza scadenza',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 28,
-                                          color: _quizTimeLeft <= 5 
-                                              ? const Color(0xFFfca5a5) 
-                                              : const Color(0xFFfbbf24),
-                                          fontFeatures: const [FontFeature.tabularFigures()],
+                                          fontSize: 16,
+                                          color: Color(0xFFfbbf24),
                                         ),
                                       ),
                                     ),
@@ -1202,9 +1175,19 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
 
   Widget _buildBossHpBar() {
     double hpPercent = _boss.currentHp / _boss.maxHp;
-    
-    return Stack(
+
+    // Fase 2, path live delle soglie: la HUD usa GameConstants 75/50/25
+    // (tacche + label qui sotto); le DESCRIZIONI dei poteri di soglia
+    // vengono da Boss.thresholdPowers (roadmap_data, es. Syntax Sentinel
+    // 50/25). Il modello BossFight (domain, enrageThreshold/isEnraged) è
+    // usato solo da test/spec, non dal fight live.
+    final thresholdNotes = _boss.thresholdPowers.entries
+        .map((e) => '${e.key}%: ${e.value}')
+        .join('\n');
+    return Column(
       children: [
+        Stack(
+          children: [
         // 1. Background Gradient (Rainbow)
         Container(
           height: 24,
@@ -1252,6 +1235,17 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
             ),
           ),
         ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        // Soglie quiz live (75/50/25) + poteri di soglia del boss.
+        Tooltip(
+          message: thresholdNotes.isEmpty ? 'Nessun potere di soglia' : thresholdNotes,
+          child: Text(
+            'Soglie quiz: ${GameConstants.bossThreshold1} • ${GameConstants.bossThreshold2} • ${GameConstants.bossThreshold3}',
+            style: const TextStyle(color: Colors.white70, fontSize: 12),
+          ),
+        ),
       ],
     );
   }
@@ -1288,6 +1282,16 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
   }
 
   Widget _buildVictoryScreen() {
+    // Fase 2, US-04 victory: claim 1 reward (via nodo boss) + sblocco
+    // capitolo + badge locale, assegnati una sola volta (idempotente in
+    // GameProvider.defeatBoss). Post-frame: mai notifyListeners durante build.
+    if (!_victoryReported) {
+      _victoryReported = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        context.read<GameProvider>().defeatBoss(widget.bossId);
+      });
+    }
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
@@ -1297,6 +1301,17 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
             const Icon(Icons.emoji_events, color: Colors.amber, size: 80),
             const SizedBox(height: 20),
             const Text('VICTORY!', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            Text(
+              'Badge: ${widget.bossId}  •  +${GameConstants.xpPerBossDefeated} XP',
+              style: const TextStyle(color: Colors.amber, fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Capitolo successivo sbloccato!\nReward del boss nell\u2019inventario.',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => Navigator.pop(context),
@@ -1318,6 +1333,11 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
             const Icon(Icons.sentiment_very_dissatisfied, color: Colors.red, size: 80),
             const SizedBox(height: 20),
             const Text('DEFEAT', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text(
+              'Retry senza XP: nessun XP guadagnato o perso.',
+              style: TextStyle(color: Colors.white70, fontSize: 14),
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: _retryFight,

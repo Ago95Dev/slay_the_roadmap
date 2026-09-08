@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../domain/models/player_progress.dart';
 import '../providers/game_provider.dart';
 import '../models/types.dart';
 import '../widgets/active_deck_widget.dart';
@@ -142,11 +143,16 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       
-                      // XP Bar
+                      // XP Bar (Fase 2: soglie levelForXp, non 100*level)
                       _buildStatBar(
                         label: 'XP',
                         current: stats.experience,
-                        max: 100 * stats.level, // Mock max XP
+                        max: PlayerProgress.levelForXp(stats.experience) >=
+                                PlayerProgress.maxLevel
+                            ? stats.experience
+                            : (PlayerProgress.levelForXp(stats.experience) == 1
+                                ? PlayerProgress.level2Threshold
+                                : PlayerProgress.level3Threshold),
                         color: Colors.purple,
                         icon: Icons.star,
                       ),
@@ -179,9 +185,41 @@ class ProfileScreen extends StatelessWidget {
             _buildSectionHeader('SKILLS'),
             const SizedBox(height: 16),
             const TinySkillsBar(),
+
+            const SizedBox(height: 32),
+
+            // Badges Section (Fase 2, US-02/US-04: collection locale
+            // topic/boss; l'Hub resta specchio best-effort offline-first).
+            _buildSectionHeader('BADGES'),
+            const SizedBox(height: 16),
+            _buildBadges(gameProvider.badges),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildBadges(List<String> badges) {
+    if (badges.isEmpty) {
+      return const Text(
+        'Nessun badge: passa un quiz o sconfiggi un boss.',
+        style: TextStyle(color: Colors.black54),
+      );
+    }
+    return Wrap(
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        for (final badge in badges)
+          Chip(
+            avatar: Icon(
+              badge.startsWith('boss:') ? Icons.emoji_events : Icons.verified,
+              size: 18,
+              color: Colors.amber.shade800,
+            ),
+            label: Text(badge),
+          ),
+      ],
     );
   }
 

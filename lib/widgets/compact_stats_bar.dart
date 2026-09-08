@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../domain/models/player_progress.dart';
 import '../providers/game_provider.dart';
 import '../screens/deck_builder_screen.dart';
 import '../screens/skill_tree_screen.dart';
@@ -14,9 +15,23 @@ class CompactStatsBar extends StatelessWidget {
     final completedCount = gameProvider.completedTopics.length;
     const totalTopics = 15; // Could be dynamic based on selected path
     final playerStats = gameProvider.playerStats;
-    
-    // Calculate XP percentage
-    final double xpPercent = (playerStats.experience / (100 * playerStats.level)).clamp(0.0, 1.0);
+
+    // Fase 2: HUD unica fonte PlayerProgress.levelForXp (soglie 0/100/500).
+    // L1: xp/100; L2: (xp-100)/400; L3: piena. Numeri = XP locali.
+    final hudLevel = PlayerProgress.levelForXp(playerStats.experience);
+    final int? hudNext = hudLevel >= PlayerProgress.maxLevel
+        ? null
+        : (hudLevel == 1
+            ? PlayerProgress.level2Threshold
+            : PlayerProgress.level3Threshold);
+    final double xpPercent = hudNext == null
+        ? 1.0
+        : hudLevel == 1
+            ? (playerStats.experience / hudNext).clamp(0.0, 1.0)
+            : ((playerStats.experience - PlayerProgress.level2Threshold) /
+                    (PlayerProgress.level3Threshold -
+                        PlayerProgress.level2Threshold))
+                .clamp(0.0, 1.0);
 
     return Container(
       height: 60,
@@ -119,7 +134,7 @@ class CompactStatsBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'LVL ${playerStats.level}',
+                      'LVL $hudLevel',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
@@ -127,7 +142,9 @@ class CompactStatsBar extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'XP ${playerStats.experience}/${100 * playerStats.level}',
+                      hudNext == null
+                          ? 'XP ${playerStats.experience} (MAX)'
+                          : 'XP ${playerStats.experience}/$hudNext',
                       style: const TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.bold,

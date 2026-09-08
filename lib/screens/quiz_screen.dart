@@ -288,12 +288,16 @@ class _QuizScreenState extends State<QuizScreen> {
       }
     }
 
-    // Get rewards for this topic
+    // Get rewards for this topic (Fase 2, US-03: enforce 1/topic — se la
+    // reward risulta già in claimedRewardTopics si blocca il re-claim con
+    // messaggio, la preview resta descrittiva).
     final topicNode = gameProvider.roadmapNodes.where((node) =>
       node.type == RoadmapNodeType.topic && node.topicId == widget.topicId
     ).firstOrNull;
-    
-    final hasRewards = topicNode != null && topicNode.rewards.isNotEmpty && passed;
+
+    final alreadyClaimed = gameProvider.isRewardClaimed(widget.topicId);
+    final hasRewards =
+        topicNode != null && topicNode.rewards.isNotEmpty && passed && !alreadyClaimed;
 
     // Show results
     showDialog(
@@ -344,9 +348,11 @@ class _QuizScreenState extends State<QuizScreen> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        hasRewards 
-                          ? 'Topic completed! Choose your reward.' 
-                          : 'Topic completed! Next topics unlocked.',
+                        hasRewards
+                            ? 'Topic completed! Choose your reward.'
+                            : alreadyClaimed
+                                ? 'Reward già riscattata per questo topic (1/topic).'
+                                : 'Topic completed! Next topics unlocked.',
                         style: const TextStyle(color: Colors.green),
                       ),
                     ),

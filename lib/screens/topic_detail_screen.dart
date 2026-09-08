@@ -543,16 +543,9 @@ class TopicDetailScreen extends StatelessWidget {
             ],
           ),
         ),
-        const PopupMenuItem<TopicStatus>(
-          value: TopicStatus.skipped,
-          child: Row(
-            children: [
-              Icon(Icons.skip_next, color: Colors.grey),
-              SizedBox(width: 13),
-              Text('Skip'),
-            ],
-          ),
-        ),
+        // Fase 2: voce Skip rimossa (decisione utente: skip-senza-XP RIMOSSO).
+        // Lo skip resta solo come stato di lettura per i save vecchi; lo
+        // sblocco avviene solo via quiz passato ≥80%.
       ],
     );
   }

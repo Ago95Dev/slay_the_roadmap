@@ -13,6 +13,7 @@ import '../services/engine_client.dart';
 import '../services/storage_service.dart';
 import '../services/dungeon_generator.dart';
 import '../data/topics_and_quizzes.dart';
+import '../utils/constants.dart';
 
 class GameProvider with ChangeNotifier {
   late final EngineClient _engine;
@@ -34,6 +35,27 @@ class GameProvider with ChangeNotifier {
   List<String> _activeDeck = [];
   Map<String, Map<String, dynamic>> _chapterProgress = {};
   List<String> _achievements = [];
+  // Badge locali (Fase 2, US-02/US-04): 'topic:<id>' al quiz passato,
+  // 'boss:<id>' alla vittoria. L'Hub resta specchio best-effort
+  // (quiz_completed/boss_defeated), la collection locale è la fonte per la UI.
+  List<String> get badges => List.unmodifiable(_achievements);
+  // Reward già riscattate 1/topic (Fase 2, US-03): specchio in-memory del set
+  // `claimedRewardTopics` (contratto persistence_repository), consultato da
+  // quiz_screen e reward_selection_screen prima di ogni claim.
+  final Set<String> _claimedRewardTopics = {};
+  Set<String> get claimedRewardTopics => Set.unmodifiable(_claimedRewardTopics);
+  bool isRewardClaimed(String topicId) =>
+      _claimedRewardTopics.contains(topicId);
+
+  /// Riscatta la reward del topic (1/topic). Ritorna false se già riscattata
+  /// (re-claim bloccato, nessun effetto).
+  bool claimRewardTopic(String topicId) {
+    if (_claimedRewardTopics.contains(topicId)) return false;
+    _claimedRewardTopics.add(topicId);
+    _saveProgress();
+    notifyListeners();
+    return true;
+  }
   DungeonRun? _dungeonRun;
   PlayerStats _playerStats = PlayerStats();
   List<SkillNode> _skillTree = [];
@@ -269,6 +291,14 @@ class GameProvider with ChangeNotifier {
           .toList();
       _gold = progress['gold'] ?? 0;
       _viewedResources = Set<String>.from(progress['viewedResources'] ?? []);
+      _claimedRewardTopics
+        ..clear()
+        ..addAll(
+          (progress['claimedRewardTopics'] as List? ?? const []).map(
+            (e) => e.toString(),
+          ),
+        );
+      _achievements = List<String>.from(progress['achievements'] ?? []);
       _selectedPath = progress['selectedPath'];
       _hasStartedJourney = progress['hasStartedJourney'] ?? false;
       // Fase 1B / F12: carica nuovi campi con default per save vecchi
@@ -340,6 +370,8 @@ class GameProvider with ChangeNotifier {
       'roadmapNodes': _roadmapNodes.map((n) => n.toJson()).toList(),
       'gold': _gold,
       'viewedResources': _viewedResources.toList(),
+      'claimedRewardTopics': _claimedRewardTopics.toList(),
+      'achievements': _achievements,
       'selectedPath': _selectedPath,
       'hasStartedJourney': _hasStartedJourney,
       'cardUpgrades': _cardUpgrades.map((k, v) => MapEntry(k, v.toJson())),
@@ -378,8 +410,9 @@ class GameProvider with ChangeNotifier {
       if (!_skippedTopics.contains(topicId)) {
         _skippedTopics.add(topicId);
         _completedTopics.remove(topicId); // Cannot be both completed and skipped
-        // Skipping also unlocks next nodes, but no XP
-        _unlockNextNodes(topicId);
+        // Fase 2 (decisione utente: skip-senza-XP RIMOSSO): lo skip NON dà XP
+        // e NON sblocca i nodi successivi. Sblocco solo via quiz passato ≥80%
+        // (completeTopicQuiz). Niente _unlockNextNodes qui.
       }
     } else if (status == TopicStatus.inProgress) {
       _completedTopics.remove(topicId);
@@ -415,7 +448,11 @@ class GameProvider with ChangeNotifier {
     // Mark topic as completed
     if (!_completedTopics.contains(topicId)) {
       _completedTopics.add(topicId);
-      
+
+      // Badge locale topic (Fase 2, US-02): l'Hub resta best-effort.
+      final topicBadge = 'topic:$topicId';
+      if (!_achievements.contains(topicBadge)) _achievements.add(topicBadge);
+
       // Award experience based on score
       final experienceReward = 50 + (score * 10);
       _awardExperience(experienceReward);
@@ -669,15 +706,19 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Award experience
+  // Award experience (Fase 2: unificata su PlayerProgress.levelForXp,
+  // soglie cumulative 0/100/500 uguali all'Hub — unica fonte di verità anche
+  // per la HUD. Il legacy sottrattivo 100+level*100 (skill_tree_data) non è
+  // più usato. Nota numeri: gli XP mostrati sono quelli LOCALI; HubConfig
+  // .quizXpAmount (100) è solo lo specchio best-effort inviato all'Hub in
+  // `quiz_completed` (offline-first: nessun blocco se l'Hub è down).
   void _awardExperience(int amount) {
+    final oldLevel = PlayerProgress.levelForXp(_playerStats.experience);
     _playerStats.experience += amount;
-    
-    final xpNeeded = calculateNextLevelXP(_playerStats.level);
-    while (_playerStats.experience >= xpNeeded) {
-      _playerStats.experience -= xpNeeded;
-      _playerStats.level += 1;
-      _playerStats.maxHp += 5;
+    final newLevel = PlayerProgress.levelForXp(_playerStats.experience);
+    if (newLevel > oldLevel) {
+      _playerStats.level = newLevel;
+      _playerStats.maxHp += 5 * (newLevel - oldLevel);
       _playerStats.currentHp = _playerStats.maxHp;
     }
   }
@@ -741,6 +782,37 @@ class GameProvider with ChangeNotifier {
 
     _saveProgress();
     notifyListeners();
+  }
+
+  /// Vittoria boss (Fase 2, US-04): badge locale + XP vittoria + sblocco
+  /// del capitolo (nodo boss completato -> connessioni aperte) + evento Hub
+  /// `boss_defeated` best-effort. Idempotente: se il boss risulta già
+  /// sconfitto non riassegna XP/badge/reward.
+  void defeatBoss(String bossId) {
+    final badge = 'boss:$bossId';
+    final node = _roadmapNodes
+        .where(
+          (n) => n.type == RoadmapNodeType.boss && n.bossId == bossId,
+        )
+        .firstOrNull;
+    if (_achievements.contains(badge) && (node == null || node.completed)) {
+      return;
+    }
+    if (!_achievements.contains(badge)) _achievements.add(badge);
+    _awardExperience(GameConstants.xpPerBossDefeated);
+    if (node != null && !node.completed) {
+      // Sblocco capitolo + reward nodo + evento Hub (in completeRoadmapNode).
+      // La vittoria presuppone aver raggiunto il boss: force-unlock del nodo.
+      node.unlocked = true;
+      completeRoadmapNode(node.id);
+    } else {
+      _analytics = _analytics.record(
+        AnalyticsEvent.bossWin,
+        topicId: bossId,
+      );
+      _saveProgress();
+      notifyListeners();
+    }
   }
 
   void _processReward(RoadmapReward reward) {
@@ -966,6 +1038,7 @@ class GameProvider with ChangeNotifier {
   Future<void> resetProgress() async {
     _completedTopics = [];
     _skippedTopics = [];
+    _claimedRewardTopics.clear();
     _currentTopic = null;
     _inventory = [];
     _activeDeck = [];
