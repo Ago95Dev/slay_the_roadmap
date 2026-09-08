@@ -9,6 +9,14 @@ import '../screens/profile_screen.dart';
 class CompactStatsBar extends StatelessWidget {
   const CompactStatsBar({super.key});
 
+  /// Classi con asset dedicato in `assets/images/` (whitelist, U2):
+  /// tutto il resto (es. Novice iniziale) mostra Icons.person nel cerchio.
+  static const _classesWithAsset = {'hunter', 'mage', 'warrior', 'utility'};
+
+  /// True se [playerClass] ha un asset immagine dedicato (case-insensitive).
+  static bool hasClassAsset(String playerClass) =>
+      _classesWithAsset.contains(playerClass.toLowerCase());
+
   @override
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
@@ -75,11 +83,19 @@ class CompactStatsBar extends StatelessWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       border: Border.all(color: Colors.grey.shade400),
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/${playerStats.playerClass.toLowerCase()}.png'),
-                        fit: BoxFit.cover,
-                      ),
+                      // U2: fallback a icona se la classe non ha asset
+                      // dedicato (es. Novice iniziale: novice.png non esiste).
+                      image: hasClassAsset(playerStats.playerClass)
+                          ? DecorationImage(
+                              image: AssetImage(
+                                  'assets/images/${playerStats.playerClass.toLowerCase()}.png'),
+                              fit: BoxFit.cover,
+                            )
+                          : null,
                     ),
+                    child: hasClassAsset(playerStats.playerClass)
+                        ? null
+                        : const Icon(Icons.person, size: 16),
                   ),
                   const SizedBox(width: 4),
                   Text(

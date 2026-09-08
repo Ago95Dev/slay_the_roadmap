@@ -12,6 +12,8 @@ class MainMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameProvider = context.watch<GameProvider>();
     final hasActiveDungeon = gameProvider.dungeonRun?.active ?? false;
+    // U1: CONTINUE solo a journey iniziata (flag persistito, mai letto prima).
+    final hasStartedJourney = gameProvider.hasStartedJourney;
 
     return Scaffold(
       body: Container(
@@ -210,17 +212,18 @@ class MainMenuScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _MenuButton(
-                            label: 'CONTINUE',
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const HomeScreen()),
-                              );
-                            },
-                          ),
-                          const SizedBox(height: 20),
+                          if (hasStartedJourney)
+                            _MenuButton(
+                              label: 'CONTINUE',
+                              onPressed: () {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const HomeScreen()),
+                                );
+                              },
+                            ),
+                          if (hasStartedJourney) const SizedBox(height: 20),
                           _MenuButton(
                             label: 'NEW RUN',
                             onPressed: () {
@@ -232,6 +235,18 @@ class MainMenuScreen extends StatelessWidget {
                               );
                             },
                           ),
+                          if (!hasStartedJourney)
+                            const Padding(
+                              padding: EdgeInsets.only(top: 12),
+                              child: Text(
+                                'Start a new run to begin.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF8b6f47),
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
                           const SizedBox(height: 20),
                           _MenuButton(
                             label: 'SETTINGS',

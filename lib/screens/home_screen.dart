@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../domain/models/player_progress.dart';
 import '../widgets/gothic_profile_dialog.dart';
+import 'main_menu_screen.dart';
 import 'roadmap_screen.dart';
 import 'deck_builder_screen.dart';
 import 'skill_tree_screen.dart';
@@ -104,6 +105,21 @@ class _HomeScreenState extends State<HomeScreen> {
                             );
                           },
                         ),
+                      const SizedBox(width: 8),
+                      // U3: ritorno al menu senza perdere lo stato della Home
+                      // (push, non replacement: la Home resta sotto).
+                      _GothicIconButton(
+                        icon: Icons.menu,
+                        tooltip: 'Menu',
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const MainMenuScreen(),
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(width: 8),
                       _GothicIconButton(
                         icon: Icons.settings,
