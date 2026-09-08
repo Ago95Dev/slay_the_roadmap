@@ -44,8 +44,10 @@ Combattimento a turni con numeri reali (stato vero implementato):
 \item \textbf{Energia 3 per turno} (1 per carta giocata).
 \item A fine turno quiz obbligatorio: risposta giusta = danno al boss
 (quiz-danno), risposta errata = danno al giocatore.
-\item Vittoria: 1 ricompensa a scelta, sblocco del capitolo successivo,
-badge del boss. Sconfitta: retry a HP pieni, senza XP.
+\item Vittoria: claim delle ricompense del nodo boss (semplificazione
+dichiarata: tutte quelle del nodo, non 1 sola), sblocco del capitolo
+successivo, badge del boss, \textbf{+100 XP} (come l'Hub). Sconfitta:
+retry a HP pieni, senza XP.
 \end{itemize}
 I tre boss (con lore di una riga dalla campagna Web):
 \begin{itemize}
@@ -62,11 +64,16 @@ I quiz del boss sono adattivi: pescati dai 3 topic del capitolo.
 \section{Economie numeriche locali}
 \begin{itemize}
 \item \textbf{XP/livelli}: soglie \textbf{L1 0 / L2 100 / L3 500}, identiche
-a quelle dell'Hub cos\`i che locale e remoto coincidano.
-\item \textbf{Streak}: bonus \textbf{+25 XP ogni 3 successi consecutivi}.
-\item \textbf{Vite}: 3. \textbf{Save locale}: SharedPreferences
-(\texttt{Save v1}: nodi completati, deck, XP, livello, boss sbloccati;
-\texttt{Continue} ripristina, \texttt{New Run} azzera con conferma).
+a quelle dell'Hub cos\`i che locale e remoto coincidano. Quiz superato:
+\textbf{+100 XP}; vittoria boss: \textbf{+100 XP} (stessi dell'Hub).
+\item \textbf{Streak}: conteggiata ai fini del ripasso
+(\path{failCount}, soglia di ripasso); il bonus XP \`e definito ma
+\textbf{non attivo} e non va considerato nella valutazione.
+\item \textbf{Vite}: 3. \textbf{Save per utente}: SharedPreferences
+(\texttt{Save v1}: nodi completati, deck, XP, livello, boss sbloccati,
+reward riscattate, badge; \texttt{Continue} ripristina,
+\texttt{New Run} chiede conferma e azzera solo quell'utente).
+Auth locale con hash salato e migrazione dalle password storiche.
 \item \textbf{Animazioni}: sobrie (transizioni essenziali, niente effetti
 extra).
 \end{itemize}

@@ -5,16 +5,19 @@
 Gli elementi implementati, classificati secondo la tassonomia di Toda et
 al.~\cite{toda}:
 \begin{itemize}
-\item \textbf{Performance}: punti XP, livelli (0/100/500), streak (+25/3),
-soglia quiz 80\,\%, feedback immediato con explanation come hint dopo
+\item \textbf{Performance}: punti XP (quiz +100, boss +100), livelli
+(0/100/500), streak conteggiata (bonus non attivo), soglia quiz
+80\,\%, feedback immediato con explanation come hint dopo
 errori ripetuti.
 \item \textbf{Ecological}: vite (3), energia boss (3/turno), economia chiusa
 senza valuta acquistabile.
 \item \textbf{Personal}: collezione carte (deck da ricompense 1-di-3),
 badge di topic e di boss, capitoli in sequenza con prerequisiti.
 \item \textbf{Fictional}: narrativa dei tre boss e del dungeon-roadmap.
-\item \textbf{Social}: tagliato (vedi Cap.~\ref{g:stato}); nessuna
-leaderboard locale, nessuna condivisione.
+\item \textbf{Social}: classifica XP dell'Hub con riga ``tu'' evidenziata
+e card profilo con punteggio, livello e badge remoti (solo lettura,
+con stati offline); nessuna leaderboard locale n\'e condivisione
+social (tagliate per scope).
 \end{itemize}
 
 \section{Lente Octalysis}
@@ -24,9 +27,11 @@ Lettura secondo Chou~\cite{chou}: il nucleo \`e
 \textbf{Possesso (CD4)} nelle carte e nei badge,
 \textbf{Imprevedibilit\`a (CD7)} nella pesca boss dai topic del capitolo,
 \textbf{Perdita (CD8)} nel rischio boss (retry senza XP).
-Significato/Narrativa (CD1) \`e coperto dalla lore dei boss; Influenza
-sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
-(visualizzazione dei pesi in Fig.~\ref{fig:octalysis}).
+Significato/Narrativa (CD1) \`e coperto dalla lore dei boss e dalle intro
+di capitolo; Influenza sociale (CD5) \`e medio via Hub (classifica +
+card) pur senza social locali; Scarsit\`a (CD6) \`e medio-bassa via
+boss-gate e daily reward una-tantum (visualizzazione dei pesi in
+Fig.~\ref{fig:octalysis}).
 
 \begin{figure}[ht]
 \centering
@@ -65,8 +70,10 @@ sociale (CD5) e Scarsit\`a (CD6) restano deboli per scelta di scope
 
 \medskip
 \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
-\textbf{DA COMPLETARE (Fase 1B, in corso).} Le voci A--E del piano
-(narrativa CD1 estesa con intro/finale per capitolo, titoli + avatar,
-passive uniche dei boss, leaderboard Hub CD5, daily reward CD6) sono in
-corso di implementazione e NON sono ancora riflesse in questo capitolo.
-Questo paragrafo sar\`a aggiornato a chiusura della Fase 1B.}}
+\textbf{Chiuso: voci A--E implementate e verificate.} A: intro per
+capitolo + lore boss pre-fight + finale con statistiche; B: titoli di
+capitolo + avatar persistito; C: una passiva distintiva per boss
+(MITM enrage 75\,\%, Amnesiac $-$1 energia, Colossus corazza); D:
+classifica XP Hub + card profilo (punteggio, livello, badge); E: bonus
+XP giornaliero una-tantum. Suite verde, si veda il
+Cap.~\ref{g:stato}.}}

@@ -52,16 +52,20 @@ Risorse: action \path{quiz_completed}, \path{claim_reward},
 \path{boss_defeated}; Point \path{xp}; Level \path{experience} su
 \path{xp} (L1 0, L2 100, L3 500); collezione badge \path{slay_badges};
 rule \path{quiz_xp}, \path{topic_badge}, \path{boss_badge}.
-Eventi inviati best-effort dai view-model di quiz e boss, solo a quiz
-superato (soglia 80\,\% verificata in app), con \path{data} sempre
-presente in snake\_case (es.\ \path{xp_amount}, \path{badge}).
+Eventi inviati best-effort dai view-model di quiz, reward e boss, solo a
+quiz superato (soglia 80\,\% verificata in app), con \path{data} sempre
+presente in snake\_case (es.\ \path{xp_amount}, \path{badge}). Solo le 3
+action di contratto partono (allowlist); gli altri eventi locali non
+vengono inviati. Il \path{claim_reward} parte anche dal pick-1-of-3 e il
+\path{boss_defeated} parte sempre, anche senza nodo roadmap.
 Autenticazione a runtime via \path{--dart-define} (Bearer 24h),
-credenziali mai nel repo; \path{playerId} locale tipo
-\path{slay_<uuid>} salvato in SharedPreferences.
+credenziali mai nel repo; \path{playerId} stabile tipo
+\path{slay_<uuid>}, uno per utente, salvato in SharedPreferences.
 
 \section{Scelte tecniche}
 Flutter + Provider per semplicit\`a e testabilit\`a; persistenza locale su
-SharedPreferences (nessun backend proprio); Hub come unico servizio
+SharedPreferences con save \textbf{per utente} e auth con hash salato
+(nessun backend proprio); Hub come unico servizio
 remoto, usato solo come specchio di XP/badge/livelli con fallback totale.
 Ogni regola di gamification corrisponde a una action Hub, cos\`i che il
 GamiDOC resti fonte di verit\`a dei parametri (soglie, danni, HP, costi).

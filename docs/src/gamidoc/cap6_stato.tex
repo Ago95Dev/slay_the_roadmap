@@ -3,24 +3,30 @@
 
 \section{Cosa gira davvero}
 App Flutter offline-first: roadmap 3 capitoli $\times$ 3 topic + boss
-finali (12 nodi quiz da 5 domande, soglia 80\,\%), reward 1-di-3 per tipo,
-boss 10 HP / giocatore 3 HP / energia 3 con quiz-danno, vite 3, streak
-+25/3, XP/livelli 0/100/500, save locale SharedPreferences, animazioni
-sobrie. Hub: eventi \path{quiz_completed}/\path{boss_defeated}
+finali (12 nodi quiz da 5 domande, soglia 80\,\%), reward 1-di-3 per tipo
+con limite 1/topic, boss 10 HP / giocatore 3 HP / energia 3 con
+quiz-danno, vite 3, XP/livelli 0/100/500 (quiz +100, boss +100, come
+l'Hub), save per utente con auth locale, login/logout, classi iniziali
+con deck differenziati, titoli + avatar, passive uniche dei boss, daily
+reward una-tantum, narrativa intro/finale, classifica e card Hub,
+New Run con conferma e wipe, animazioni sobrie. Hub: eventi
+\path{quiz_completed}/\path{claim_reward}/\path{boss_defeated}
 best-effort con XP/badge/livelli remoti e fallback offline completo.
 
 \section{Tagli dichiarati (future work)}
-Dichiarati nel piano (\S2) e NON implementati: social e leaderboard
-locale, shop/coins, classi, login e signup (playerId locale fisso),
-roadmap extra, profilo/achievement avanzati, eventi testuali random,
-branching di campagna, difficolt\`a adattiva oltre la pesca boss, monthly
-quest e login reward, animazioni extra. Voci mockup M1 Sign-in e M2
-Option2: rimosse o disattivate.
+Dichiarati nel piano (\S2) e NON implementati: shop/coins, condivisione
+social, leaderboard locale (c'\`e quella Hub), signup remota,
+roadmap extra, achievement avanzati oltre badge topic/boss, eventi
+testuali random, branching di campagna, difficolt\`a adattiva oltre la
+pesca boss, monthly quest, animazioni extra. Voci mockup M1 Sign-in e M2
+Option2: rimosse o disattivate. Semplificazioni dichiarate: preview
+reward solo descrittiva; vittoria boss assegna tutte le reward del nodo;
+override manuale ``Done'' con XP lasciato come scelta esplicita.
 
 \medskip
 \noindent\fbox{\parbox{\dimexpr\linewidth-2\fboxsep-2\fboxrule\relax}{%
-\textbf{DA COMPLETARE (Fase 1B B--E, in corso).} A chiusura delle voci
-B (titoli + avatar), C (passive uniche boss), D (leaderboard Hub) ed E
-(daily reward) aggiornare l'elenco ``cosa gira'' con i numeri reali
-implementati e i test corrispondenti. Nessun comportamento futuro va
-descritto al presente.}}
+\textbf{Chiuso.} Voci B--E implementate e verificate (test verdi):
+titoli + avatar, passive boss, leaderboard e card Hub, daily reward.
+La voce A (narrativa) \`e implementata: intro capitoli, lore pre-fight
+e finale con statistiche. Nessun comportamento futuro \`e descritto
+al presente.}}
