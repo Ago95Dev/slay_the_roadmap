@@ -125,7 +125,7 @@ class _GothicLeaderboardWidgetState extends State<GothicLeaderboardWidget> {
             itemCount: entries.length,
             itemBuilder: (context, index) {
               final entry = entries[index];
-              final isOwn = entry.playerId == ownId;
+              final isOwn = ownId.isNotEmpty && entry.playerId == ownId;
               
               return Container(
                 margin: const EdgeInsets.only(bottom: 8),
