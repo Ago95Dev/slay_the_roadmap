@@ -68,23 +68,26 @@ void main() {
     return provider;
   }
 
-  // ---------------------------------------------------------- H1 allowlist
-  group('H1: solo le 3 action contrattuali partono', () {
-    test('daily_login bloccato, +25 XP locali invariati', () async {
+  // ------------------------------------------------- H1 allowlist (scelta B:
+  // specchio totale — 7 action contrattuali, extra veri bloccati)
+  group('H1: le 7 action contrattuali partono, le altre no', () {
+    test('daily_login inviato con xp_amount 25, +25 XP locali', () async {
       final provider = await makeLogged('h1daily');
       final fake = provider.engine as FakeEngineClient;
 
       expect(provider.claimDailyReward(), isTrue);
       await settle();
 
-      expect(
-        fake.calls.where((c) => c['actionId'] == 'daily_login'),
-        isEmpty,
-      );
+      final dailies = fake.calls
+          .where((c) => c['actionId'] == 'daily_login')
+          .toList();
+      expect(dailies, hasLength(1));
+      expect(dailies.single['data']['xp_amount'], 25);
       expect(provider.playerStats.experience, 25);
     });
 
-    test('study_resource_viewed bloccato, reward locale invariata', () async {
+    test('resource_viewed inviato (una-tantum), reward locale invariata',
+        () async {
       final provider = await makeLogged('h1res');
       final fake = provider.engine as FakeEngineClient;
 
@@ -92,6 +95,11 @@ void main() {
       await settle();
 
       expect(out['alreadyViewed'], isFalse);
+      final views = fake.calls
+          .where((c) => c['actionId'] == 'resource_viewed')
+          .toList();
+      expect(views, hasLength(1));
+      expect(views.single['data']['xp_amount'], 30);
       expect(
         fake.calls.where((c) => c['actionId'] == 'study_resource_viewed'),
         isEmpty,

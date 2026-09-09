@@ -95,7 +95,10 @@ class GameProvider with ChangeNotifier {
   bool claimRewardTopic(String topicId) {
     if (_claimedRewardTopics.contains(topicId)) return false;
     _claimedRewardTopics.add(topicId);
-    _hubEvent(HubConfig.claimRewardAction, {'badge': topicId});
+    _hubEvent(HubConfig.claimRewardAction, {
+      'badge': topicId,
+      'xp_amount': 0,
+    });
     _saveProgress();
     notifyListeners();
     return true;
@@ -181,7 +184,9 @@ class GameProvider with ChangeNotifier {
     if (_lastDailyClaim == today) return false;
     _lastDailyClaim = today;
     _awardExperience(dailyRewardXp);
-    _hubEvent('daily_login', {'xp': dailyRewardXp, 'streak': 1}); // Integrazione Hub
+    _hubEvent(HubConfig.dailyLoginAction, {
+      'xp_amount': HubConfig.dailyLoginXp,
+    });
     _analytics = _analytics.record(
       AnalyticsEvent.rewardClaim,
       value: dailyRewardXp,
@@ -479,6 +484,10 @@ class GameProvider with ChangeNotifier {
       _completedTopics.add(topicId);
       _skippedTopics.remove(topicId); // Ensure it's not skipped anymore
       _awardExperience(50);
+      _hubEvent(HubConfig.topicCompletedAction, {
+        'xp_amount': HubConfig.topicCompletedXp,
+        'badge': topicId,
+      });
       _saveProgress();
       notifyListeners();
     }
@@ -491,6 +500,10 @@ class GameProvider with ChangeNotifier {
         _completedTopics.add(topicId);
         _skippedTopics.remove(topicId);
         _awardExperience(50);
+        _hubEvent(HubConfig.topicCompletedAction, {
+          'xp_amount': HubConfig.topicCompletedXp,
+          'badge': topicId,
+        });
         _unlockNextNodes(topicId);
       }
     } else if (status == TopicStatus.skipped) {
@@ -617,7 +630,10 @@ class GameProvider with ChangeNotifier {
     
     _awardExperience(xpReward);
     _gold += goldReward;
-    _hubEvent('study_resource_viewed', {'xp': xpReward, 'gold': goldReward, 'topicId': topicId}); // Integrazione Hub
+    _hubEvent(HubConfig.resourceViewedAction, {
+      'xp_amount': HubConfig.resourceViewedXp,
+      'topic': topicId,
+    });
     
     _saveProgress();
     notifyListeners();
@@ -813,14 +829,14 @@ class GameProvider with ChangeNotifier {
     );
     
     _runHistory.add(run);
+    final dungeonId = _dungeonRun!.id;
     _dungeonRun = null;
-    
+
     if (victory) {
       _awardExperience(200);
-      _hubEvent('dungeon_cleared', {
-        'ascension_level': _dungeonRun?.ascensionLevel ?? 0, 
-        'nodes_visited': _dungeonRun?.floor ?? 1, 
-        'xp': 200
+      _hubEvent(HubConfig.dungeonClearedAction, {
+        'xp_amount': HubConfig.dungeonClearedXp,
+        'dungeon': dungeonId,
       });
     }
     
@@ -953,6 +969,7 @@ class GameProvider with ChangeNotifier {
       'reward_type': reward.type,
       'reward_id': reward.id ?? '',
       'reward_amount': reward.amount ?? 0,
+      'xp_amount': reward.type == 'experience' ? (reward.amount ?? 0) : 0,
     });
 
     switch (reward.type) {
@@ -1260,16 +1277,22 @@ class GameProvider with ChangeNotifier {
   }
 
   // --- Hub Gamification: fire-and-forget event dispatch ---
-  /// Action contrattuali inviate all'Hub (H1, da `hub_config.dart`):
-  /// solo queste 3 partono; le altre restano locali e vengono bloccate
-  /// con un log esplicito (engine condiviso: niente 404 extra).
+  /// Action contrattuali inviate all'Hub (specchio 1:1 delle fonti XP locali,
+  /// scelta B, da `hub_config.dart`): solo queste 7 partono; le altre restano
+  /// locali e vengono bloccate con un log esplicito (engine condiviso:
+  /// niente 404 extra). Action non ancora create su console falliscono
+  /// best-effort silenziose lato Hub, come ogni altro errore di rete.
   static const _hubAllowedActions = {
     HubConfig.quizCompletedAction,
     HubConfig.claimRewardAction,
     HubConfig.bossDefeatedAction,
+    HubConfig.topicCompletedAction,
+    HubConfig.resourceViewedAction,
+    HubConfig.dungeonClearedAction,
+    HubConfig.dailyLoginAction,
   };
 
-  /// True se [actionId] è tra le 3 action contrattuali dell'Hub.
+  /// True se [actionId] è tra le 7 action contrattuali dell'Hub.
   bool _isHubActionAllowed(String actionId) =>
       _hubAllowedActions.contains(actionId);
 

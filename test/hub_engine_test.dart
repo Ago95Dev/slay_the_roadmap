@@ -375,17 +375,18 @@ void main() {
       expect(provider.badges, contains('boss:boss_fantasma_h7'));
     });
 
-    test('extra daily_login → MAI chiamato', () async {
+    test('daily_login inviato una sola volta con xp_amount 25', () async {
       final provider = await makeLogged('h7extra');
       final fake = provider.engine as FakeEngineClient;
 
       expect(provider.claimDailyReward(), isTrue);
       await settle();
 
-      expect(
-        fake.calls.where((c) => c['actionId'] == 'daily_login'),
-        isEmpty,
-      );
+      final dailies = fake.calls
+          .where((c) => c['actionId'] == 'daily_login')
+          .toList();
+      expect(dailies, hasLength(1));
+      expect(dailies.single['data']['xp_amount'], 25);
     });
   });
 }
