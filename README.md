@@ -4,14 +4,14 @@ Dungeon crawler didattico in Flutter che gamifica lo studio di Dart/Flutter: la 
 
 ## Come si gioca
 
-Studio di un topic → quiz da 2-5 domande (soglia 80%) → scelta 1 carta su 3 → sblocco del nodo successivo → boss di capitolo (10 HP vs 50 HP, turni di carte e quiz, soglie per-boss). XP e livelli con soglie 0/100/500, identiche all'Hub. Vittoria boss: badge + 100 XP + capitolo successivo; sconfitta: retry senza XP.
+Studio di un topic → quiz da 2-5 domande (soglia 80%) → scelta 1 carta su 3 → sblocco del nodo successivo → boss di capitolo (10 HP vs 50 HP, turni di carte e quiz, soglie per-boss). XP e livelli (10 livelli: 0/100/500/1000/1600/2300/3100/4000/5000/6100), identiche all'Hub. Vittoria boss: badge + 100 XP + capitolo successivo; sconfitta: retry senza XP.
 
 ## Stato e numeri reali
 
 - Roadmap 4 capitoli (29 nodi), 11 quiz (13 topic, 4×5Q + 7×2Q), 31 carte in 4 rarità, 4 boss con mosse/soglie proprie
 - Save per utente con auth locale (hash salato), login/logout, New Run con conferma e wipe
 - Hub best-effort offline-first: eventi `quiz_completed` / `claim_reward` / `boss_defeated`, classifica e card profilo; senza credenziali l'app è identica
-- Suite: `flutter analyze` 0 error, `flutter test` 103/103
+- Suite: `flutter analyze` 0 error, `flutter test` 118/118
 
 ## Run
 
@@ -39,7 +39,7 @@ lib/
 ├── providers/game_provider.dart  # stato globale (progress, deck, Hub)
 ├── services/                 # storage (save per utente, auth), engine Hub
 ├── data/                     # roadmap, topic, quiz, carte, boss, repository
-├── domain/models/            # PlayerProgress (livelli 0/100/500), boss, quiz
+├── domain/models/            # PlayerProgress (10 livelli), boss, quiz
 ├── screens/                  # menu, home, roadmap, quiz, reward, boss, profilo
 └── widgets/                  # HUD, classifica Hub, card profilo, compendio
 test/                         # smoke + US-01..05 + Hub mock + UX (86 test)

@@ -7,7 +7,7 @@
 1:10-1:50 US-03: reward 1-di-3, guard 1/topic, inventory.
 1:50-2:50 US-04: boss HP10/player HP50, turni quiz (giusta −10, soglia −20), soglie per-boss, victory (badge+XP+sblocco) + defeat/retry.
 2:50-3:20 US-05: autosave, restore, wipe con confirm; 2 utenti separati.
-3:20-3:40 profilo: livelli 0/100/500, badge. Chiusura: comandi verdi (`analyze`/`test` 103/103/`build`).
+3:20-3:40 profilo: 10 livelli, badge. Chiusura: comandi verdi (`analyze`/`test` 118/118/`build`).
 
 ## Sprint
 

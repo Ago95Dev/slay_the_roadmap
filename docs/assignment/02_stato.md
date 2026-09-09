@@ -2,10 +2,10 @@
 
 ## FATTO (Fasi 0-4 + Hub H1-H8 + UX U1-U3, branch `fix/last_version-stabilize`)
 
-- Boot pulito `flutter run -d linux`; `flutter analyze` 0 error; test **103/103**; `flutter build linux --debug` ok.
-- Numeri ALLINEATI app=Hub: quiz pass → +100 XP, vittoria boss → +100 XP; livelli 0/100/500.
+- Boot pulito `flutter run -d linux`; `flutter analyze` 0 error; test **118/118**; `flutter build linux --debug` ok.
+- Numeri ALLINEATI app=Hub: quiz pass → +100 XP, vittoria boss → +100 XP; 10 livelli 0/100/500/1000/1600/2300/3100/4000/5000/6100.
 - US-01 roadmap ad albero con gate reale (sequenziale per capitolo); US-02 quiz 2-5 domande soglia 80%, submit bloccato senza risposta, sblocco auto; US-03 reward pick-1-of-3 con guard 1/topic + inventory; US-04 boss HP10/player HP50, quiz giusta −10 (soglia −20), errata = danno mossa, soglie per-boss live, victory (badge+100XP+sblocco) / defeat (retry senza XP); US-05 autosave per utente + restore + wipe con confirm.
-- Rimosse deviazioni: timer 25s boss, skip-che-sblocca-senza-XP. Livelli unificati su `levelForXp` 0/100/500 (=Hub). Badge locali topic/boss + sezione profilo.
+- Rimosse deviazioni: timer 25s boss, skip-che-sblocca-senza-XP. Livelli a 10 soglie (`levelThresholds`, L1-L3 invariati) + HUD/profilo sui nuovi helper. Badge locali topic/boss + sezione profilo.
 - Auth v2 `salt$sha256` con migrazione v1 e cancellazione chiare; save per utente (`dart_quest_progress_<u>` / `slay_save_v1_<u>`); playerId Hub `slay_<uuid>` stabile (mai username in chiaro). Hub best-effort offline-first (`FakeEngineClient`), credenziali solo `--dart-define`, mai nel repo. Eventi attivi: solo `quiz_completed`/`claim_reward`/`boss_defeated` (extra disattivati, vedi `06_proposta_engine.md`); `claim_reward` anche dal pick-1-of-3; `boss_defeated` sempre; badge remoti nella card Hub; log successi + stato online reale.
 - Igiene: 139 artifact unstagati (`src/build/`, `src/*/ephemeral`), `pubspec.yaml.backup` rimosso, `.gitignore` esteso. Contratto Hub intatto (game `6a9dbf…`, snake_case, `quiz_completed`/`boss_defeated`, `overall_xp`).
 - Docs: GamiDOC/specifica/teoria in `docs/*.pdf` (sorgenti `docs/src/`); Octalysis radar `docs/assets/Octa_Analysis.jpg`.
@@ -17,5 +17,5 @@
 3. Reward `experience` del nodo boss si somma ai 100 XP vittoria (numeri semplici).
 4. Dropdown "Done" in topic_detail = override manuale con XP (lasciato, da dichiarare o rimuovere in review).
 5. UX onboarding: CONTINUE solo a campagna iniziata, chip classe con icona fallback, pulsante menu in Home con rientro (U1-U3), NEW RUN con conferma e wipe per-utente (U5).
-5. GamiDOC PDF: riallineare i numeri (80%=4/5, HP10/3, 0/100/500) e le 4 note sopra prima della consegna (`pdflatex` due passate, vedi `docs/README.md`).
+5. GamiDOC PDF: riallineare i numeri e le note prima della consegna (`pdflatex` due passate, vedi `docs/README.md`).
 6. Evaluation 5 utenti da eseguire (protocollo in `04_evaluation.md`); video 3-5min da girare (scaletta in `05_video_e_sprint.md`).
