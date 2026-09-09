@@ -18,7 +18,8 @@ abstract final class HubConfig {
   static const String bossDefeatedAction = 'boss_defeated';
 
   /// XP assegnati dall'Hub per ogni quiz passato (soglie livello locali
-  /// in `PlayerProgress`: L1 0 / L2 100 / L3 500, uguali all'Hub).
+  /// in `PlayerProgress.levelThresholds`: curva 10 livelli
+  /// 0/100/500/1000/1600/2300/3100/4000/5000/6100, uguale all'Hub).
   static const int quizXpAmount = 100;
   static const String overallXpClassification = 'overall_xp';
 }

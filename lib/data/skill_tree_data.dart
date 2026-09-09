@@ -568,7 +568,8 @@ int calculateSkillPoints(int level, int prestigeLevel) {
 }
 
 /// Legacy (pre-Fase 2, non più usato): la progressione è unificata su
-/// `PlayerProgress.levelForXp` (soglie cumulative 0/100/500, uguali all'Hub).
+/// `PlayerProgress.levelForXp` (curva 10 livelli
+/// 0/100/500/1000/1600/2300/3100/4000/5000/6100, uguale all'Hub).
 /// Tenuta per compatibilità con eventuali caller esterni.
 int calculateNextLevelXP(int currentLevel) {
   // XP required increases by 100 each level

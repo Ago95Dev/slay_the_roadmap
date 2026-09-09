@@ -150,12 +150,8 @@ class ProfileScreen extends StatelessWidget {
                       _buildStatBar(
                         label: 'XP',
                         current: stats.experience,
-                        max: PlayerProgress.levelForXp(stats.experience) >=
-                                PlayerProgress.maxLevel
-                            ? stats.experience
-                            : (PlayerProgress.levelForXp(stats.experience) == 1
-                                ? PlayerProgress.level2Threshold
-                                : PlayerProgress.level3Threshold),
+                        max: PlayerProgress.xpForNextLevelOf(stats.experience) ??
+                            stats.experience,
                         color: Colors.purple,
                         icon: Icons.star,
                       ),

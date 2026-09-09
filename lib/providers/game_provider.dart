@@ -829,18 +829,23 @@ class GameProvider with ChangeNotifier {
   }
 
   // Award experience (Fase 2: unificata su PlayerProgress.levelForXp,
-  // soglie cumulative 0/100/500 uguali all'Hub — unica fonte di verità anche
-  // per la HUD. Il legacy sottrattivo 100+level*100 (skill_tree_data) non è
-  // più usato. Nota numeri: gli XP mostrati sono quelli LOCALI; HubConfig
-  // .quizXpAmount (100) è solo lo specchio best-effort inviato all'Hub in
-  // `quiz_completed` (offline-first: nessun blocco se l'Hub è down).
+  // curva 10 livelli 0/100/500/1000/1600/2300/3100/4000/5000/6100 uguale
+  // all'Hub — unica fonte di verità anche per la HUD. Il legacy sottrattivo
+  // 100+level*100 (skill_tree_data) non è più usato. Nota numeri: gli XP
+  // mostrati sono quelli LOCALI; HubConfig.quizXpAmount (100) è solo lo
+  // specchio best-effort inviato all'Hub in `quiz_completed` (offline-first:
+  // nessun blocco se l'Hub è down).
   void _awardExperience(int amount) {
     final oldLevel = PlayerProgress.levelForXp(_playerStats.experience);
     _playerStats.experience += amount;
     final newLevel = PlayerProgress.levelForXp(_playerStats.experience);
     if (newLevel > oldLevel) {
       _playerStats.level = newLevel;
-      _playerStats.maxHp += 5 * (newLevel - oldLevel);
+      // Design: bonus level-up +5 maxHp cappato a +15 totale (3 level-up
+      // equivalenti) per non rompere il bilanciamento fight con 10 livelli.
+      final cappedOld = (5 * (oldLevel - 1)).clamp(0, 15);
+      final cappedNew = (5 * (newLevel - 1)).clamp(0, 15);
+      _playerStats.maxHp += cappedNew - cappedOld;
       _playerStats.currentHp = _playerStats.maxHp;
     }
   }

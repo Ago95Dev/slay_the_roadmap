@@ -5,10 +5,15 @@ import 'quiz.dart';
 import 'boss_fight.dart';
 
 class PlayerProgress extends Equatable {
-  /// Soglie XP (F6, uguali al futuro Hub): L1 0 / L2 100 / L3 500.
+  /// Soglie XP cumulative per livello (curva 10 livelli, uguali all'Hub):
+  /// L1 0 / L2 100 / L3 500 / L4 1000 / L5 1600 / L6 2300 / L7 3100 /
+  /// L8 4000 / L9 5000 / L10 6100.
+  static const List<int> levelThresholds = [
+    0, 100, 500, 1000, 1600, 2300, 3100, 4000, 5000, 6100,
+  ];
   static const int level2Threshold = 100;
   static const int level3Threshold = 500;
-  static const int maxLevel = 3;
+  static const int maxLevel = 10;
 
   /// Vite per i boss fight (GamiDOC): 3 di default, max 3.
   static const int maxLives = 3;
@@ -18,11 +23,29 @@ class PlayerProgress extends Equatable {
   static const int streakBonusXp = 25;
 
   /// Livello calcolato da [experience] (unica fonte di verità, anche per
-  /// l'Hub futuro). 0–99 → 1, 100–499 → 2, 500+ → 3.
+  /// l'Hub futuro). Negativi → 1, oltre l'ultima soglia → 10.
   static int levelForXp(int experience) {
-    if (experience >= level3Threshold) return 3;
-    if (experience >= level2Threshold) return 2;
-    return 1;
+    var level = 1;
+    for (var i = 0; i < levelThresholds.length; i++) {
+      if (experience >= levelThresholds[i]) level = i + 1;
+    }
+    return level;
+  }
+
+  /// Soglia XP del prossimo livello (null al livello massimo).
+  static int? xpForNextLevelOf(int experience) {
+    final level = levelForXp(experience);
+    if (level >= maxLevel) return null;
+    return levelThresholds[level];
+  }
+
+  /// Frazione 0..1 verso il prossimo livello (1.0 al livello massimo).
+  static double xpProgressOf(int experience) {
+    final level = levelForXp(experience);
+    if (level >= maxLevel) return 1.0;
+    final base = levelThresholds[level - 1];
+    final next = levelThresholds[level];
+    return ((experience - base) / (next - base)).clamp(0.0, 1.0);
   }
 
   final String playerId;
@@ -102,10 +125,7 @@ class PlayerProgress extends Equatable {
   int get level => levelForXp(experience);
 
   /// Soglia XP del prossimo livello (null al livello massimo).
-  int? get xpForNextLevel {
-    if (level >= maxLevel) return null;
-    return level == 1 ? level2Threshold : level3Threshold;
-  }
+  int? get xpForNextLevel => xpForNextLevelOf(experience);
 
   /// XP mancanti al prossimo livello (null al livello massimo).
   int? get xpToNextLevel {
@@ -115,15 +135,7 @@ class PlayerProgress extends Equatable {
   }
 
   /// Frazione 0..1 verso il prossimo livello (1.0 al livello massimo).
-  /// L1: xp/100; L2: (xp-100)/400.
-  double get xpProgress {
-    if (level >= maxLevel) return 1.0;
-    if (level == 1) {
-      return (experience / level2Threshold).clamp(0.0, 1.0);
-    }
-    const span = level3Threshold - level2Threshold;
-    return ((experience - level2Threshold) / span).clamp(0.0, 1.0);
-  }
+  double get xpProgress => xpProgressOf(experience);
 
   const PlayerProgress({
     required this.playerId,

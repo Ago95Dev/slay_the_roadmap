@@ -24,22 +24,13 @@ class CompactStatsBar extends StatelessWidget {
     const totalTopics = 15; // Could be dynamic based on selected path
     final playerStats = gameProvider.playerStats;
 
-    // Fase 2: HUD unica fonte PlayerProgress.levelForXp (soglie 0/100/500).
-    // L1: xp/100; L2: (xp-100)/400; L3: piena. Numeri = XP locali.
+    // Fase 2: HUD unica fonte PlayerProgress.levelForXp
+    // (curva 10 livelli, soglie levelThresholds). Numeri = XP locali.
     final hudLevel = PlayerProgress.levelForXp(playerStats.experience);
-    final int? hudNext = hudLevel >= PlayerProgress.maxLevel
-        ? null
-        : (hudLevel == 1
-            ? PlayerProgress.level2Threshold
-            : PlayerProgress.level3Threshold);
-    final double xpPercent = hudNext == null
-        ? 1.0
-        : hudLevel == 1
-            ? (playerStats.experience / hudNext).clamp(0.0, 1.0)
-            : ((playerStats.experience - PlayerProgress.level2Threshold) /
-                    (PlayerProgress.level3Threshold -
-                        PlayerProgress.level2Threshold))
-                .clamp(0.0, 1.0);
+    final int? hudNext =
+        PlayerProgress.xpForNextLevelOf(playerStats.experience);
+    final double xpPercent =
+        PlayerProgress.xpProgressOf(playerStats.experience);
 
     return Container(
       height: 60,
