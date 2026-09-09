@@ -971,7 +971,13 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
                     child: Container(
-                      constraints: const BoxConstraints(maxWidth: 700),
+                      constraints: BoxConstraints(
+                        maxWidth: 700,
+                        // Dialog quiz limitato allo schermo: la lista
+                        // risposte scrolla, footer conseguenza pinnato.
+                        maxHeight: max(
+                            280.0, MediaQuery.of(context).size.height - 100),
+                      ),
                       decoration: BoxDecoration(
                         // Dark parchment background with gradient
                         gradient: const LinearGradient(
@@ -1134,8 +1140,20 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                 
                                 const SizedBox(height: 24),
                                 
-                                // Answers with gothic button style
-                                ...List.generate(_currentQuestion!.options.length, (index) {
+                                // Answers with gothic button style:
+                                // area scrollabile (Flexible loose: a spazio
+                                // pieno resta min, look invariato) così il
+                                // footer conseguenza resta sempre visibile.
+                                Flexible(
+                                  fit: FlexFit.loose,
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: List.generate(
+                                          _currentQuestion!.options.length,
+                                          (index) {
                                   bool isCorrect = index == _currentQuestion!.correctAnswer;
                                   bool showResult = _quizAnswered;
                                   
@@ -1162,7 +1180,8 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                   return Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
                                     child: Container(
-                                      height: 56,
+                                      constraints: const BoxConstraints(
+                                          minHeight: 56),
                                       decoration: BoxDecoration(
                                         boxShadow: [
                                           BoxShadow(
@@ -1230,8 +1249,11 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                       ),
                                     ),
                                   );
-                                }),
-                                
+                                    }),
+                                    ),
+                                  ),
+                                ),
+
                                 const SizedBox(height: 20),
                                 
                                 // Boss Intent / Damage Warning
@@ -1259,13 +1281,16 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                                           size: 24,
                                         ),
                                         const SizedBox(width: 12),
-                                        Text(
-                                          'FAILURE CONSEQUENCE: ${_bossIntent!.damage} DAMAGE',
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: Color(0xFFfca5a5),
-                                            fontSize: 14,
-                                            letterSpacing: 1,
+                                        Flexible(
+                                          child: Text(
+                                            'FAILURE CONSEQUENCE: ${_bossIntent!.damage} DAMAGE',
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFFfca5a5),
+                                              fontSize: 14,
+                                              letterSpacing: 1,
+                                            ),
+                                            softWrap: true,
                                           ),
                                         ),
                                         if (_bossIntent!.effects != null)
