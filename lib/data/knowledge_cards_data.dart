@@ -192,6 +192,63 @@ final List<CardModel> knowledgeCards = [
       CardEffect(type: 'force_topic', value: 0, target: 'boss'),
     ],
   ),
+
+  // Widgets Knowledge Card
+  CardModel(
+    id: 'knowledge_widgets',
+    name: 'Widgets Adept',
+    type: CardType.knowledge,
+    description: 'Force next question: Widgets Basics',
+    effect: 0,
+    manaCost: 0,
+    rarity: CardRarity.epic,
+    icon: '🧩',
+    imageAsset: 'assets/images/cards/card_knowledge.png',
+    topicId: 'widgets',
+    questionTopicFilter: 'widgets',
+    flavourText: '"Everything is a widget, and every widget has its place."',
+    effects: [
+      CardEffect(type: 'force_topic', value: 0, target: 'boss'),
+    ],
+  ),
+
+  // Layouts Knowledge Card
+  CardModel(
+    id: 'knowledge_layouts',
+    name: 'Layouts Tactician',
+    type: CardType.knowledge,
+    description: 'Force next question: Layouts',
+    effect: 0,
+    manaCost: 0,
+    rarity: CardRarity.epic,
+    icon: '📐',
+    imageAsset: 'assets/images/cards/card_knowledge.png',
+    topicId: 'layouts',
+    questionTopicFilter: 'layouts',
+    flavourText: '"Row by row, column by column, order emerges from chaos."',
+    effects: [
+      CardEffect(type: 'force_topic', value: 0, target: 'boss'),
+    ],
+  ),
+
+  // State Management Knowledge Card
+  CardModel(
+    id: 'knowledge_state_management',
+    name: 'State Keeper',
+    type: CardType.knowledge,
+    description: 'Force next question: State Management Basics',
+    effect: 0,
+    manaCost: 0,
+    rarity: CardRarity.epic,
+    icon: '🗂️',
+    imageAsset: 'assets/images/cards/card_knowledge.png',
+    topicId: 'state-management',
+    questionTopicFilter: 'state-management',
+    flavourText: '"Lift the state up, and the whole tree shall follow."',
+    effects: [
+      CardEffect(type: 'force_topic', value: 0, target: 'boss'),
+    ],
+  ),
 ];
 
 // Helper function to get knowledge card by topic ID

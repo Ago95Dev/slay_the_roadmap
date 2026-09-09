@@ -21,11 +21,11 @@ class BossFightScreen extends StatefulWidget {
 
 enum TurnPhase { player, bossIntro, bossQuiz, bossAttack, victory, defeat, thresholdQuiz }
 
-/// HP effettivi del fight (numeri consegna US-04: boss 10 HP).
+/// HP effettivi del fight (stabilizzazione: boss 30 HP, mai one-shot).
 /// I dati roadmap dichiarano HP narrativi di progressione (80/120/180/200,
-/// tier 4 = 200 per `widget_warlord`): il fight live li mappa a 10 con clamp,
-/// senza toccare i dati. Il player resta a 3 HP (modello `BossFight`).
-int resolveBossFightHp(Boss boss) => boss.maxHp.clamp(1, 10).toInt();
+/// tier 4 = 200 per `widget_warlord`): il fight live li mappa a 30 con clamp,
+/// senza toccare i dati. Il player resta a 50 HP, energia 3 (invariati).
+int resolveBossFightHp(Boss boss) => boss.maxHp.clamp(1, 30).toInt();
 
 class _BossFightScreenState extends State<BossFightScreen> with TickerProviderStateMixin {
   late Boss _boss;
@@ -96,7 +96,7 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
     }
 
     // Clone boss data to avoid modifying static data.
-    // Numeri consegna: il fight resta a 10 HP anche se i dati roadmap
+    // Stabilizzazione: il fight resta a 30 HP anche se i dati roadmap
     // dichiarano HP narrativi (cfr. resolveBossFightHp).
     final fightHp = resolveBossFightHp(bossData);
     _boss = Boss(
@@ -371,18 +371,18 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('KNOWLEDGE CHECK PASSED! Bonus Damage!'), backgroundColor: Colors.amber),
         );
-        // Bonus damage for threshold success
+        // Bonus damage for threshold success (mai one-shot: 10 < 30 HP fight)
         setState(() {
-          _boss.currentHp = (_boss.currentHp - 20).clamp(0, _boss.maxHp);
+          _boss.currentHp = (_boss.currentHp - 10).clamp(0, _boss.maxHp);
           _shakeController.forward(from: 0);
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Correct! Attack Blocked!'), backgroundColor: Colors.green),
         );
-        // Counter damage
+        // Counter damage (mai one-shot: 6 < 30 HP fight)
         setState(() {
-          _boss.currentHp = (_boss.currentHp - 10).clamp(0, _boss.maxHp);
+          _boss.currentHp = (_boss.currentHp - 6).clamp(0, _boss.maxHp);
         });
       }
     } else {

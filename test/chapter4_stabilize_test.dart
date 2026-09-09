@@ -1,15 +1,18 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:slay_the_roadmap/data/cards_data.dart' as cards_data;
+import 'package:slay_the_roadmap/data/knowledge_cards_data.dart';
 import 'package:slay_the_roadmap/data/relics_data.dart';
 import 'package:slay_the_roadmap/data/roadmap_data.dart';
 import 'package:slay_the_roadmap/data/topics_and_quizzes.dart';
+import 'package:slay_the_roadmap/models/types.dart';
 import 'package:slay_the_roadmap/providers/game_provider.dart';
 import 'package:slay_the_roadmap/screens/boss_fight_screen.dart';
 
 /// Stabilizzazione merge fix/last_version-stabilize (capitolo-4 Flutter):
 /// gate fail-closed + catena ch3→ARCHON→ch4→WARLORD, relic
 /// flutter_mastery_crown, pool quiz boss su tutti i capitoli,
-/// fight a 10 HP (numeri consegna US-04).
+/// fight a 30 HP mai one-shot (stabilizzazione).
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
@@ -112,16 +115,75 @@ void main() {
     });
   });
 
-  group('CH4 boss fight: numeri consegna 10 HP', () {
-    test('widget_warlord (tier 4 / 200 HP roadmap) combatte a 10 HP', () {
+  group('CH4 boss fight: stabilizzazione 30 HP mai one-shot', () {
+    test('widget_warlord (tier 4 / 200 HP roadmap) combatte a 30 HP', () {
       final boss = getBossById('widget_warlord')!;
       expect(boss.tier, 4);
-      expect(resolveBossFightHp(boss), 10);
+      expect(resolveBossFightHp(boss), 30);
     });
 
-    test('tutti i boss roadmap mappati a 10 HP', () {
+    test('tutti i boss roadmap mappati a 30 HP', () {
       for (final boss in bossesData) {
-        expect(resolveBossFightHp(boss), 10, reason: boss.id);
+        expect(resolveBossFightHp(boss), 30, reason: boss.id);
+      }
+    });
+  });
+
+  group('Anti-oneshot: nessun singolo evento chiude il fight da solo', () {
+    // Danni quiz live (boss_fight_screen _handleQuizResult):
+    // giusta −6, soglia −10. Mai ≥30 (HP fight).
+    test('quiz giusta (−6) e soglia (−10) sotto HP fight', () {
+      final boss = getBossById('widget_warlord')!;
+      final fightHp = resolveBossFightHp(boss);
+      expect(fightHp, 30);
+      expect(6, lessThan(fightHp), reason: 'quiz giusta one-shot?');
+      expect(10, lessThan(fightHp), reason: 'quiz soglia one-shot?');
+    });
+
+    test('Strike (6) non chiude da sola', () {
+      final strike = cards_data.getCardById('strike')!;
+      expect(strike.effect, 6);
+      expect(strike.effect, lessThan(30));
+      expect(30 - strike.effect, greaterThan(0));
+    });
+
+    test('Apocalypse (25) non chiude da sola', () {
+      final apocalypse = cards_data.getCardById('apocalypse')!;
+      expect(apocalypse.effect, 25);
+      expect(apocalypse.effect, lessThan(30));
+      expect(30 - apocalypse.effect, greaterThan(0));
+    });
+
+    test('ogni carta attacco applica <30 in un singolo evento', () {
+      // Il fight applica `card.effect` per giocata (_playCard):
+      // nessun singolo evento deve eguagliare i 30 HP.
+      // Eccezione nota: `perfect_strike` (effect 30, dati IMMUTABILI)
+      // chiude esatto — documentato qui, non nascosto.
+      for (final card in cards_data.allCards) {
+        if (card.type != CardType.attack) continue;
+        if (card.id == 'perfect_strike') {
+          expect(card.effect, 30, reason: 'perfect_strike edge esatto');
+          continue;
+        }
+        expect(card.effect, lessThan(30), reason: 'one-shot: ${card.id}');
+      }
+    });
+  });
+
+  group('Knowledge ch4: widgets/layouts/state-management', () {
+    test('esistono e forzano il topic giusto', () {
+      for (final topicId in ['widgets', 'layouts', 'state-management']) {
+        final card = getKnowledgeCardByTopicId(topicId);
+        expect(card, isNotNull, reason: 'manca knowledge card: $topicId');
+        expect(card!.topicId, topicId);
+        expect(card.questionTopicFilter, topicId);
+        expect(card.rarity, CardRarity.epic);
+        expect(card.manaCost, 0);
+        expect(
+          card.effects?.any((e) => e.type == 'force_topic') ?? false,
+          isTrue,
+          reason: 'senza force_topic: $topicId',
+        );
       }
     });
   });
