@@ -125,4 +125,22 @@ void main() {
       }
     });
   });
+
+  group('Quiz coverage: ogni topic ha il suo quiz', () {
+    test('inheritance e async hanno quiz 5Q a soglia 80', () {
+      for (final id in ['inheritance', 'async']) {
+        final quiz = getQuizByTopicId(id);
+        expect(quiz, isNotNull, reason: 'manca quiz per $id');
+        expect(quiz!.questions.length, 5, reason: id);
+        expect(quiz.passingScore, 80, reason: id);
+      }
+    });
+
+    test('tutti i topic del dataset hanno un quiz', () {
+      for (final topic in topicsData) {
+        expect(getQuizByTopicId(topic.id), isNotNull,
+            reason: 'topic senza quiz: ${topic.id}');
+      }
+    });
+  });
 }

@@ -517,6 +517,134 @@ final List<Quiz> quizzesData = [
     passingScore: 80,
     timeLimit: 120,
   ),
+
+  // Inheritance & Mixins Quiz
+  Quiz(
+    topicId: 'inheritance',
+    questions: [
+      QuizQuestion(
+        question: 'How does a class inherit from another class in Dart?',
+        options: [
+          'class Child inherits Parent {}',
+          'class Child extends Parent {}',
+          'class Child : Parent {}',
+          'class Child implements Parent {}',
+        ],
+        correctAnswer: 1,
+        explanation: 'The extends keyword creates a subclass that inherits fields and methods.',
+      ),
+      QuizQuestion(
+        question: 'What is a mixin used for?',
+        options: [
+          'To create object instances',
+          'To reuse code across unrelated class hierarchies',
+          'To hide private fields',
+          'To run async code',
+        ],
+        correctAnswer: 1,
+        explanation: 'Mixins (with keyword) share behavior between classes without inheritance.',
+      ),
+      QuizQuestion(
+        question: 'What does the @override annotation indicate?',
+        options: [
+          'The method is deprecated',
+          'The method replaces an inherited member intentionally',
+          'The method is static',
+          'The method is asynchronous',
+        ],
+        correctAnswer: 1,
+        explanation: '@override marks a member that intentionally replaces an inherited one.',
+      ),
+      QuizQuestion(
+        question: 'What is the difference between extends and implements?',
+        options: [
+          'There is no difference',
+          'extends inherits implementation, implements requires you to redeclare every member',
+          'implements inherits implementation, extends does not',
+          'extends works only for mixins',
+        ],
+        correctAnswer: 1,
+        explanation: 'With implements you must provide your own version of every member.',
+      ),
+      QuizQuestion(
+        question: 'Which keyword gives a subclass access to the parent implementation?',
+        options: [
+          'base',
+          'parent',
+          'super',
+          'this',
+        ],
+        correctAnswer: 2,
+        explanation: 'super calls the parent constructor or an overridden member.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 300,
+  ),
+
+  // Async & Futures Quiz
+  Quiz(
+    topicId: 'async',
+    questions: [
+      QuizQuestion(
+        question: 'What does the async keyword do to a function?',
+        options: [
+          'It runs the function on another thread',
+          'It makes the function return a Future',
+          'It blocks until the result is ready',
+          'It caches the return value',
+        ],
+        correctAnswer: 1,
+        explanation: 'An async function always returns a Future, even without await inside.',
+      ),
+      QuizQuestion(
+        question: 'What does await do?',
+        options: [
+          'It pauses the whole app until completion',
+          'It suspends the function until the Future completes, without blocking',
+          'It cancels the Future on timeout',
+          'It converts a Stream into a Future',
+        ],
+        correctAnswer: 1,
+        explanation: 'await suspends only the current async function while others keep running.',
+      ),
+      QuizQuestion(
+        question: 'What is a Future in Dart?',
+        options: [
+          'A value that will be available at some point in time',
+          'A background isolate',
+          'A deprecated callback API',
+          'A widget that rebuilds over time',
+        ],
+        correctAnswer: 0,
+        explanation: 'A Future represents a potential value or error available later.',
+      ),
+      QuizQuestion(
+        question: 'How do you handle errors from an awaited Future?',
+        options: [
+          'With onError callbacks only',
+          'Errors cannot be caught',
+          'With a regular try/catch block',
+          'By checking a boolean flag',
+        ],
+        correctAnswer: 2,
+        explanation: 'awaited Futures throw inside async code, so try/catch works normally.',
+      ),
+      QuizQuestion(
+        question: 'When should you use Future.wait?',
+        options: [
+          'To run one Future after another in order',
+          'To run several Futures concurrently and wait for all of them',
+          'To delay a Future by a fixed duration',
+          'To convert Futures into Streams',
+        ],
+        correctAnswer: 1,
+        explanation: 'Future.wait runs multiple Futures in parallel and completes with all results.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 300,
+  ),
 ];
 
 // Helper function to get quiz by topic ID
