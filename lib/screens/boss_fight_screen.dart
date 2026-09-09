@@ -718,108 +718,220 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
                         const Spacer(),
                         
                         // Hand (Row, Spaced, Drag OR Double Tap)
-                        Row(
-                          children: [
-                            // Hand Cards
-                            Expanded(
-                              child: SizedBox(
-                                height: 256,
-                                child: Center(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: _hand.map((card) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                                          child: Tooltip(
-                                            message: card.type == CardType.knowledge
-                                                ? '${card.name}\n\n${card.description}\n\n${card.flavourText ?? ""}'
-                                                : card.description,
-                                            padding: const EdgeInsets.all(12),
-                                            margin: const EdgeInsets.symmetric(horizontal: 20),
-                                            decoration: BoxDecoration(
-                                              color: card.type == CardType.knowledge
-                                                  ? const Color(0xFF1A0B2E).withValues(alpha: 0.95)
-                                                  : Colors.black87,
-                                              borderRadius: BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: card.type == CardType.knowledge
-                                                    ? const Color(0xFF7C3AED)
-                                                    : Colors.grey[700]!,
-                                                width: 2,
-                                              ),
-                                            ),
-                                            textStyle: TextStyle(
-                                              color: card.type == CardType.knowledge
-                                                  ? const Color(0xFFE9D5FF)
-                                                  : Colors.white,
-                                              fontSize: 14,
-                                              height: 1.4,
-                                            ),
-                                            preferBelow: false,
-                                            waitDuration: const Duration(milliseconds: 500),
-                                            child: Draggable<CardModel>(
-                                              data: card,
-                                              feedback: SizedBox(
-                                                width: 160,
-                                                height: 224,
-                                                child: Transform.scale(
-                                                  scale: 1.1,
-                                                  child: TinyCardWidget(card: card),
-                                                ),
-                                              ),
-                                              childWhenDragging: SizedBox(
-                                                width: 160,
-                                                height: 224,
-                                                child: Opacity(
-                                                  opacity: 0.5,
-                                                  child: TinyCardWidget(card: card),
-                                                ),
-                                              ),
-                                              child: GestureDetector(
-                                                onDoubleTap: () => _playCard(card),
-                                                onLongPress: () => _showCardZoom(card),
-                                                child: SizedBox(
-                                                  width: 160,
-                                                  height: 224,
-                                                  child: TinyCardWidget(card: card),
-                                                ),
-                                              ),
+                        // Scale-down su schermi bassi: a spazio pieno
+                        // scala 1.0 (256/160x224 invariati), altrimenti la
+                        // mano si restringe senza overflow.
+                        Flexible(
+                          fit: FlexFit.loose,
+                          child: ConstrainedBox(
+                            constraints:
+                                const BoxConstraints(maxHeight: 256),
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                final double budget =
+                                    constraints.maxHeight.isFinite
+                                        ? constraints.maxHeight
+                                        : 256.0;
+                                final double scale =
+                                    (budget / 256.0).clamp(0.4, 1.0);
+                                final double rowH = 256.0 * scale;
+                                final double cardW = 160.0 * scale;
+                                final double cardH = 224.0 * scale;
+                                final double deckW = 96.0 * scale;
+                                final double deckH = 128.0 * scale;
+                                return SizedBox(
+                                  height: rowH,
+                                  child: Row(
+                                    children: [
+                                      // Hand Cards
+                                      Expanded(
+                                        child: Center(
+                                          child: SingleChildScrollView(
+                                            scrollDirection:
+                                                Axis.horizontal,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: _hand.map((card) {
+                                                return Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 4),
+                                                  child: Tooltip(
+                                                    message: card.type ==
+                                                            CardType
+                                                                .knowledge
+                                                        ? '${card.name}\n\n${card.description}\n\n${card.flavourText ?? ""}'
+                                                        : card.description,
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            12),
+                                                    margin: const EdgeInsets
+                                                        .symmetric(
+                                                        horizontal: 20),
+                                                    decoration:
+                                                        BoxDecoration(
+                                                      color: card.type ==
+                                                              CardType
+                                                                  .knowledge
+                                                          ? const Color(
+                                                                  0xFF1A0B2E)
+                                                              .withValues(
+                                                                  alpha:
+                                                                      0.95)
+                                                          : Colors.black87,
+                                                      borderRadius:
+                                                          BorderRadius
+                                                              .circular(8),
+                                                      border:
+                                                          Border.all(
+                                                        color: card.type ==
+                                                                CardType
+                                                                    .knowledge
+                                                            ? const Color(
+                                                                0xFF7C3AED)
+                                                            : Colors.grey[
+                                                                700]!,
+                                                        width: 2,
+                                                      ),
+                                                    ),
+                                                    textStyle:
+                                                        TextStyle(
+                                                      color: card.type ==
+                                                              CardType
+                                                                  .knowledge
+                                                          ? const Color(
+                                                              0xFFE9D5FF)
+                                                          : Colors.white,
+                                                      fontSize: 14,
+                                                      height: 1.4,
+                                                    ),
+                                                    preferBelow: false,
+                                                    waitDuration:
+                                                        const Duration(
+                                                            milliseconds:
+                                                                500),
+                                                    child: Draggable<
+                                                        CardModel>(
+                                                      data: card,
+                                                      feedback:
+                                                          SizedBox(
+                                                        width: 160,
+                                                        height: 224,
+                                                        child:
+                                                            Transform
+                                                                .scale(
+                                                          scale:
+                                                              1.1,
+                                                          child:
+                                                              TinyCardWidget(
+                                                                  card:
+                                                                      card),
+                                                        ),
+                                                      ),
+                                                      childWhenDragging:
+                                                          SizedBox(
+                                                        width:
+                                                            160,
+                                                        height:
+                                                            224,
+                                                        child:
+                                                            Opacity(
+                                                          opacity:
+                                                              0.5,
+                                                          child:
+                                                              TinyCardWidget(
+                                                                  card:
+                                                                      card),
+                                                        ),
+                                                      ),
+                                                      child:
+                                                          GestureDetector(
+                                                        onDoubleTap: () =>
+                                                            _playCard(
+                                                                card),
+                                                        onLongPress: () =>
+                                                            _showCardZoom(
+                                                                card),
+                                                        child:
+                                                            SizedBox(
+                                                          width:
+                                                              cardW,
+                                                          height:
+                                                              cardH,
+                                                          child:
+                                                              TinyCardWidget(
+                                                                  card:
+                                                                      card),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                );
+                                              }).toList(),
                                             ),
                                           ),
-                                        );
-                                      }).toList(),
-                                    ),
+                                        ),
+                                      ),
+
+                                      // Deck Pile
+                                      Container(
+                                        width: deckW,
+                                        height: deckH,
+                                        margin: const EdgeInsets.only(
+                                            left: 10),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              Colors.brown[800],
+                                          borderRadius:
+                                              BorderRadius.circular(
+                                                  8),
+                                          border: Border.all(
+                                              color: Colors
+                                                  .brown[400]!),
+                                        ),
+                                        child: Center(
+                                          child:
+                                              FittedBox(
+                                            fit: BoxFit
+                                                .scaleDown,
+                                            child: Column(
+                                              mainAxisSize:
+                                                  MainAxisSize
+                                                      .min,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .center,
+                                              children: [
+                                                const Icon(
+                                                    Icons
+                                                        .layers,
+                                                    color: Colors
+                                                        .white70,
+                                                    size:
+                                                        28),
+                                                Text(
+                                                  '${_drawPile.length}',
+                                                  style: const TextStyle(
+                                                      color: Colors
+                                                          .white,
+                                                      fontWeight:
+                                                          FontWeight
+                                                              .bold,
+                                                      fontSize:
+                                                          18),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
-                            
-                            // Deck Pile
-                            Container(
-                              width: 96,
-                              height: 128,
-                              margin: const EdgeInsets.only(left: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.brown[800],
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.brown[400]!),
-                              ),
-                              child: Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.layers, color: Colors.white70, size: 28),
-                                    Text(
-                                      '${_drawPile.length}',
-                                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                         const SizedBox(height: 10),
                         
