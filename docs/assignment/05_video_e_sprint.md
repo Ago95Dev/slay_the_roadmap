@@ -5,9 +5,9 @@
 0:00-0:20 run da clone fresco (`pub get` → `run -d linux`), menu pulito.
 0:20-1:10 US-01/02: roadmap gate, quiz 5 domande, soglia 80%, sblocco.
 1:10-1:50 US-03: reward 1-di-3, guard 1/topic, inventory.
-1:50-2:50 US-04: boss HP10/player HP50, turni quiz (giusta −10, soglia −20), soglie per-boss, victory (badge+XP+sblocco) + defeat/retry.
+1:50-2:50 US-04: boss HP30/player HP50, turni quiz (giusta −6, soglia −10), soglie per-boss, victory (badge+XP+sblocco) + defeat/retry.
 2:50-3:20 US-05: autosave, restore, wipe con confirm; 2 utenti separati.
-3:20-3:40 profilo: 10 livelli, badge. Chiusura: comandi verdi (`analyze`/`test` 118/118/`build`).
+3:20-3:40 profilo: 10 livelli, badge. Chiusura: comandi verdi (`analyze`/`test` 123/123/`build`).
 
 ## Sprint
 
