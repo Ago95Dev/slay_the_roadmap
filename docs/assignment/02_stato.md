@@ -2,9 +2,9 @@
 
 ## FATTO (Fasi 0-4 + Hub H1-H8 + UX U1-U3, branch `fix/last_version-stabilize`)
 
-- Boot pulito `flutter run -d linux`; `flutter analyze` 0 error; test **86/86**; `flutter build linux --debug` ok.
+- Boot pulito `flutter run -d linux`; `flutter analyze` 0 error; test **103/103**; `flutter build linux --debug` ok.
 - Numeri ALLINEATI app=Hub: quiz pass → +100 XP, vittoria boss → +100 XP; livelli 0/100/500.
-- US-01 roadmap ad albero con gate reale (sequenziale per capitolo); US-02 quiz 5 domande soglia 80% (=4/5), submit bloccato senza risposta, sblocco auto; US-03 reward pick-1-of-3 con guard 1/topic + inventory; US-04 boss HP10/player HP3, turni quiz ±1 (enraged -2), soglie 75/50/25 live, victory (badge+100XP+sblocco) / defeat (retry senza XP); US-05 autosave per utente + restore + wipe con confirm.
+- US-01 roadmap ad albero con gate reale (sequenziale per capitolo); US-02 quiz 2-5 domande soglia 80%, submit bloccato senza risposta, sblocco auto; US-03 reward pick-1-of-3 con guard 1/topic + inventory; US-04 boss HP10/player HP50, quiz giusta −10 (soglia −20), errata = danno mossa, soglie per-boss live, victory (badge+100XP+sblocco) / defeat (retry senza XP); US-05 autosave per utente + restore + wipe con confirm.
 - Rimosse deviazioni: timer 25s boss, skip-che-sblocca-senza-XP. Livelli unificati su `levelForXp` 0/100/500 (=Hub). Badge locali topic/boss + sezione profilo.
 - Auth v2 `salt$sha256` con migrazione v1 e cancellazione chiare; save per utente (`dart_quest_progress_<u>` / `slay_save_v1_<u>`); playerId Hub `slay_<uuid>` stabile (mai username in chiaro). Hub best-effort offline-first (`FakeEngineClient`), credenziali solo `--dart-define`, mai nel repo. Eventi attivi: solo `quiz_completed`/`claim_reward`/`boss_defeated` (extra disattivati, vedi `06_proposta_engine.md`); `claim_reward` anche dal pick-1-of-3; `boss_defeated` sempre; badge remoti nella card Hub; log successi + stato online reale.
 - Igiene: 139 artifact unstagati (`src/build/`, `src/*/ephemeral`), `pubspec.yaml.backup` rimosso, `.gitignore` esteso. Contratto Hub intatto (game `6a9dbf…`, snake_case, `quiz_completed`/`boss_defeated`, `overall_xp`).

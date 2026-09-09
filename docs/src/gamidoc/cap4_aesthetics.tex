@@ -11,7 +11,7 @@ Dynamics: la progressione \`e doppia ma semplice -- \textbf{mastery}
 (XP, livelli, badge, sblocco nodi) e \textbf{potere} (deck pi\`u forte
 tramite ricompense 1-di-3), cos\`i che studiare meglio significhi
 combattere meglio. La soglia 80\,\% mantiene il flow senza frustrare
-(tentativi illimitati ma penalizzati); il boss a 10 HP contro 3 HP del
+(tentativi illimitati ma penalizzati); il boss a 10 HP contro 50 HP del
 giocatore con quiz-danno a fine turno crea archi di tensione brevi e
 leggibili. Nessun dato di esperienza utente \`e ancora raccolto: si veda
 il Cap.~\ref{g:valutazione}. Riferimenti di design: \textit{Duolingo}
@@ -46,12 +46,13 @@ Capitolo & Boss & Dominio & Meccanica distintiva \\
 Rarit\`a & Esempio & Danno & Effetto bonus \\
 \midrule
 Comune (7) & Strike & 6 & Nessuno \\
-Rara (5) & Bash & 8 & Vulnerable $\times$2 \\
+Rara (5) & Poison Strike & 7 & Poison $\times$3 \\
 Epica (5) & Critical Strike & 12 & Critico 50\,\% $\times$2 \\
 Leggendaria (4) & Apocalypse & 25 & Poison/Burn/Bleed $\times$10 \\
 \bottomrule
 \end{tabular}
-\caption{Rarit\`a reali delle 21 carte (costo in energia 1--4).}
+\caption{Rarit\`a reali delle 21 carte (+10 knowledge epiche = 31 totali;
+costo in energia 0--4).}
 \label{tab:rarita}
 \end{table}
 

@@ -28,7 +28,7 @@ a fine capitolo, \textbf{boss fight}.
 \node[cstep, right=of s] (q) {Quiz 5Q\\soglia 80\%};
 \node[cstep, right=of q] (r) {Ricompensa\\1-di-3};
 \node[cstep, right=of r] (a) {Avanzamento\\sblocco nodo};
-\node[cstep, right=of a] (b) {Boss fight\\10 HP vs 3 HP};
+\node[cstep, right=of a] (b) {Boss fight\\10 HP vs 50 HP};
 \draw[->] (s) -- (q); \draw[->] (q) -- (r); \draw[->] (r) -- (a); \draw[->] (a) -- (b);
 \draw[->, dashed] (b.south) -- ++(0,-10mm) -| (s.south);
 \node[anchor=north, font=\scriptsize\itshape] at ([yshift=-11mm]q.south) {vittoria boss: capitolo successivo, si ritorna a Studio};
@@ -40,10 +40,13 @@ a fine capitolo, \textbf{boss fight}.
 \section{Boss fight}
 Combattimento a turni con numeri reali (stato vero implementato):
 \begin{itemize}
-\item Boss: \textbf{10 HP}; giocatore: \textbf{3 HP}; \textbf{vite totali 3}.
+\item Boss: \textbf{10 HP} (clamp dai valori narrativi 80/120/180/200);
+giocatore: \textbf{50 HP} da \path{PlayerStats}; \textbf{vite totali 3}.
 \item \textbf{Energia 3 per turno} (1 per carta giocata).
-\item A fine turno quiz obbligatorio: risposta giusta = danno al boss
-(quiz-danno), risposta errata = danno al giocatore.
+\item A fine turno quiz obbligatorio: risposta giusta = \textbf{$-$10
+al boss} ($-$20 sulle soglie: chiude il fight in un colpo, dichiarato
+come semplificazione); risposta errata = danno intero della mossa boss
+(8--30, mitigabile con Block).
 \item Vittoria: claim delle ricompense del nodo boss (semplificazione
 dichiarata: tutte quelle del nodo, non 1 sola), sblocco del capitolo
 successivo, badge del boss, \textbf{+100 XP} (come l'Hub). Sconfitta:
@@ -72,7 +75,7 @@ richiede il nodo $n$; capitolo $k{+}1$ richiede il boss del capitolo
 $k$).
 \item Quiz da 5 domande, soglia \textbf{80\,\%}, tentativi illimitati ma
 penalizzati (nessuna XP se non superato).
-\item Boss: 10 HP contro 3 HP, energia 3 per turno (1 per carta), 3 vite
+\item Boss: 10 HP contro 50 HP, energia 3 per turno (1 per carta), 3 vite
 totali; quiz-danno a fine turno.
 \item Una sola ricompensa per topic (scelta 1-di-3); retry boss a HP
 pieni senza XP.
