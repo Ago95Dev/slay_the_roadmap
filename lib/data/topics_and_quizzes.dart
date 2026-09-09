@@ -264,9 +264,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 2,
         explanation: 'The ! operator (bang operator) casts away nullability, telling the compiler you are sure the value is not null.',
       ),
+      QuizQuestion(
+        question: 'What does the late keyword mean in Dart?',
+        options: ['It makes a variable nullable', 'It declares a non-nullable variable initialized later', 'It makes a variable final', 'It disables null safety'],
+        correctAnswer: 1,
+        explanation: 'late promises the compiler a non-nullable variable will be assigned before first use.',
+      ),
+      QuizQuestion(
+        question: 'What does x ??= 5 do in Dart?',
+        options: ['Assigns 5 only if x is null', 'Always assigns 5', 'Throws if x is null', 'Compares x with 5'],
+        correctAnswer: 0,
+        explanation: '??= assigns the right-hand value only when the left side is null.',
+      ),
+      QuizQuestion(
+        question: 'How do you force a named parameter to stay non-nullable?',
+        options: ['void f({int? x})', 'void f({required int x})', 'void f([int x])', 'void f({late int x})'],
+        correctAnswer: 1,
+        explanation: 'required makes a named parameter mandatory, so it can stay non-nullable.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Conditionals Quiz (Chapter 2)
@@ -285,9 +303,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 0,
         explanation: 'The ternary operator takes the form condition ? exprIfTrue : exprIfFalse.',
       ),
+      QuizQuestion(
+        question: 'Which keyword handles the fallback case in a switch statement?',
+        options: ['else', 'default', 'otherwise', 'fallback'],
+        correctAnswer: 1,
+        explanation: 'default runs when no case matches in a switch statement.',
+      ),
+      QuizQuestion(
+        question: 'What must a Dart if condition evaluate to?',
+        options: ['An int', 'A boolean', 'Any object', 'A String'],
+        correctAnswer: 1,
+        explanation: 'Dart if conditions must evaluate to a bool; there are no truthy values.',
+      ),
+      QuizQuestion(
+        question: 'What must a non-empty switch case end with in Dart?',
+        options: ['A semicolon', 'break, return, continue, rethrow or throw', 'A comma', 'Nothing, fallthrough is automatic'],
+        correctAnswer: 1,
+        explanation: 'Non-empty cases in Dart do not fall through; they must end with break, return, throw or similar.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Loops Quiz (Chapter 2)
@@ -306,9 +342,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 3,
         explanation: 'The break statement immediately terminates the loop it is in.',
       ),
+      QuizQuestion(
+        question: 'What does continue do inside a loop?',
+        options: ['Stops the loop entirely', 'Skips to the next iteration', 'Restarts the program', 'Exits the function'],
+        correctAnswer: 1,
+        explanation: 'continue skips the rest of the current iteration and jumps to the next one.',
+      ),
+      QuizQuestion(
+        question: 'When should you use a for-in loop?',
+        options: ['To repeat a fixed number of times with an index', 'To iterate directly over each element of a collection', 'To loop while a condition holds', 'To run the body at least once'],
+        correctAnswer: 1,
+        explanation: 'for-in iterates directly over each element of an Iterable like a List or Set.',
+      ),
+      QuizQuestion(
+        question: 'Which collection method runs a function on each element?',
+        options: ['map()', 'forEach()', 'where()', 'reduce()'],
+        correctAnswer: 1,
+        explanation: 'forEach() executes the given function once per element of the collection.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Collections Quiz (Chapter 2)
@@ -327,9 +381,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 1,
         explanation: 'A Set is an unordered collection of unique items.',
       ),
+      QuizQuestion(
+        question: 'What does the spread operator ... do?',
+        options: ['Multiplies numbers', 'Expands a collection inside another collection', 'Declares a nullable type', 'Casts a List to a Set'],
+        correctAnswer: 1,
+        explanation: 'The spread operator ... inserts all elements of one collection into another.',
+      ),
+      QuizQuestion(
+        question: 'What is collection-if in Dart?',
+        options: ['An if statement inside a collection literal', 'A function that filters lists', 'A loop over a Map', 'A type of Set'],
+        correctAnswer: 0,
+        explanation: 'Collection-if lets you include elements conditionally inside a list, set or map literal.',
+      ),
+      QuizQuestion(
+        question: 'How do you read a value from a Map?',
+        options: ['map[0]', 'map[key]', 'map.get(key)', 'map{key}'],
+        correctAnswer: 1,
+        explanation: 'Use square brackets with the key to read a value from a Map.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Functions Quiz
@@ -471,9 +543,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 1,
         explanation: 'The build() method describes the part of the user interface represented by the widget.',
       ),
+      QuizQuestion(
+        question: 'What does calling setState() do?',
+        options: ['Builds the app from scratch', 'Marks a StatefulWidget dirty so it rebuilds with new state', 'Deletes the widget state', 'Navigates to a new screen'],
+        correctAnswer: 1,
+        explanation: 'setState() notifies Flutter that state changed so the StatefulWidget rebuilds.',
+      ),
+      QuizQuestion(
+        question: 'Which method must a StatefulWidget override?',
+        options: ['build()', 'createState()', 'initState()', 'dispose()'],
+        correctAnswer: 1,
+        explanation: 'StatefulWidgets override createState() to return the mutable State object.',
+      ),
+      QuizQuestion(
+        question: 'What is the BuildContext passed to build()?',
+        options: ['A State object', 'A handle locating the widget within the tree', 'A widget key', 'A Theme object'],
+        correctAnswer: 1,
+        explanation: 'build() receives a BuildContext that locates the widget within the tree.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Layouts Quiz (Chapter 4)
@@ -492,9 +582,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 0,
         explanation: 'The Stack widget allows you to overlap several children in a simple way.',
       ),
+      QuizQuestion(
+        question: 'Which widget arranges its children in a horizontal array?',
+        options: ['Column', 'Row', 'Stack', 'ListView'],
+        correctAnswer: 1,
+        explanation: 'A Row displays its children in a horizontal array.',
+      ),
+      QuizQuestion(
+        question: 'What does Expanded do inside a Row or Column?',
+        options: ['Overlaps children', 'Makes a child fill the remaining space', 'Adds scrolling', 'Centers the parent'],
+        correctAnswer: 1,
+        explanation: 'Expanded forces its child to fill the remaining free space along the main axis.',
+      ),
+      QuizQuestion(
+        question: 'What is the Container widget commonly used for?',
+        options: ['Overlapping widgets', 'Backgrounds, padding, margins and borders', 'Scrolling long lists', 'Loading async data'],
+        correctAnswer: 1,
+        explanation: 'Container is a convenience widget for backgrounds, padding, margins and borders.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // State Management Quiz (Chapter 4)
@@ -513,9 +621,27 @@ final List<Quiz> quizzesData = [
         correctAnswer: 1,
         explanation: 'Lifting state up to the lowest common parent is a fundamental state management pattern.',
       ),
+      QuizQuestion(
+        question: 'What is ephemeral (local) state?',
+        options: ['State shared across the whole app', 'State held by a single widget, like a checkbox value', 'State stored on disk', 'State synced with a server'],
+        correctAnswer: 1,
+        explanation: 'Ephemeral state belongs to one widget, such as the current tab or a checkbox value.',
+      ),
+      QuizQuestion(
+        question: 'What problem does Provider help avoid?',
+        options: ['Writing widgets', 'Prop drilling through many widget layers', 'Using setState at all', 'Writing async code'],
+        correctAnswer: 1,
+        explanation: 'Provider exposes state down the tree so intermediate widgets do not pass it manually.',
+      ),
+      QuizQuestion(
+        question: 'When should you lift state up to a parent?',
+        options: ['When two sibling widgets share the same data', 'When a widget never rebuilds', 'When state is stored in a database', 'When using only StatelessWidgets'],
+        correctAnswer: 0,
+        explanation: 'Lift shared state to the lowest common parent so both siblings read the same source.',
+      ),
     ],
     passingScore: 80,
-    timeLimit: 120,
+    timeLimit: 300,
   ),
 
   // Inheritance & Mixins Quiz
