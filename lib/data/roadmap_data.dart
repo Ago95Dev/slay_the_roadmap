@@ -56,12 +56,12 @@ final List<Boss> bossesData = [
     currentHp: 120,
     icon: '🐉',
     tier: 2,
-    imageAsset: 'assets/images/bosses/logic_lich.png',
+    imageAsset: 'assets/images/bosses/logic_leviathan.jpg',
     backgroundImage: 'assets/images/backgrounds/spire_bg.png',
     openingDialogue: [
-      'Your logic is flawed.',
-      'Let me correct it.',
-      'There is no escape from this loop.'
+      'La tua logica fa acqua da tutte le parti.',
+      'Ho visto cicli infiniti migliori del tuo codice.',
+      'Non c\'è via d\'uscita dal mio loop!'
     ],
     abilities: [
       BossAbility(
@@ -107,12 +107,12 @@ final List<Boss> bossesData = [
     currentHp: 180,
     icon: '👑',
     tier: 3,
-    imageAsset: 'assets/images/bosses/bug_bear.png',
+    imageAsset: 'assets/images/bosses/abstraction_archon.jpg',
     backgroundImage: 'assets/images/backgrounds/spire_bg.png',
     openingDialogue: [
-      'N-n-ull P-p-ointer...',
-      'RRRRAAAH!',
-      'SEGMENTATION FAULT (CORE DUMPED)'
+      'Inchinati di fronte alla mia architettura pulita!',
+      'Le tue classi sono decisamente troppo accoppiate!',
+      'Stai per sperimentare l\'ereditarietà del dolore!'
     ],
     abilities: [
       BossAbility(
@@ -184,6 +184,67 @@ final List<Boss> bossesData = [
       75: 'Summons a copy of last played card',
       50: 'Gains immunity to status effects',
       25: 'All abilities deal +10 damage',
+    },
+  ),
+
+  // Chapter 4 Final Boss
+  Boss(
+    id: 'widget_warlord',
+    name: 'Widget Warlord',
+    description: 'Il signore incontrastato dell\'albero dei widget. Ha nidificato così tante Column e Row che nessuno sa più come allineare al centro la sua fortezza.',
+    maxHp: 200,
+    currentHp: 200,
+    icon: '🎨',
+    tier: 4,
+    imageAsset: 'assets/images/bosses/widget_warlord.jpg',
+    backgroundImage: 'assets/images/backgrounds/spire_bg.png',
+    openingDialogue: [
+      'A RenderFlex overflowed by 9999 pixels!',
+      'Osi davvero mettere uno Scaffold dentro uno Scaffold?!',
+      'La tua UI è fragile come uno StatelessWidget!'
+    ],
+    abilities: [
+      BossAbility(
+        name: 'SetState Crash',
+        description: 'Deal 15 damage. Gain 10 Block.',
+        damage: 15,
+        cooldown: 0,
+      ),
+      BossAbility(
+        name: 'Expanded Flex',
+        description: 'Deal 25 damage. Apply 3 Vulnerable.',
+        damage: 25,
+        cooldown: 3,
+        effects: [
+          CardEffect(
+            type: 'status',
+            value: 3,
+            target: 'enemy',
+            statusEffect: StatusEffect.vulnerable,
+            statusStacks: 3,
+          ),
+        ],
+      ),
+      BossAbility(
+        name: 'Stack Overflow',
+        description: 'Deal 30 damage. Apply 5 Burn.',
+        damage: 30,
+        cooldown: 4,
+        effects: [
+          CardEffect(
+            type: 'status',
+            value: 5,
+            target: 'enemy',
+            statusEffect: StatusEffect.burn,
+            statusStacks: 5,
+          ),
+        ],
+      ),
+    ],
+    thresholdPowers: {
+      75: 'Gains 20 Block every turn',
+      50: 'All attacks apply 2 Vulnerable',
+      25: 'Heals 50 HP immediately',
     },
   ),
 ];
@@ -610,7 +671,7 @@ final List<RoadmapNode> roadmapNodes = [
     chapterId: 'chapter-3',
   ),
 
-  // ============ TIER 11 - FINAL BOSS ============
+  // ============ TIER 11 - CHAPTER 3 BOSS (apre il capitolo 4) ============
   RoadmapNode(
     id: 'node_11_boss',
     type: RoadmapNodeType.boss,
@@ -619,7 +680,7 @@ final List<RoadmapNode> roadmapNodes = [
     description: 'The ultimate Dart challenge',
     tier: 11,
     lane: 1,
-    connections: [],
+    connections: ['node_12_0'],
     unlocked: false,
     completed: false,
     rewards: [
@@ -630,6 +691,84 @@ final List<RoadmapNode> roadmapNodes = [
       RoadmapReward(type: 'gold', amount: 1000),
     ],
     chapterId: 'chapter-3',
+  ),
+
+  // ============ TIER 12 (CHAPTER 4) ============
+  RoadmapNode(
+    id: 'node_12_0',
+    type: RoadmapNodeType.topic,
+    topicId: 'widgets',
+    title: 'Widgets Basics',
+    description: 'Stateless vs Stateful',
+    tier: 12,
+    lane: 1,
+    connections: ['node_13_0'],
+    unlocked: false,
+    completed: false,
+    rewards: [
+      RoadmapReward(type: 'experience', amount: 150),
+    ],
+    chapterId: 'chapter-4',
+  ),
+
+  // ============ TIER 13 ============
+  RoadmapNode(
+    id: 'node_13_0',
+    type: RoadmapNodeType.topic,
+    topicId: 'layouts',
+    title: 'Layouts',
+    description: 'Row, Column, Stack',
+    tier: 13,
+    lane: 0,
+    connections: ['node_14_0'],
+    unlocked: false,
+    completed: false,
+    rewards: [
+      RoadmapReward(type: 'card', rarity: CardRarity.epic),
+      RoadmapReward(type: 'experience', amount: 150),
+    ],
+    chapterId: 'chapter-4',
+  ),
+
+  // ============ TIER 14 ============
+  RoadmapNode(
+    id: 'node_14_0',
+    type: RoadmapNodeType.topic,
+    topicId: 'state-management',
+    title: 'State Management Basics',
+    description: 'Lifting state up',
+    tier: 14,
+    lane: 2,
+    connections: ['node_15_boss'],
+    unlocked: false,
+    completed: false,
+    rewards: [
+      RoadmapReward(type: 'card', rarity: CardRarity.legendary),
+      RoadmapReward(type: 'experience', amount: 200),
+    ],
+    chapterId: 'chapter-4',
+  ),
+
+  // ============ TIER 15 - FINAL BOSS ============
+  RoadmapNode(
+    id: 'node_15_boss',
+    type: RoadmapNodeType.boss,
+    bossId: 'widget_warlord',
+    title: 'Widget Warlord',
+    description: 'Master of UI and Layouts',
+    tier: 15,
+    lane: 1,
+    connections: [],
+    unlocked: false,
+    completed: false,
+    rewards: [
+      RoadmapReward(type: 'card', rarity: CardRarity.legendary),
+      RoadmapReward(type: 'card', rarity: CardRarity.legendary),
+      RoadmapReward(type: 'relic', id: 'flutter_mastery_crown'),
+      RoadmapReward(type: 'experience', amount: 1000),
+      RoadmapReward(type: 'gold', amount: 2000),
+    ],
+    chapterId: 'chapter-4',
   ),
 ];
 

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slay_the_roadmap/data/repositories/boss_repository.dart';
 import 'package:slay_the_roadmap/data/services/shared_preferences_persistence.dart';
+import 'package:slay_the_roadmap/data/topics_and_quizzes.dart';
 import 'package:slay_the_roadmap/domain/models/boss_fight.dart';
 import 'package:slay_the_roadmap/domain/models/player_progress.dart';
 import 'package:slay_the_roadmap/domain/models/quiz.dart' as domain;
@@ -144,10 +145,6 @@ void main() {
     });
 
     testWidgets('topic locked: SnackBar e nessuna navigazione', (tester) async {
-      // Contratto del ramo locked di RoadmapScreen._handleTopicTap
-      // (SnackBar + return senza push). Harness locale su TopicNode reale:
-      // _isTopicUnlocked in RoadmapScreen è oggi demo-always-true, il
-      // cablaggio del lock vero è Fase 2 (il gate provider è testato sopra).
       final topic = Topic(
         id: 'locked-topic',
         title: 'Locked',
@@ -197,10 +194,87 @@ void main() {
       );
       expect(navigated, isFalse);
     });
+
+    test('fail-closed: capitolo sconosciuto resta bloccato', () {
+      final ghost = Topic(
+        id: 'ghost-topic',
+        title: 'Ghost',
+        description: 'desc',
+        chapterId: 'chapter-99',
+        type: TopicType.core,
+        difficulty: 'easy',
+        resources: const [],
+        order: 1,
+      );
+      expect(isTopicUnlockedInChain(ghost, const []), isFalse);
+    });
+
+    test('fail-closed: topic id sconosciuto resta bloccato', () {
+      final ghost = Topic(
+        id: 'ghost-in-ch1',
+        title: 'Ghost',
+        description: 'desc',
+        chapterId: 'chapter-1',
+        type: TopicType.core,
+        difficulty: 'easy',
+        resources: const [],
+        order: 99,
+      );
+      expect(isTopicUnlockedInChain(ghost, const []), isFalse);
+    });
+
+    testWidgets('ch4 locked all\'avvio, unlock dopo boss ch3', (tester) async {
+      final provider = makeProvider();
+      suppressMissingAssets();
+      await pumpIgnoringAssets(
+        tester,
+        withProvider(provider, const RoadmapScreen()),
+      );
+      await tester.pumpAndSettle();
+
+      // Il ListView virtualizza: si scorre in fondo per montare i nodi ch4.
+      Future<void> scrollToCh4() async {
+        await tester.scrollUntilVisible(find.text('WIDGET WARLORD'), 500);
+        await tester.pumpAndSettle();
+      }
+
+      Iterable<TopicNode> ch4Nodes() => tester
+          .widgetList<TopicNode>(find.byType(TopicNode))
+          .where((n) => n.topic.chapterId == 'chapter-4');
+      await scrollToCh4();
+      final before = ch4Nodes().toList();
+      expect(before, isNotEmpty);
+      expect(
+        before.every((n) => n.topic.status == TopicStatus.locked),
+        isTrue,
+        reason: 'tutti i topic ch4 devono essere locked a progress zero',
+      );
+
+      // Boss ch3 sconfitto = ultimo topic ch3 completato (via quiz ≥80%).
+      provider.completeTopicQuiz('classes', 5, true);
+      provider.completeTopicQuiz('inheritance', 5, true);
+      provider.completeTopicQuiz('async', 5, true);
+      await tester.pumpAndSettle();
+      await scrollToCh4();
+
+      final widgets = ch4Nodes().firstWhere((n) => n.topic.id == 'widgets');
+      expect(widgets.topic.status, TopicStatus.inProgress);
+    });
   });
 
   // ---------------------------------------------------------------- US-02
   group('US-02 quiz soglia 80', () {
+    test('dataset: tutti i quiz hanno soglia 80 (coerenza US-02)', () {
+      expect(quizzesData, isNotEmpty);
+      for (final quiz in quizzesData) {
+        expect(
+          quiz.passingScore,
+          80,
+          reason: 'quiz ${quiz.topicId} deve avere soglia 80',
+        );
+      }
+    });
+
     test('soglia 80 su tutte le fonti (constants, entrambi i modelli)', () {
       expect(GameConstants.quizPassingScore, 80);
       expect(

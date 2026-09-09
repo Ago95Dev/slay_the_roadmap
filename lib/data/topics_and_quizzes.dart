@@ -19,7 +19,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'operators',
     title: 'Operators',
-    description: 'Master Dart operators including arithmetic, relational, and logical',
+    description: 'Dart supporta una vasta gamma di operatori per manipolare i dati. Gli operatori aritmetici (+, -, *, /) si usano per la matematica di base, quelli relazionali (==, !=, >, <) per confrontare valori, e quelli logici (&&, ||, !) per combinare condizioni. Inoltre, Dart offre operatori null-aware come "??" per gestire in modo elegante i valori nulli senza crash.',
     chapterId: 'chapter-1',
     type: TopicType.core,
     difficulty: 'easy',
@@ -31,7 +31,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'null-safety',
     title: 'Null Safety',
-    description: 'Understand Dart\'s sound null safety system',
+    description: 'Con la Sound Null Safety, Dart protegge il tuo codice dalle eccezioni di tipo null reference. Di default, le variabili non possono contenere "null". Se hai bisogno che una variabile possa essere nulla, devi dichiararla esplicitamente con un punto interrogativo (es. String?). Questo permette al compilatore di avvisarti in anticipo se c\'è il rischio di un errore a runtime.',
     chapterId: 'chapter-1',
     type: TopicType.elective,
     difficulty: 'medium',
@@ -45,7 +45,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'conditionals',
     title: 'Conditionals',
-    description: 'Learn if-else statements and switch cases',
+    description: 'Le istruzioni condizionali permettono al tuo codice di prendere decisioni dinamiche. Usa "if" e "else" per eseguire blocchi di codice in base a condizioni vere o false. Per scelte multiple basate sul valore di una singola variabile, lo "switch" statement è estremamente leggibile ed efficiente. Ricorda: in Dart le condizioni devono sempre restituire un booleano (true o false).',
     chapterId: 'chapter-2',
     type: TopicType.core,
     difficulty: 'easy',
@@ -57,7 +57,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'loops',
     title: 'Loops',
-    description: 'Master for, while, and do-while loops',
+    description: 'I cicli ti permettono di eseguire ripetutamente un blocco di codice. Il classico ciclo "for" è ideale quando conosci a priori il numero esatto di iterazioni. I cicli "while" e "do-while" si usano invece quando la ripetizione dipende da una condizione valutata dinamicamente. Dart offre anche il "for-in", utilissimo per iterare con facilità su collezioni come array e set.',
     chapterId: 'chapter-2',
     type: TopicType.core,
     difficulty: 'easy',
@@ -69,7 +69,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'functions',
     title: 'Functions',
-    description: 'Create and use functions with parameters and return values',
+    description: 'Le funzioni sono blocchi logici riutilizzabili. In Dart, puoi definire parametri posizionali obbligatori o parametri nominati opzionali (racchiusi tra graffe {}). Questo migliora enormemente la leggibilità del codice. Dart supporta anche le funzioni freccia (=>) per abbreviare operazioni di una sola riga e considera le funzioni come oggetti di prima classe passabili per argomento.',
     chapterId: 'chapter-2',
     type: TopicType.core,
     difficulty: 'medium',
@@ -81,7 +81,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'collections',
     title: 'Collections',
-    description: 'Work with Lists, Sets, and Maps',
+    description: 'Le List, i Set e le Map sono il cuore dei dati aggregati. Le List sono array ordinati; i Set sono collezioni non ordinate di elementi garantiti unici; le Map memorizzano dati come coppie chiave-valore. Dart ha una sintassi modernissima per comporre collezioni: puoi usare lo spread operator (...) per fonderle e costrutti condizionali (collection-if, collection-for) direttamente al loro interno.',
     chapterId: 'chapter-2',
     type: TopicType.core,
     difficulty: 'medium',
@@ -95,7 +95,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'classes',
     title: 'Classes & Objects',
-    description: 'Understand object-oriented programming in Dart',
+    description: 'Dart è pienamente orientato agli oggetti. Una classe è un "progetto" per creare oggetti, in cui puoi definire dati (proprietà) e comportamenti (metodi). Dart supporta i classici costruttori e aggiunge l\'utile concetto di "costruttore nominato" (factory) per restituire istanze personalizzate senza vincoli rigorosi di allocazione di memoria. Quasi ogni cosa è un oggetto!',
     chapterId: 'chapter-3',
     type: TopicType.core,
     difficulty: 'medium',
@@ -107,7 +107,7 @@ final List<Topic> topicsData = [
   Topic(
     id: 'inheritance',
     title: 'Inheritance & Mixins',
-    description: 'Learn about class inheritance and mixins',
+    description: 'Tramite l\'ereditarietà (extends), puoi costruire una nuova classe espandendo le funzionalità di una già esistente. Sebbene Dart supporti solo l\'ereditarietà singola stretta, supera questo limite tramite i "mixin". Usando la parola chiave "with", un mixin ti permette di "iniettare" blocchi di funzionalità in diverse gerarchie di classi senza alcun problema di collisione.',
     chapterId: 'chapter-3',
     type: TopicType.core,
     difficulty: 'hard',
@@ -119,12 +119,50 @@ final List<Topic> topicsData = [
   Topic(
     id: 'async',
     title: 'Async & Futures',
-    description: 'Master asynchronous programming with Future and async/await',
+    description: 'La programmazione asincrona ti permette di eseguire operazioni lunghe (come query su database o richieste API) senza bloccare l\'intera interfaccia utente. In Dart, un "Future" rappresenta un valore non ancora disponibile. Grazie alle comodissime parole chiave "async" e "await", puoi scrivere il tuo codice asincrono come se fosse lineare, rendendolo estremamente leggibile e pulito.',
     chapterId: 'chapter-3',
     type: TopicType.elective,
     difficulty: 'hard',
     resources: [
       'https://dart.dev/codelabs/async-await',
+    ],
+    order: 3,
+  ),
+
+  // CHAPTER 4: Flutter Basics
+  Topic(
+    id: 'widgets',
+    title: 'Widgets Basics',
+    description: 'In Flutter, quasi tutto è un Widget! Un widget è la dichiarazione descrittiva di una porzione dell\'UI. Gli "StatelessWidget" sono leggeri e immutabili: una volta disegnati restano tali. Gli "StatefulWidget", invece, ospitano uno stato (veri e propri dati in memoria) in grado di evolversi. Chiamando "setState()", puoi dire a Flutter di ridisegnare quello specifico widget con i nuovi dati.',
+    chapterId: 'chapter-4',
+    type: TopicType.core,
+    difficulty: 'medium',
+    resources: [
+      'https://docs.flutter.dev/ui/widgets/basics',
+    ],
+    order: 1,
+  ),
+  Topic(
+    id: 'layouts',
+    title: 'Layouts',
+    description: 'Costruire un\'interfaccia in Flutter significa annidare sapientemente i widget di Layout. Usa "Row" per impilare orizzontalmente e "Column" verticalmente; puoi controllare come occupano lo spazio rimanente usando i widget "Expanded". Se devi posizionare elementi uno sopra l\'altro (es. un testo su un\'immagine), affidati a "Stack". Il "Container" è invece perfetto per sfondi, bordi e spaziature.',
+    chapterId: 'chapter-4',
+    type: TopicType.core,
+    difficulty: 'medium',
+    resources: [
+      'https://docs.flutter.dev/ui/layout',
+    ],
+    order: 2,
+  ),
+  Topic(
+    id: 'state-management',
+    title: 'State Management Basics',
+    description: 'Per app articolate, i dati devono spesso viaggiare tra schermi e componenti diversi. Inizierai imparando a sollevare lo stato ("lifting state up"): spostare una variabile comune dal widget figlio al widget genitore condiviso. Man mano che l\'albero cresce, passerai a soluzioni più solide (es. Provider, Riverpod o BLoC) che ti evitano di dover passare i parametri per decine di livelli d\'interfaccia.',
+    chapterId: 'chapter-4',
+    type: TopicType.core,
+    difficulty: 'hard',
+    resources: [
+      'https://docs.flutter.dev/data-and-backend/state-mgmt/intro',
     ],
     order: 3,
   ),
@@ -208,6 +246,90 @@ final List<Quiz> quizzesData = [
     ],
     passingScore: 80,
     timeLimit: 300,
+  ),
+
+  // Null Safety Quiz (Chapter 1)
+  Quiz(
+    topicId: 'null-safety',
+    questions: [
+      QuizQuestion(
+        question: 'Which symbol is used to indicate a nullable type in Dart?',
+        options: ['!', '?', '*', '&'],
+        correctAnswer: 1,
+        explanation: 'Appending ? to a type indicates that a variable can be null (e.g., int?).',
+      ),
+      QuizQuestion(
+        question: 'What does the ! operator do in null safety?',
+        options: ['Casts to null', 'Checks if null', 'Asserts that a value is not null', 'Makes a variable nullable'],
+        correctAnswer: 2,
+        explanation: 'The ! operator (bang operator) casts away nullability, telling the compiler you are sure the value is not null.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
+  ),
+
+  // Conditionals Quiz (Chapter 2)
+  Quiz(
+    topicId: 'conditionals',
+    questions: [
+      QuizQuestion(
+        question: 'Which statement is used to execute code if a condition is true?',
+        options: ['for', 'if', 'switch', 'while'],
+        correctAnswer: 1,
+        explanation: 'The if statement evaluates a condition and executes the block if it is true.',
+      ),
+      QuizQuestion(
+        question: 'What is the syntax for a ternary operator?',
+        options: ['condition ? true_expr : false_expr', 'condition : true_expr ? false_expr', 'if condition ? true : false', 'condition => true : false'],
+        correctAnswer: 0,
+        explanation: 'The ternary operator takes the form condition ? exprIfTrue : exprIfFalse.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
+  ),
+
+  // Loops Quiz (Chapter 2)
+  Quiz(
+    topicId: 'loops',
+    questions: [
+      QuizQuestion(
+        question: 'Which loop is guaranteed to execute at least once?',
+        options: ['for loop', 'while loop', 'do-while loop', 'for-in loop'],
+        correctAnswer: 2,
+        explanation: 'A do-while loop executes the code block first, then checks the condition.',
+      ),
+      QuizQuestion(
+        question: 'Which keyword stops the execution of a loop entirely?',
+        options: ['continue', 'return', 'stop', 'break'],
+        correctAnswer: 3,
+        explanation: 'The break statement immediately terminates the loop it is in.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
+  ),
+
+  // Collections Quiz (Chapter 2)
+  Quiz(
+    topicId: 'collections',
+    questions: [
+      QuizQuestion(
+        question: 'Which collection type stores key-value pairs?',
+        options: ['List', 'Set', 'Map', 'Array'],
+        correctAnswer: 2,
+        explanation: 'A Map in Dart is an object that associates keys and values.',
+      ),
+      QuizQuestion(
+        question: 'Which collection guarantees that all elements are unique?',
+        options: ['List', 'Set', 'Map', 'Iterable'],
+        correctAnswer: 1,
+        explanation: 'A Set is an unordered collection of unique items.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
   ),
 
   // Functions Quiz
@@ -331,6 +453,69 @@ final List<Quiz> quizzesData = [
     ],
     passingScore: 80,
     timeLimit: 300,
+  ),
+
+  // Widgets Basics Quiz (Chapter 4)
+  Quiz(
+    topicId: 'widgets',
+    questions: [
+      QuizQuestion(
+        question: 'Which widget is used when the UI does not change dynamically?',
+        options: ['StatefulWidget', 'StatelessWidget', 'InheritedWidget', 'DynamicWidget'],
+        correctAnswer: 1,
+        explanation: 'StatelessWidgets are immutable and their UI cannot change dynamically once built.',
+      ),
+      QuizQuestion(
+        question: 'What method must be overridden in a StatelessWidget?',
+        options: ['createState()', 'build()', 'init()', 'render()'],
+        correctAnswer: 1,
+        explanation: 'The build() method describes the part of the user interface represented by the widget.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
+  ),
+
+  // Layouts Quiz (Chapter 4)
+  Quiz(
+    topicId: 'layouts',
+    questions: [
+      QuizQuestion(
+        question: 'Which widget arranges its children in a vertical array?',
+        options: ['Row', 'Stack', 'Column', 'Wrap'],
+        correctAnswer: 2,
+        explanation: 'A Column widget displays its children in a vertical array.',
+      ),
+      QuizQuestion(
+        question: 'How do you overlap widgets in Flutter?',
+        options: ['Using a Stack', 'Using a Column with negative margins', 'Using a Row', 'Using a GridView'],
+        correctAnswer: 0,
+        explanation: 'The Stack widget allows you to overlap several children in a simple way.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
+  ),
+
+  // State Management Quiz (Chapter 4)
+  Quiz(
+    topicId: 'state-management',
+    questions: [
+      QuizQuestion(
+        question: 'Which method tells the framework to redraw a StatefulWidget?',
+        options: ['refresh()', 'update()', 'setState()', 'redraw()'],
+        correctAnswer: 2,
+        explanation: 'Calling setState() notifies the framework that the internal state of the widget has changed.',
+      ),
+      QuizQuestion(
+        question: 'Where should you hold the state that is shared across multiple widgets?',
+        options: ['In a global variable', 'In the lowest common parent widget', 'In a StatelessWidget', 'In the runApp method'],
+        correctAnswer: 1,
+        explanation: 'Lifting state up to the lowest common parent is a fundamental state management pattern.',
+      ),
+    ],
+    passingScore: 80,
+    timeLimit: 120,
   ),
 ];
 

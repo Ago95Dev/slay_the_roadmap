@@ -96,6 +96,14 @@ final List<Relic> relicsData = [
     effect: 'cost-reduce-1',
     icon: 'memory',
   ),
+  Relic(
+    id: 'flutter_mastery_crown',
+    name: 'Flutter Mastery Crown',
+    description: 'At the start of your turn, heal 1 HP',
+    rarity: CardRarity.legendary,
+    effect: 'heal-1-turn',
+    icon: 'workspace_premium',
+  ),
 ];
 
 final Map<String, Map<String, dynamic>> bossThresholdPowers = {

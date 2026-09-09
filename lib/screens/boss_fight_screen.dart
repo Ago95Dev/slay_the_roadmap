@@ -21,6 +21,12 @@ class BossFightScreen extends StatefulWidget {
 
 enum TurnPhase { player, bossIntro, bossQuiz, bossAttack, victory, defeat, thresholdQuiz }
 
+/// HP effettivi del fight (numeri consegna US-04: boss 10 HP).
+/// I dati roadmap dichiarano HP narrativi di progressione (80/120/180/200,
+/// tier 4 = 200 per `widget_warlord`): il fight live li mappa a 10 con clamp,
+/// senza toccare i dati. Il player resta a 3 HP (modello `BossFight`).
+int resolveBossFightHp(Boss boss) => boss.maxHp.clamp(1, 10).toInt();
+
 class _BossFightScreenState extends State<BossFightScreen> with TickerProviderStateMixin {
   late Boss _boss;
   TurnPhase _phase = TurnPhase.player;
@@ -89,13 +95,16 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
       return;
     }
 
-    // Clone boss data to avoid modifying static data
+    // Clone boss data to avoid modifying static data.
+    // Numeri consegna: il fight resta a 10 HP anche se i dati roadmap
+    // dichiarano HP narrativi (cfr. resolveBossFightHp).
+    final fightHp = resolveBossFightHp(bossData);
     _boss = Boss(
       id: bossData.id,
       name: bossData.name,
       description: bossData.description,
-      maxHp: bossData.maxHp,
-      currentHp: bossData.maxHp,
+      maxHp: fightHp,
+      currentHp: fightHp,
       abilities: bossData.abilities,
       thresholdPowers: bossData.thresholdPowers,
       icon: bossData.icon,
@@ -404,6 +413,9 @@ class _BossFightScreenState extends State<BossFightScreen> with TickerProviderSt
     setState(() {
       _phase = TurnPhase.bossAttack;
     });
+    
+    // Boss attack animation
+    _shakeController.forward(from: 0);
     
     Future.delayed(const Duration(milliseconds: 500), () {
       _takeDamage(_bossIntent?.damage ?? 5);

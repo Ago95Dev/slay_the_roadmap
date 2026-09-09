@@ -8,6 +8,34 @@ import '../widgets/topic_node.dart';
 import 'topic_detail_screen.dart';
 import 'boss_fight_screen.dart';
 
+/// Gate capitoli/topic (Fase 2: gate reale, prima demo-always-true nota Fase 1).
+/// Sblocco solo via quiz passato ≥80% (skip non sblocca, vedi GameProvider).
+/// Fail-closed: capitoli o topic con indice sconosciuto restano BLOCCATI.
+/// Catena: ch1 → ch2 → ch3 → ARCHON → ch4 → WARLORD.
+bool isTopicUnlockedInChain(Topic topic, List<String> completedTopics) {
+  final siblings = topicsData
+      .where((t) => t.chapterId == topic.chapterId)
+      .toList()
+    ..sort((a, b) => a.order.compareTo(b.order));
+  final idx = siblings.indexWhere((t) => t.id == topic.id);
+  // Topic con indice sconosciuto: bloccato (fail-closed, mai bypass).
+  if (idx < 0) return false;
+  if (idx > 0) return completedTopics.contains(siblings[idx - 1].id);
+  // Primo del capitolo: capitolo 1 sempre aperto, gli altri richiedono
+  // l'ultimo topic del capitolo precedente completato.
+  const chapterOrder = ['chapter-1', 'chapter-2', 'chapter-3', 'chapter-4'];
+  final ci = chapterOrder.indexOf(topic.chapterId);
+  // Capitolo sconosciuto: bloccato (fail-closed, mai bypass).
+  if (ci < 0) return false;
+  if (ci == 0) return true;
+  final prev = topicsData
+      .where((t) => t.chapterId == chapterOrder[ci - 1])
+      .toList()
+    ..sort((a, b) => a.order.compareTo(b.order));
+  if (prev.isEmpty) return true;
+  return completedTopics.contains(prev.last.id);
+}
+
 class RoadmapScreen extends StatefulWidget {
   const RoadmapScreen({super.key});
 
@@ -29,6 +57,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
       'chapter-1': {'title': 'BASICS', 'topics': <Topic>[]},
       'chapter-2': {'title': 'CONTROL FLOW', 'topics': <Topic>[]},
       'chapter-3': {'title': 'OOP', 'topics': <Topic>[]},
+      'chapter-4': {'title': 'FLUTTER BASICS', 'topics': <Topic>[]},
     };
 
     // Populate chapters with topics
@@ -76,11 +105,19 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               children: [
                 _buildChapterNode(context, 'chapter-1', chapters['chapter-1']!),
                 _buildConnectorLine(),
+                _buildMidBossNode('SYNTAX SENTINEL', 'syntax_sentinel'),
+                _buildConnectorLine(),
                 _buildChapterNode(context, 'chapter-2', chapters['chapter-2']!),
                 _buildConnectorLine(),
-                _buildMidBossNode('BASIC TEST'),
+                _buildMidBossNode('LOGIC LEVIATHAN', 'logic_leviathan'),
                 _buildConnectorLine(),
                 _buildChapterNode(context, 'chapter-3', chapters['chapter-3']!),
+                _buildConnectorLine(),
+                _buildMidBossNode('ABSTRACTION ARCHON', 'abstraction_archon'),
+                _buildConnectorLine(),
+                _buildChapterNode(context, 'chapter-4', chapters['chapter-4']!),
+                _buildConnectorLine(),
+                _buildMidBossNode('WIDGET WARLORD', 'widget_warlord'),
               ],
             ),
           ),
@@ -89,27 +126,8 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     );
   }
 
-  bool _isTopicUnlocked(Topic topic, List<String> completedTopics) {
-    // Fase 2: gate reale (prima demo-always-true, nota Fase 1). Sblocco solo
-    // via quiz passato ≥80% (skip non sblocca, vedi GameProvider).
-    final siblings = topicsData
-        .where((t) => t.chapterId == topic.chapterId)
-        .toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
-    final idx = siblings.indexWhere((t) => t.id == topic.id);
-    if (idx > 0) return completedTopics.contains(siblings[idx - 1].id);
-    // Primo del capitolo: capitolo 1 sempre aperto, gli altri richiedono
-    // l'ultimo topic del capitolo precedente completato.
-    const chapterOrder = ['chapter-1', 'chapter-2', 'chapter-3'];
-    final ci = chapterOrder.indexOf(topic.chapterId);
-    if (ci <= 0) return true;
-    final prev = topicsData
-        .where((t) => t.chapterId == chapterOrder[ci - 1])
-        .toList()
-      ..sort((a, b) => a.order.compareTo(b.order));
-    if (prev.isEmpty) return true;
-    return completedTopics.contains(prev.last.id);
-  }
+  bool _isTopicUnlocked(Topic topic, List<String> completedTopics) =>
+      isTopicUnlockedInChain(topic, completedTopics);
 
   Widget _buildChapterNode(
     BuildContext context,
@@ -220,7 +238,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
     );
   }
 
-  Widget _buildMidBossNode(String title) {
+  Widget _buildMidBossNode(String title, String bossId) {
     return Column(
       children: [
         Material(
@@ -230,7 +248,7 @@ class _RoadmapScreenState extends State<RoadmapScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const BossFightScreen(bossId: 'syntax_sentinel'),
+                  builder: (_) => BossFightScreen(bossId: bossId),
                 ),
               );
             },

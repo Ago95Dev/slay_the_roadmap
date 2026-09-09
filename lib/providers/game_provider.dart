@@ -1131,19 +1131,16 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  // Get random questions from completed topics for Boss Fight
+  // Get random questions from all topics for Boss Fight
   List<QuizQuestion> getRandomQuestionsFromTopics(int count) {
     final allQuestions = <QuizQuestion>[];
-    
-    // Collect questions from all completed topics (or all topics for now if few completed)
-    // Ideally we filter by _completedTopics, but for demo we might want more variety
+
+    // Pool da TUTTI i capitoli/topic del dataset live (boss ch3-4 inclusi):
+    // pescare solo da ch1-2 darebbe ai boss avanzati domande sbagliate.
     for (var topic in topicsData) {
-      // Only include topics from chapters 1 & 2 for the Basic Test boss
-      if (['chapter-1', 'chapter-2'].contains(topic.chapterId)) {
-        final quiz = getQuizByTopicId(topic.id);
-        if (quiz != null) {
-          allQuestions.addAll(quiz.questions);
-        }
+      final quiz = getQuizByTopicId(topic.id);
+      if (quiz != null) {
+        allQuestions.addAll(quiz.questions);
       }
     }
     
