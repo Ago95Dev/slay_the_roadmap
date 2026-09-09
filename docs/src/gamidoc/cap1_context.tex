@@ -23,12 +23,22 @@ streak, save) sia sull'Hub (XP, badge, livelli remoti).
 \end{itemize}
 
 \section{Target users}
-Studenti di programmazione con basi deboli o nulle di tecnologie Web, che
-devono orientarsi prima di scrivere codice. Non si assume conoscenza di
-HTTP, DNS, JSON, DOM o git: i testi dei topic partono dalle idee e i link
-di approfondimento (MDN, Cloudflare, web.dev, roadmap.sh) sono opzionali.
-Il gioco \`e pensato per sessioni brevi (pochi minuti per topic) e per
-essere rigiocabile da zero (New Run).
+Studenti al primo approccio alle tecnologie Web (tipicamente primo anno
+di indirizzo informatico, 18--22 anni), con basi deboli o nulle di
+HTTP, DNS, JSON, DOM o git: i testi dei topic partono dalle idee e i
+link di approfondimento (MDN, Cloudflare, web.dev, roadmap.sh) sono
+opzionali. Esclusi di proposito: sviluppatori esperti (nessuna sfida) e
+pubblico generalista (contenuti troppo specifici). Il gioco \`e pensato
+per sessioni brevi (pochi minuti per topic) e per essere rigiocabile da
+zero (New Run).
+
+\section{Perch\'e faticano (contesto del problema)}
+Chi inizia dal Web parte di solito dalla sintassi (tag, selettori,
+framework) senza modelli mentali: a cosa serve una richiesta, dove
+vivono i dati, cosa succede al deploy. Il risultato \`e copiare codice
+senza capirlo e bloccarsi al primo errore. La campagna ``Web --
+fondamenta'' inverte l'ordine: prima perch\'e/come/cosa-succede-se,
+poi la sintassi (fuori scope di questo prototipo).
 
 \section{Domain}
 Ambito applicativo: sviluppo software e tecnologie Web, con allineamento
@@ -48,6 +58,20 @@ deck in funzione del boss;
 \item \textbf{Problem solving adattivo}: quiz del boss pescati dai topic
 del capitolo, passive diverse per boss.
 \end{itemize}
+
+\section{Comportamenti scoraggiati e anti-abuso}
+\begin{itemize}
+\item \textbf{Spam di tentativi}: i retry non danno XP (quiz) o danno
+retry senza XP (boss); lo skip-che-sbloccava \`e stato rimosso;
+\item \textbf{Doppie ricompense}: guard 1/topic con messaggio, anche via
+re-claim;
+\item \textbf{Farming XP}: XP solo a superamento (quiz 80\,\%) o vittoria;
+nessun XP per sconfitte, visualizzazioni o login ripetuti (il daily \`e
+una-tantum);
+\item \textbf{Override manuale}: la voce ``Done'' resta come scelta
+esplicita dichiarata, non come scorciatoia nascosta.
+\end{itemize}
+Il sistema non punisce mai: nessuna perdita di progressi, carte o livelli.
 
 \section{Tecnologia}
 Flutter con un'unica codebase (sviluppo e verifica su Linux desktop,
