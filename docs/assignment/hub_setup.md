@@ -6,11 +6,11 @@
 
 ## Risorse create (2026-09-06, via API + validate)
 
-- Actions: `quiz_completed`, `claim_reward`, `boss_defeated`
+- Actions: `quiz_completed`, `claim_reward`, `boss_defeated` + (scelta B, 2026-09-09, via API): `topic_completed`, `resource_viewed`, `dungeon_cleared`, `daily_login`
 - PointConcept: `xp` (all-time, senza periods)
-- Level: `experience` su `xp` — Level 1: 0, Level 2: 100, Level 3: 500 (stesse soglie app F6)
+- Level: `experience` su `xp` — DA PORTARE a 10 livelli da console (0/100/500/1000/1600/2300/3100/4000/5000/6100)
 - Badge collection: `slay_badges` (visible, creata vuota; i badge li assegnano le rule)
-- Rules (validate OK, create): `quiz_xp`, `topic_badge`, `boss_badge` (salience -10 per le badge)
+- Rules (validate OK, create): `quiz_xp`, `topic_badge`, `boss_badge` (salience -10 per le badge) + (scelta B, via API): `topic_xp`, `resource_xp`, `dungeon_xp`, `daily_xp`, `claim_xp` (tutte mappano `data.xp_amount`, guard amount>0)
 
 ## Contratto eventi (l'app deve inviare ESATTAMENTE così)
 

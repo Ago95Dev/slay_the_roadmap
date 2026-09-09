@@ -48,11 +48,13 @@ Game \textbf{Slay The Code} su console Hub
 (\path{gameId} = \path{6a9dbf66cc89679981fe7893}, owner \path{slay}), API
 \path{gamification-api.createlab-univaq.it/api/v1}~\cite{hub}.
 Risorse: action \path{quiz_completed}, \path{claim_reward},
-\path{boss_defeated}; Point \path{xp}; Level \path{experience} su
+\path{boss_defeated}, \path{topic_completed}, \path{resource_viewed},
+\path{dungeon_cleared}, \path{daily_login} (scelta B: ogni XP locale ha
+la sua action); Point \path{xp}; Level \path{experience} su
 \path{xp} (10 livelli: 0/100/500/1000/1600/2300/3100/4000/5000/6100); collezione badge \path{slay_badges};
 rule \path{quiz_xp}, \path{topic_badge}, \path{boss_badge}.
-Eventi inviati best-effort dai view-model di quiz, reward e boss, solo a
-quiz superato (soglia 80\,\% verificata in app), con \path{data} sempre
+Eventi inviati best-effort dai punti di assegnazione XP (allowlist di 7
+action), con \path{data} sempre
 presente in snake\_case (es.\ \path{xp_amount}, \path{badge}). Solo le 3
 action di contratto partono (allowlist); gli altri eventi locali non
 vengono inviati. Il \path{claim_reward} parte anche dal pick-1-of-3 e il

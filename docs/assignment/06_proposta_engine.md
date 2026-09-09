@@ -1,4 +1,9 @@
-# 06 — Proposta engine (future work post-consegna, NON implementare ora)
+# 06 — Proposta engine (stato: PARZIALMENTE IMPLEMENTATA il 2026-09-09)
+
+Implementati come action+rule vere (scelta B): `topic_completed`,
+`resource_viewed`, `dungeon_cleared`, `daily_login` (vedi hub_setup.md).
+Restano future work: `skill_unlocked`, `relic_acquired` (solo badge,
+0 XP) — sotto la proposta originaria.
 
 Il game condiviso `6a9dbf66cc89679981fe7893` ("Slay The Code") oggi ha 3 action.
 L'app invia(va) anche questi eventi, oggi bloccati lato app (H1) con log. Se dopo
