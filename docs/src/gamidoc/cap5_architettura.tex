@@ -11,11 +11,11 @@ ricompensa, boss) con view-model Provider; un'unica fonte di verit\`a
 locale per il progresso (\path{PlayerProgress}: XP, livello, vite,
 streak, deck, sblocchi).
 \item \textbf{Repository}: sei repository con responsabilit\`a singola ---
-roadmap (seed: 3 root + 9 sub, prerequisiti a catena tramite
-\path{bossId}/\path{requiredBossId}), testi dei topic (12),
-quiz (12 da 5 domande), boss (nomi, lore, quiz adattivi del capitolo),
-ricompense (scelta 1-di-3, limite 1/topic) e persistenza
-(save locale \path{Save v1} su SharedPreferences).
+roadmap (4 capitoli, 29 nodi, prerequisiti a catena tramite
+\path{bossId}/\path{requiredBossId}), testi dei topic, quiz (11 da 5
+domande), boss (nomi, mosse, soglie, quiz del capitolo), ricompense
+(scelta 1-di-3, limite 1/topic) e persistenza (save per utente
+\path{Save v1} su SharedPreferences).
 \item \textbf{Engine}: logica di combattimento (HP 10 vs 3, energia 3,
 quiz-danno) e regole di sblocco, XP, streak e livelli isolate dai widget.
 \item \textbf{Hub client con fallback}: \path{EngineClient} reale e
