@@ -104,6 +104,65 @@ final List<Relic> relicsData = [
     effect: 'heal-1-turn',
     icon: 'workspace_premium',
   ),
+
+  // Roadmap reward relics (previously dangling ids in roadmap_data).
+  // Effects reuse only pre-existing effect strings; numbers stay in scale.
+  Relic(
+    id: 'thinking_cap',
+    name: 'Thinking Cap',
+    description: 'Scry 2 at the start of each combat',
+    rarity: CardRarity.common,
+    effect: 'scry-2-start',
+    icon: 'visibility',
+  ),
+  Relic(
+    id: 'debugger_charm',
+    name: 'Debugger Charm',
+    description: 'Your defense cards block 2 additional damage',
+    rarity: CardRarity.rare,
+    effect: 'defense-plus-2',
+    icon: 'restore',
+  ),
+  Relic(
+    id: 'syntax_crown',
+    name: 'Syntax Crown',
+    description: 'Whenever you answer correctly, gain 3 Armor',
+    rarity: CardRarity.epic,
+    effect: 'armor-on-correct',
+    icon: 'auto_awesome',
+  ),
+  Relic(
+    id: 'recursive_relic',
+    name: 'Recursive Relic',
+    description: 'Once per combat, return a card from your discard pile to your hand',
+    rarity: CardRarity.rare,
+    effect: 'resurrect-once',
+    icon: 'storage',
+  ),
+  Relic(
+    id: 'ancient_tome',
+    name: 'Ancient Tome',
+    description: 'Whenever you play 3 cards in a turn, draw 1 card',
+    rarity: CardRarity.rare,
+    effect: 'draw-after-3',
+    icon: 'menu_book',
+  ),
+  Relic(
+    id: 'logic_orb',
+    name: 'Logic Orb',
+    description: 'At the start of your turn, heal 2 HP',
+    rarity: CardRarity.epic,
+    effect: 'heal-2-turn',
+    icon: 'memory',
+  ),
+  Relic(
+    id: 'polymorphic_gem',
+    name: 'Polymorphic Gem',
+    description: 'Draw 2 additional cards at the start of each turn',
+    rarity: CardRarity.legendary,
+    effect: 'draw-2-start',
+    icon: 'layers',
+  ),
 ];
 
 final Map<String, Map<String, dynamic>> bossThresholdPowers = {
